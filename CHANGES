@@ -1,4 +1,11 @@
-Wed Mar 19 18:01:05 MSK 2003
+Thu Mar 20 18:43:55 MSD 2003
+
+Changes to version 3.3.3
+------------------------
+
+- examples/ converted to use `env' for interpreter invocation
+
+Wed Mar 19 18:01:05 MSD 2003
 
 Changes to version 3.3.2
 ------------------------
