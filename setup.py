@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name="pysnmp",
-      version="3.3.4",
+      version="3.3.5",
       description="Python SNMP Toolkit",
       author="Ilya Etingof",
       author_email="ilya@glas.net ",
@@ -14,7 +14,8 @@ setup(name="pysnmp",
                    'pysnmp.asn1.encoding.ber',
                    'pysnmp.proto',
                    'pysnmp.proto.api',
-                   'pysnmp.proto.api.generic',                   
+                   'pysnmp.proto.api.alpha',
+                   'pysnmp.proto.api.generic',
                    'pysnmp.proto.cli',
                    'pysnmp.proto.cli.ucd',                   
                    'pysnmp.mapping',
