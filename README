@@ -20,7 +20,7 @@ FEATURES
 * Seamless SNMP manager and agent roles support
 * Both synchronous and asynchronous IO API support
 * Fully documented API with many examples
-* Objective ASN.1 data types implementation
+* Generic, objective ASN.1 framework
 * MIB I/II data types and macros implementation
 * 100% Python, works with Python 1.x and later
 * MT-safe
