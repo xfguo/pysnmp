@@ -1,3 +1,43 @@
+Thu Nov 14 18:09:53 MSD 2002
+
+Changes to version 3.2.2
+------------------------
+
+- Bugfix to default value for 'dst' address parameter in
+  mapping/udp/role.py and mapping/udp/asynrole.py.
+- Compatibility bugfix to asynrole.manager.handle_error() and
+  asynrole.agent.handle_error() parameters list. Affected the
+  mapping/udp/asynrole.py and examples/asyncmgr.py scripts.
+- Bugfix to mapping/udp/bulkrole.py transport-level exceptions
+  handling.
+- Command line parameters support implemented to the
+  examples/asyncmgr.py script.
+
+Thu Oct 31 08:32:49 MSD 2002
+
+Changes to version 3.2.1
+------------------------
+
+- asn1.base.ChoiceTypeAsn1Object.get() method added for recursively
+  fetching enclosed scalar terminals whenever possible.
+- examples/*.py scripts updated to make use of the above feature
+  (by means of -R command line swich).
+
+Tue Oct 15 23:53:32 MSD 2002
+
+Changes to version 3.1.3
+------------------------
+
+- A few bugs fixed in example/snmptrap.py and example/snmpset.py
+
+Sat Oct 12 10:43:46 MSD 2002
+
+Changes to version 3.1.2
+------------------------
+
+- Incorrect params to role.agent() constructor in examples/snmptrapd.py fixed
+- The __all__ list memebers in rfc1155.py and rfc1902.py updated
+
 Fri Oct 11 18:34:31 MSD 2002
 
 Changes to version 3.1.1
