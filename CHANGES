@@ -1,9 +1,25 @@
-Mon Apr 21 19:38:57 MSD 2003
+Thu Jun 07 19:23:33 MSD 2003
+
+Changes to version 3.3.4
+------------------------
+
+- Raw values access interface of asn1.base.SimpleAsn1Object reworked for
+  better performance
+- initialValue of asn1.base.SimpleAsn1Object class objects may now be
+  defined as method
+- Bugfix to asn1.base.SimpleAsn1Object value assignment -- copy mutable
+  values rather then store a reference to the passed one
+- The tree-making facility of asn1.univ.ObjectIdentifier class reworked
+  for better performance and clearer protocol
+- Bugfix initial value assignment of proto.rfc1157.RequestId & 
+  proto.rfc1905.RequestId classes to get much less repetitive values
+
+Thu Mar 20 18:43:55 MSD 2003
 
 Changes to version 3.3.3
 ------------------------
 
-- The constraints methods set of asn1.base.Asn1Object converted to 
+- The constraints methods set of asn1.base.Asn1Object converted to
   a set of flags accompanied by a single constraints checking
   method for better efficiency.
 - The asn1.base.ChoiceTypeAsn1Object.get() method converted to
