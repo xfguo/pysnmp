@@ -1,3 +1,29 @@
+Thu Feb  5 18:35:38 MSK 2004
+
+Changes to version 3.4.1
+------------------------
+
+- The examples/* tools reworked to act more like examples while full-blown
+  SNMP tools (along with their CLI and friends) moved to a stand-alone package
+  which is pysnmp-apps available from PySNMP homepage.
+- Components caching implemented at almost all asn1.base.Asn1Object
+  deviratives what aims at significant performance improvement. What is
+  related to this change is that various structured ASN.1 objects might not
+  now return newly created inner components as well as not copying (but
+  borrowing) passed objects on assignment.
+- The pysnmp.mapping.udp.bulkrole module dropped as it looks somewhat
+  redundant to asynrole functionality.
+- Alpha API to pysnmp.proto objects is now the API of choice. Besides
+  other improvements, this package introduces a protocol version-neutral
+  API. Previous Generic API (pysnmp.proto.api.generic) remains for
+  compatibility.
+- Code cleaned up to better comply with coding standards. Particularily,
+  some symbols changed their case, though, aliases set for compatibility.
+- The suggested way to process SNMP responses at role.Agent has been changed
+  to perform complete response processing at the callback function (cbFun).
+  That's why the sendAndReceive() method of role.Agent class now accepts cbCtx
+  parameter.
+
 Thu Oct 30 18:43:44 MSK 2003
 
 Changes to version 3.3.6
