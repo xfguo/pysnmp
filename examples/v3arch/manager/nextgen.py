@@ -1,10 +1,10 @@
 """Command Generator Application (GETNEXT)"""
 from pysnmp.proto.rfc3412 import MsgAndPduDispatcher, AbstractApplication
-from pysnmp.proto.api import alpha
+from pysnmp.proto import omni
 
 # PDU version to use
-versionId = alpha.protoVersionId1
-ver = alpha.protoVersions[versionId]
+versionId = omni.protoVersionId1
+ver = omni.protoVersions[versionId]
 
 # SNMP table header
 headVars = [ ver.ObjectName((1,3,6,1,2,1,1)) ]
@@ -34,20 +34,20 @@ class ManagerApplication(AbstractApplication):
         rspPdu = kwargs['PDU']
 
         # Check for PDU-level error
-        errorStatus = rspPdu.apiAlphaGetErrorStatus()
+        errorStatus = rspPdu.omniGetErrorStatus()
         if 0 != errorStatus != 2:
             raise str(errorStatus)
 
         # Build SNMP table from response
         tableIndices = apply(
-            reqPdu.apiAlphaGetTableIndices, [rspPdu] + headVars
+            reqPdu.omniGetTableIndices, [rspPdu] + headVars
             )
 
         # Report SNMP table
-        varBindList = rspPdu.apiAlphaGetVarBindList()
+        varBindList = rspPdu.omniGetVarBindList()
         for rowIndices in tableIndices:
             for cellIdx in filter(lambda x: x!=-1, rowIndices):
-                print varBindList[cellIdx].apiAlphaGetOidVal()
+                print varBindList[cellIdx].omniGetOidVal()
 
         # Remove completed SNMP table columns
         map(lambda idx, headVars=headVars: headVars.__delitem__(idx), \
@@ -58,12 +58,12 @@ class ManagerApplication(AbstractApplication):
 
         # Generate request PDU for next row
         lastRow = map(lambda cellIdx, varBindList=varBindList:
-                      varBindList[cellIdx].apiAlphaGetOidVal(),
+                      varBindList[cellIdx].omniGetOidVal(),
                       filter(lambda x: x!=-1, tableIndices[-1]))
-        apply(reqPdu.apiAlphaSetVarBindList,
+        apply(reqPdu.omniSetVarBindList,
               map(lambda (x, y): (x.get(), None), lastRow))
         
-        reqPdu.apiAlphaGetRequestId().inc(1)
+        reqPdu.omniGetRequestId().inc(1)
 
         # Submit next req to msgAndPduDsp
         self.sendReq(
@@ -93,7 +93,7 @@ msgAndPduDsp.mibInstrumController.writeVars(
     )
 
 pdu = ver.GetNextRequestPdu()
-pdu.apiAlphaSetVarBindList((headVars[0].clone(), ver.Null()))
+pdu.omniSetVarBindList((headVars[0].clone(), ver.Null()))
 
 app = ManagerApplication()
 app.sendReq(

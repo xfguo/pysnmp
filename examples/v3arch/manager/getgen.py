@@ -1,10 +1,10 @@
 """Command Generator Application (GET)"""
 from pysnmp.proto.rfc3412 import MsgAndPduDispatcher, AbstractApplication
-from pysnmp.proto.api import alpha
+from pysnmp.proto import omni
 
 # PDU version to use
-versionId = alpha.protoVersionId1
-ver = alpha.protoVersions[versionId]
+versionId = omni.protoVersionId1
+ver = omni.protoVersions[versionId]
 
 class ManagerApplication(AbstractApplication):
     __pendingReqs = {}
@@ -25,13 +25,13 @@ class ManagerApplication(AbstractApplication):
         rspPdu = kwargs['PDU']
 
         # Check for PDU-level errors
-        errorStatus = rspPdu.apiAlphaGetErrorStatus()
+        errorStatus = rspPdu.omniGetErrorStatus()
         if errorStatus:
             raise str(errorStatus)
 
         # Report response values
-        for varBind in rspPdu.apiAlphaGetVarBindList():
-            oid, val = varBind.apiAlphaGetOidVal()
+        for varBind in rspPdu.omniGetVarBindList():
+            oid, val = varBind.omniGetOidVal()
             print oid, val
         msgAndPduDsp.transportDispatcher.doDispatchFlag = 0
 
@@ -51,7 +51,7 @@ msgAndPduDsp.mibInstrumController.writeVars(
     )
 
 pdu = ver.GetRequestPdu()
-pdu.apiAlphaSetVarBindList(((1,3,6,1,2,1,1,1), ver.Null()))
+pdu.omniSetVarBindList(((1,3,6,1,2,1,1,1), ver.Null()))
 
 app = ManagerApplication()
 app.sendReq(
