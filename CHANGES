@@ -13,6 +13,11 @@ Changes to version 3.3.4
   for better performance and clearer protocol
 - Bugfix initial value assignment of proto.rfc1157.RequestId & 
   proto.rfc1905.RequestId classes to get much less repetitive values
+- The getTerminal() method implemented to all base ASN1 data types
+  (simple & structed) for a more constent API
+- Bugfix to examples/* var-bind pretty printing (IpAddress wouldn't print).
+- Command line interface mixins now support the rest of SNMP data types
+  (Gauge, Counter32 etc.)
 
 Thu Mar 20 18:43:55 MSD 2003
 
