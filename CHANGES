@@ -16,7 +16,7 @@ Changes to version 3.3.4
 - The getTerminal() method implemented to all base ASN1 data types
   (simple & structed) for a more constent API
 - Bugfix to examples/* var-bind pretty printing (IpAddress wouldn't print).
-- Command line interface mixins now support the rest of SNMP data types
+- UCD command line interface mixins now support the rest of SNMP data types
   (Gauge, Counter32 etc.)
 
 Thu Mar 20 18:43:55 MSD 2003
