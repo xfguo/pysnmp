@@ -1,9 +1,23 @@
-Thu Mar 20 18:43:55 MSD 2003
+Mon Apr 21 19:38:57 MSD 2003
 
 Changes to version 3.3.3
 ------------------------
 
-- examples/ converted to use `env' for interpreter invocation
+- The constraints methods set of asn1.base.Asn1Object converted to 
+  a set of flags accompanied by a single constraints checking
+  method for better efficiency.
+- The asn1.base.ChoiceTypeAsn1Object.get() method converted to
+  getTerminal() to handle possible structured Choice elements
+  (may cause incompatibilities!).
+- ber.base.decodeTag() function substitutes functionally similar
+  code scattered over a few BER decoders.
+- asn1.univ.ObjectIdentifier.str2num()/num2str() methods code optimized
+  for better performance.
+- Bugfix to handle_error() methods of udp.asynrole.manager/agent.
+- Bugfix to examples/snmpwalk.py v2c.EndOfMibView handling in
+  response.
+- examples/ converted to use `env' for interpreter invocation.
+- Many minor optimization changes.
 
 Wed Mar 19 18:01:05 MSD 2003
 
