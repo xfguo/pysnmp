@@ -94,6 +94,8 @@ Copyright 1991-1995 Stichting Mathematisch Centrum, Amsterdam
 >>> vals = map(lambda x: x['value'], rsp['pdu']['get_response']['variable_bindings'])
 >>> print vals
 [ObjectSyntax(simple=SimpleSyntax(string=OctetString('Cisco Internetwork Operating System Software \015\012IOS (tm) 5400 Software (C5400-JS-M), Version 12.2(11.8b), MAINTENANCE INTERIM SOFTWARE\015\012Copyright (c) 1986-2002 by cisco Systems, Inc.\015\012Compiled Tue 30-Jul-02 19:02 by pwade')))]
+>>> print map(lambda x: x.get(), vals)
+['Cisco Internetwork Operating System Software \015\012IOS (tm) 5400 Software (C5400-JS-M), Version 12.2(11.8b), MAINTENANCE INTERIM SOFTWARE\015\012Copyright (c) 1986-2002 by cisco Systems, Inc.\015\012Compiled Tue 30-Jul-02 19:02 by pwade']
 >>>
 
 8X---------------- cut here --------------------
