@@ -8,6 +8,12 @@ Changes to version 3.3.1
   SNMP messages problem).
 - examples/* tools updated to utilize role.manager()'s message verification
   callback function
+- Net-SNMP-style command-line interface implemented (as a sub-package
+  pysnmp.proto.cli)
+- high-level API to SNMP message objects implemented (as a sub-package
+  pysnmp.proto.api)
+- the examples/asyncmgr.py tool now supports all available SNMP message
+  types
 
 Thu Nov 14 18:09:53 MSD 2002
 
