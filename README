@@ -69,6 +69,17 @@ I've been told, that on Windows 2000, one needs to go to "Control panel"
 -> "System" -> "Advanced" -> "Environment variables" and add/update the
 PYTHONPATH environment variable there.
 
+TESTING
+-------
+
+Once the PySNMP package is installed, try running:
+
+python -c 'from pysnmp.test import suite; suite.run()'
+
+at your command line to make sure the whole thing is working
+properly. Otherwise, please, report all failures to PySNMP mailing
+list (see below).
+
 OPERATION
 ---------
 

@@ -3,11 +3,13 @@ Sun Feb  8 19:12:34 MSK 2004
 Changes to version 3.4.2
 ------------------------
 
+- The pysnmp.test package implemented (pyunit based).
 - Bugfix to pysnmp1.x compatibility API that makes it operational
   again.
 - Bugfix to None -> Null() value translation at proto.api.generic.
 - Bugfix to OIDs comparation & SNMP error propagation code at
   proto.api.generic.
+- Bugfix to role.Agent instantiation at asyncrole.Agent code.
 - The VarBindMixIn.apiAlphaSetOidVal() method now does not modify current
   oid and/or val whenever None's passed as oid and/or val parameters
   respectively.
