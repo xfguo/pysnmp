@@ -10,10 +10,13 @@ Changes to version 3.3.1
   callback function
 - Net-SNMP-style command-line interface implemented (as a sub-package
   pysnmp.proto.cli)
-- high-level API to SNMP message objects implemented (as a sub-package
+- High-level API to SNMP message objects implemented (as a sub-package
   pysnmp.proto.api)
-- the examples/asyncmgr.py tool now supports all available SNMP message
+- The examples/asyncmgr.py tool now supports all available SNMP message
   types
+- pysnmp.asn1.ber sub-package re-written to act as an optional mix-in
+  to base ASN.1 objects (and moved under pysnmp.asn1.encoding package)
+- quite a few small fixes
 
 Thu Nov 14 18:09:53 MSD 2002
 
