@@ -1,3 +1,14 @@
+Tue Jan 14 19:41:21 MSD 2003
+
+Changes to version 3.3.1
+------------------------
+
+- role.manager() now uses a user-specified callback function to
+  verify received SNMP messages (this mostly addresses the out-of-order
+  SNMP messages problem).
+- examples/* tools updated to utilize role.manager()'s message verification
+  callback function
+
 Thu Nov 14 18:09:53 MSD 2002
 
 Changes to version 3.2.2
