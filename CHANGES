@@ -1,3 +1,14 @@
+Sun Feb  8 19:12:34 MSK 2004
+
+Changes to version 3.4.2
+------------------------
+
+- Bugfix to pysnmp1.x compatibility API that makes it operational
+  again.
+- Bugfix to None -> Null() value translation at proto.api.generic.
+- Bugfix to OIDs comparation & SNMP error propagation code at
+  proto.api.generic.
+
 Thu Feb  5 18:35:38 MSK 2004
 
 Changes to version 3.4.1
