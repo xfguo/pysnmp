@@ -4,16 +4,14 @@ Changes to version 3.2.2
 ------------------------
 
 - Bugfix to default value for 'dst' address parameter in
-  mapping/udp/role.py and mapping/udp/asynrole.py.
-- Compatibility bugfix to asynrole.manager.handle_error() and
-  asynrole.agent.handle_error() parameters list. Affected the
-  mapping/udp/asynrole.py and examples/asyncmgr.py scripts.
-- Bugfix to mapping/udp/bulkrole.py transport-level exceptions
-  handling.
-- Bugfix to role.manager() instaniation parameters at
+  mapping/udp/role.py, mapping/udp/asynrole.py and
   mapping/udp/bulkrole.py.
+- asyncode compatibility bugfix to asynrole.manager.handle_error()   
+  and asynrole.agent.handle_error() parameters list. Affected the
+  mapping/udp/asynrole.py and examples/asyncmgr.py scripts.
+- Bugfix to transport-level exceptions handling code in
+  examples/snmpbulk.py and mapping/udp/bulkrole.py.
 - Bugfix to reportTypeFlag handling at examples/snmpbulk.py.
-- Bugfix to exception handling code at examples/snmpbulk.py.
 - Command line parameters support implemented to the
   examples/asyncmgr.py script.
 
@@ -70,6 +68,26 @@ Changes to version 3.0.0
 
   Backward compatibility with earlier PySMMP versions is preserved by means
   of compatibility sub-packages.
+
+Wed Dec 18 20:39:00 MSD 2002
+
+Changes to version 2.0.8
+------------------------
+
+- Convert examples/snmptable.py into examples/snmpwalk.py as the
+  functionality of the former seems to closer mimic Net-SNMP's
+  snmpwalk behavior.
+- The examples/snmpwalk.py fixed to include requested OID in the
+  search range.
+
+Thu Nov 28 18:58:45 MSD 200
+
+Changes to version 2.0.7
+------------------------
+
+- Bugfix to asn1.py, incorrect ASN.1 tag used for UNSIGNED32 type.
+- Bugfix to v1.py & v2c.py modules, GAUGE32 was missing from the
+  list of allowed value-bind types.
 
 Fri Sep 20 08:35:43 MSD 2002
 
