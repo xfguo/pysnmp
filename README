@@ -1,5 +1,5 @@
 
-SNMP engine for Python, version 2.0.6
+SNMP engine for Python, version 3.0.0
 -------------------------------------
 
 This is a Python implementation of SNMP v.1/v.2c engine. It's general
@@ -10,26 +10,22 @@ a few transport methods specific to TCP/IP networking.
 PySNMP is written entirely in Python and is self-sufficient in terms
 that it does not rely on any third party tool (it is not a wrapper!).
 
-This code is known to be used under Python interpreter versions 1.5.2,
-1.6 and 2.0.
+This code is compatible with Python interpreter versions 1.x and 2.x.
 
-This package is distributed under terms and conditions of BSD-style
+The PySNMP package is distributed under terms and conditions of BSD-style
 license. See the LICENSE file for details.
 
 PRECAUTIONS
 -----------
 
-Unfortunately, version 2.x of PySNMP software is *INCOMPATIBLE* with
-its 1.x branch at the moment. Work on a compatibility layer is being
-in progress.
+The 3.x revision of PySNMP software underwent a major re-write for
+a more accurate, standards compliant and extensible implementation,
+although [hopefully] complete compatibility with all previous PySNMP
+implementations is preserved by means of compatibility sub-packages.
+Please, refer to package documentation for more information.
 
-While the pure-Python MIB compiler project is underway, the ASN.1
-types of Object IDs associated values must be explicitly specified
-whenever user application passes values to SNMP engine.
-
-Lack of MIB support leads to another limitation -- all the PySNMP
-methods accept and report Object IDs only in dotted numeric (that is
-not symbolic) representation.
+Since MIB support is not integrated into PySNMP package at the moment, this
+software accept and report Object IDs in non-symbolic (dotted) notation.
 
 INSTALLATION
 ------------
@@ -46,13 +42,13 @@ directory in the following way (assuming your Python distribution
 resides under /usr/local/lib/python):
 
 $ cd /usr/local/lib/python/site-packages
-$ tar xvf /tmp/pysnmp-2.0.6.tar
-$ echo pysnmp-2.0.6 > pysnmp.pth
+$ tar xvf /tmp/pysnmp-3.0.0.tar
+$ echo pysnmp-3.0.0 > pysnmp.pth
 
 Alternatively, the $PYTHONPATH environment variable can be updated to
 point to your PySNMP package location (assuming your UNIX shell is bash):
 
-export PYTHONPATH=/home/ilya/src/py/pysnmp-2.0.6:$PYTHONPATH
+export PYTHONPATH=/home/ilya/src/py/pysnmp-3.0.0:$PYTHONPATH
 
 The latter trick is also known to work on Windows.
 
@@ -70,22 +66,22 @@ Here is an example of using pysnmp package for querying SNMP agent
 
 Python 1.5.2 (#3, Aug 25 1999, 19:14:24)  [GCC 2.8.1] on sunos5
 Copyright 1991-1995 Stichting Mathematisch Centrum, Amsterdam
->>> from pysnmp import role, v2c, asn1
->>> req = v2c.GETREQUEST()
->>> req['encoded_oids'] = [ asn1.OBJECTID().encode('1.3.6.1.2.1.1.1.0') ]
+>>> from pysnmp.proto import v1
+>>> from pysnmp.mapping.udp import role
+>>> req = v1.GetRequest()
+>>> req['pdu']['get_request']['variable_bindings'].append(v1.VarBind(name=v1.ObjectN
+ame('1.3.6.1.2.1.1.1.0')))
 >>> tr = role.manager(('router-1.glas.net', 161))
->>> (rawrsp, src) = tr.send_and_receive(req.encode())
->>> rsp = v2c.RESPONSE()
->>> rsp.decode(rawrsp)
->>> oids = map(lambda x:x[0], map(asn1.OBJECTID().decode, rsp['encoded_oids']))
+>>> (answer, src) = tr.send_and_receive(req.encode())
+>>> rsp = v1.GetResponse()
+>>> rsp.decode(answer)
+>>> oids = map(lambda x: x['name'].get(), rsp['pdu']['get_response']['variable_bindings'
+])
 >>> print oids
 ['.1.3.6.1.2.1.1.1.0']
->>> vals = map(lambda x: x[0](), map(asn1.decode, rsp['encoded_vals']))
+>>> vals = map(lambda x: x['value'], rsp['pdu']['get_response']['variable_bindings'])
 >>> print vals
-['Cisco Internetwork Operating System Software \015\012IOS (tm) 5300 Software
-(C5300-J-M), Experimental Version 12.1(20001115:152556) [haag-V121_4 102]
-\015\012Copyright (c) 1986-2000 by cisco Systems, Inc.\015\012Compiled
-Mon 20-Nov-00 19:22 by haag']
+[ObjectSyntax(simple=SimpleSyntax(string=OctetString('Cisco Internetwork Operating System Software \015\012IOS (tm) 5400 Software (C5400-JS-M), Version 12.2(11.8b), MAINTENANCE INTERIM SOFTWARE\015\012Copyright (c) 1986-2002 by cisco Systems, Inc.\015\012Compiled Tue 30-Jul-02 19:02 by pwade')))]
 >>>
 
 8X---------------- cut here --------------------

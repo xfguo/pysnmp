@@ -1,3 +1,14 @@
+Tue Oct  1 08:02:43 MSD 2002
+
+Changes to version 3.0.0
+------------------------
+
+- Major re-write of the whole package aimed at a more accurate, standards
+  compliant and extensible ASN.1 and SNMP protocol objects implementation.
+
+  Backward compatibility with earlier PySMMP versions is preserved by means
+  of compatibility sub-packages.
+
 Fri Sep 20 08:35:43 MSD 2002
 
 Changes to version 2.0.6
