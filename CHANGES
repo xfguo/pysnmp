@@ -10,6 +10,10 @@ Changes to version 3.2.2
   mapping/udp/asynrole.py and examples/asyncmgr.py scripts.
 - Bugfix to mapping/udp/bulkrole.py transport-level exceptions
   handling.
+- Bugfix to role.manager() instaniation parameters at
+  mapping/udp/bulkrole.py.
+- Bugfix to reportTypeFlag handling at examples/snmpbulk.py.
+- Bugfix to exception handling code at examples/snmpbulk.py.
 - Command line parameters support implemented to the
   examples/asyncmgr.py script.
 
