@@ -1,6 +1,6 @@
 
-SNMP engine for Python, version 3.0.0
--------------------------------------
+SNMP engine for Python, version 3.x
+-----------------------------------
 
 This is a Python implementation of SNMP v.1/v.2c engine. Its general
 functionality is to assemble/disassemble SNMP messages from/into
@@ -18,11 +18,8 @@ license. See the LICENSE file for details.
 PRECAUTIONS
 -----------
 
-In its 3.x revision, the PySNMP software underwent a major re-write for
-a more accurate, standards compliant and extensible implementation,
-although [hopefully] complete compatibility with all previous PySNMP
-implementations is preserved by means of compatibility sub-packages.
-Please, refer to package documentation for more information.
+For notes on backward compatibility with previous PySNMP revisions, please,
+refer to the COMPATIBILITY file in the PySNMP distribution.
 
 Since MIB support is not integrated into PySNMP package at the moment, this
 software accept and report Object IDs only in a non-symbolic (dotted) notation.
@@ -42,13 +39,13 @@ directory in the following way (assuming your Python distribution
 resides under /usr/local/lib/python):
 
 $ cd /usr/local/lib/python/site-packages
-$ tar xvf /tmp/pysnmp-3.0.0.tar
-$ echo pysnmp-3.0.0 > pysnmp.pth
+$ tar xvf /tmp/pysnmp-3.0.1.tar
+$ echo pysnmp-3.0.1 > pysnmp.pth
 
 Alternatively, the $PYTHONPATH environment variable can be updated to
 point to your PySNMP package location (assuming your UNIX shell is bash):
 
-export PYTHONPATH=/home/ilya/src/py/pysnmp-3.0.0:$PYTHONPATH
+export PYTHONPATH=/home/ilya/src/py/pysnmp-3.0.1:$PYTHONPATH
 
 The latter trick is also known to work on Windows.
 
