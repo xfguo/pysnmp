@@ -6,7 +6,7 @@ from string import split, replace, find, atol, atoi
 from types import StringType, DictType
 import sys, time
 
-version = '0.0.2'
+version = '0.0.3-alpha'
 
 class Error(StandardError): pass
 
@@ -72,6 +72,19 @@ def addLabelForSymbol(symbol):
 
 __oidToTuple = lambda x: str(tuple(map(lambda y: int(y), split(x, '.'))))
 
+def __reprIntVal(value):
+    try:
+        intVal = atoi(value)
+    except ValueError:
+        try:
+            intVal = atol(value)
+        except ValueError:
+            return repr(value)
+    if -2147483647 < intVal < 2147483647:
+        return repr(intVal)
+    else:
+        return repr(long(intVal))
+    
 def __genDefVal(baseType, symDef):
     if baseType == 'OctetString':
         if symDef['default'][:2] == '0x':
@@ -84,9 +97,9 @@ def __genDefVal(baseType, symDef):
             defVal = symDef['default']
         return '%s' % repr(defVal)
     elif baseType == 'Integer':
-        return '\"%s\"' % symDef['default']
+        return '%s' % __reprIntVal(symDef['default'])
     elif baseType == 'Integer32':
-        return '%d' % atol(symDef['default'])
+        return '%s' % __reprIntVal(symDef['default'])
     elif baseType == 'ObjectIdentifier':
         return '%s' % __oidToTuple(symDef['default'])
     elif baseType == 'IpAddress':
@@ -183,13 +196,14 @@ def __genTypeDef((symName, symDef), classMode=0):
             if classMode:
                 r = r + 'subtypeConstraints = %s.subtypeConstraints' % parentType
                 r = r + ' + ( subtypes.ValueRangeConstraint(%s, %s), )\n' % \
-                    (typeDef['range']['min'], typeDef['range']['max'])
+                    (__reprIntVal(typeDef['range']['min']),
+                     __reprIntVal(typeDef['range']['max']))
                 r = r + identFiller*identValue
             else:
                 r = r + \
                     '.addConstraints(subtypes.ValueRangeConstraint(%s, %s))' % (
-                    typeDef['range']['min'],
-                    typeDef['range']['max']
+                    __reprIntVal(typeDef['range']['min']),
+                    __reprIntVal(typeDef['range']['max'])
                     )
     if symDef.has_key('default'):
         defVal = __genDefVal(baseType, symDef)
