@@ -1,3 +1,10 @@
+Sun Oct 24 00:18:20 MSK 2004
+
+Changes to version 3.4.4
+------------------------
+
+- Bugfix to version checking logic at pysnmp.version.py
+
 Fri Oct  22 18:23:43 MSK 2004
 
 Changes to version 3.4.3
