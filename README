@@ -2,7 +2,7 @@
 SNMP engine for Python, version 3.0.0
 -------------------------------------
 
-This is a Python implementation of SNMP v.1/v.2c engine. It's general
+This is a Python implementation of SNMP v.1/v.2c engine. Its general
 functionality is to assemble/disassemble SNMP messages from/into
 given SNMP Object IDs along with associated values. PySNMP also provides
 a few transport methods specific to TCP/IP networking.
@@ -18,14 +18,14 @@ license. See the LICENSE file for details.
 PRECAUTIONS
 -----------
 
-The 3.x revision of PySNMP software underwent a major re-write for
+In its 3.x revision, the PySNMP software underwent a major re-write for
 a more accurate, standards compliant and extensible implementation,
 although [hopefully] complete compatibility with all previous PySNMP
 implementations is preserved by means of compatibility sub-packages.
 Please, refer to package documentation for more information.
 
 Since MIB support is not integrated into PySNMP package at the moment, this
-software accept and report Object IDs in non-symbolic (dotted) notation.
+software accept and report Object IDs only in a non-symbolic (dotted) notation.
 
 INSTALLATION
 ------------
@@ -69,14 +69,12 @@ Copyright 1991-1995 Stichting Mathematisch Centrum, Amsterdam
 >>> from pysnmp.proto import v1
 >>> from pysnmp.mapping.udp import role
 >>> req = v1.GetRequest()
->>> req['pdu']['get_request']['variable_bindings'].append(v1.VarBind(name=v1.ObjectN
-ame('1.3.6.1.2.1.1.1.0')))
+>>> req['pdu']['get_request']['variable_bindings'].append(v1.VarBind(name=v1.ObjectName('1.3.6.1.2.1.1.1.0')))
 >>> tr = role.manager(('router-1.glas.net', 161))
 >>> (answer, src) = tr.send_and_receive(req.encode())
 >>> rsp = v1.GetResponse()
 >>> rsp.decode(answer)
->>> oids = map(lambda x: x['name'].get(), rsp['pdu']['get_response']['variable_bindings'
-])
+>>> oids = map(lambda x: x['name'].get(), rsp['pdu']['get_response']['variable_bindings'])
 >>> print oids
 ['.1.3.6.1.2.1.1.1.0']
 >>> vals = map(lambda x: x['value'], rsp['pdu']['get_response']['variable_bindings'])
