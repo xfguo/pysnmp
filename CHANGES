@@ -4,6 +4,7 @@ Changes to version 3.4.4
 ------------------------
 
 - Bugfix to version checking logic at pysnmp.version.py
+- Python 2.4 compatibility fix to test suite code (int vals > maxint issue)
 
 Fri Oct  22 18:23:43 MSK 2004
 
