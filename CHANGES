@@ -3,13 +3,17 @@ Wed Feb 18 18:34:05 MSK 2004
 Changes to version 3.4.3
 ------------------------
 
-- More tests added at pysnmp.test package.
+- ASN.1 codecs framework re-designed and re-implemented aimed at a more
+  consistent design and better performance. Highlights include abstract
+  codec interface and serialized data caching (at encoder).
 - Asn1Object constraints machinery re-implemented based on Mike C. Fletcher's
   design and code. Now various constrains are implemented as stand-alone
   objects serving interested Asn1Object derivatives through some abstract
   protocol (that's probably the Decorator design pattern).
-- The asn1.Asn1Object.allowedType has become a tuple for performance
-  reasons.
+- Structured pysnmp.asn1.base.* classes reworked to act as proxy objects
+  over Python dictionary for better performance.
+- Many low-level API modifications at pysnmp.asn1.* classes.
+- More tests added at pysnmp.test package.
 
 Sun Feb  8 19:12:34 MSK 2004
 
