@@ -1,3 +1,16 @@
+Wed Mar 19 18:01:05 MSK 2003
+
+Changes to version 3.3.2
+------------------------
+
+- Bugfix to examples/asyncmgr.py to make the tool simultaneous
+  request safe
+- Bugfix to setup.py -- some sub-packages were not installed
+- The request-specific match() method of proto.v1 and proto.v2c
+  split on request and PDU-specific parts
+- Half-baked SNMP v.3 files appeared in 3.3.1 by mistake (rfc2571.py, 
+  rfc2572.py) excluded
+
 Tue Jan 14 19:41:21 MSD 2003
 
 Changes to version 3.3.1
