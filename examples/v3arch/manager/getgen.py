@@ -27,21 +27,20 @@ class ManagerApplication(AbstractApplication):
 
 msgAndPduDsp = MsgAndPduDispatcher()
 
+msgAndPduDsp.transportDispatcher.getTransport('udp').openClientMode()
+
 # Configure target SNMP agent at LCD
 ( snmpCommunityEntry, )  \
   =  msgAndPduDsp.mibInstrumController.mibBuilder.importSymbols(
     'SNMP-COMMUNITY-MIB', 'snmpCommunityEntry'
     )
-
 msgAndPduDsp.mibInstrumController.writeVars(
     (snmpCommunityEntry.getInstNameByIndex(2, 'myAgentIdx'), 'public'),
     (snmpCommunityEntry.getInstNameByIndex(3, 'myAgentIdx'), 'myAgent')
     )
 
-msgAndPduDsp.transportDispatcher.getTransport('udp').openClientMode()
-
 pdu = ver.GetRequestPdu()
-pdu.apiAlphaSetVarBindList(((1,3,6,1,2,1,1,2,0), ver.Null()))
+pdu.apiAlphaSetVarBindList(((1,3,6,1,2,1,1,1), ver.Null()))
 
 app = ManagerApplication()
 app.sendReq(
