@@ -10,10 +10,27 @@ a few transport methods specific to TCP/IP networking.
 PySNMP is written entirely in Python and is self-sufficient in terms
 that it does not rely on any third party tool (it is not a wrapper!).
 
-This code is compatible with Python interpreter versions 1.x and 2.x.
-
 The PySNMP package is distributed under terms and conditions of BSD-style
 license. See the LICENSE file for details.
+
+FEATURES
+--------
+
+* Complete SNMPv1 and SNMPv2c support
+* Seamless SNMP manager and agent roles support
+* Both synchronous and asynchronous IO API support
+* Fully documented API with many examples
+* Objective ASN.1 data types implementation
+* MIB I/II data types and macros implementation
+* 100% Python, works with Python 1.x and later
+* MT-safe
+
+MISFEATURES
+-----------
+
+* No MIB compiler (though, it's possible to compile ASN.1 code into PySNMP
+  classes by hand, oh)
+* No SNMP v.3 support (though, it's almost implemented, check CVS at SF)
 
 PRECAUTIONS
 -----------
