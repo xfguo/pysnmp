@@ -1,3 +1,11 @@
+Fri Oct 11 18:34:31 MSD 2002
+
+Changes to version 3.1.1
+------------------------
+
+- A bug in setup.py (that prevents package installation) has been fixed.
+- Syntax typo in asynrole.py has been fixed.
+
 Mon Oct  7 08:29:58 MSD 2002
 
 Changes to version 3.1.0
