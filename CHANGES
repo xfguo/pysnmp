@@ -8,6 +8,9 @@ Changes to version 3.4.2
 - Bugfix to None -> Null() value translation at proto.api.generic.
 - Bugfix to OIDs comparation & SNMP error propagation code at
   proto.api.generic.
+- The VarBindMixIn.apiAlphaSetOidVal() method now does not modify current
+  oid and/or val whenever None's passed as oid and/or val parameters
+  respectively.
 
 Thu Feb  5 18:35:38 MSK 2004
 
