@@ -1,4 +1,6 @@
 """Command Generator Application (GETNEXT)"""
+from pysnmp import setApiVersion
+setApiVersion('v4')
 from pysnmp.proto.rfc3412 import MsgAndPduDispatcher, AbstractApplication
 from pysnmp.proto import omni
 
