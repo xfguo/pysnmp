@@ -21,7 +21,8 @@ FEATURES
 * Both synchronous and asynchronous IO API support
 * Fully documented API with many examples
 * Generic, objective ASN.1 framework
-* MIB I/II data types and macros implementation
+* Partial MIB I/II data types and macros implementation (check
+  CVS at SF for recent development)
 * 100% Python, works with Python 1.x and later
 * MT-safe
 
@@ -29,7 +30,7 @@ MISFEATURES
 -----------
 
 * No MIB compiler (though, it's possible to compile ASN.1 code into PySNMP
-  classes by hand, oh)
+  classes by hand, oh...)
 * No SNMP v.3 support (though, it's almost implemented, check CVS at SF)
 
 PRECAUTIONS
