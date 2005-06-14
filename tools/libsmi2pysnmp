@@ -158,23 +158,22 @@ def __genTypeDef((symName, symDef), classMode=0):
             r = r + ', %s()' % parentType
         if baseType == 'Enumeration':
             if classMode:
-                r = r + 'subtypeConstraints = %s.subtypeConstraints' % parentType
-                r = r + ' + ( subtypes.SingleValueConstraint('
+                r = r + 'subtypeSpec = %s.subtypeSpec+constraint.SingleValueConstraint(' % parentType
             else:
-                r = r + '.addConstraints(subtypes.SingleValueConstraint('
+                r = r + '.clone(subtypeSpec=constraint.SingleValueConstraint('
             for e, v in typeDef.items():
                 if type(v) == DictType and v.has_key('nodetype') \
                        and v['nodetype'] == 'namednumber':
                     r = r + '%s,' % v['number']
             if classMode:
-                r = r + '), )\n'
+                r = r + ')\n'
                 r = r + identFiller*identValue
             else:
                 r = r + '))'
         if classMode:
-            r = r + 'namedValues = %s.namedValues.clone(' % parentType
+            r = r + 'namedValues = namedval.NamedValues('
         else:
-            r = r + '.addNamedValues('
+            r = r + '.clone(namedValues=namedval.NamedValues('
         typedesc = typeDef.items()
         typedesc.sort(lambda x,y: cmp(x[1],y[1]))
         for e, v in typedesc:
@@ -185,7 +184,7 @@ def __genTypeDef((symName, symDef), classMode=0):
             r = r + ')\n'
             r = r + identFiller*identValue            
         else:
-            r = r + ')'
+            r = r + '))'
     else:
         if classMode:
             r = r + '%s):\n' % parentType
@@ -194,25 +193,18 @@ def __genTypeDef((symName, symDef), classMode=0):
             r = r + ', %s()' % parentType
         if typeDef.has_key('range'):
             if classMode:
-                r = r + 'subtypeConstraints = %s.subtypeConstraints' % parentType
-                r = r + ' + ( subtypes.ValueRangeConstraint(%s, %s), )\n' % \
-                    (__reprIntVal(typeDef['range']['min']),
-                     __reprIntVal(typeDef['range']['max']))
+                r = r + 'subtypeSpec = %s.subtypeSpec+constraint.ValueRangeConstraint(%s,%s)\n' % (parentType, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
                 r = r + identFiller*identValue
             else:
-                r = r + \
-                    '.addConstraints(subtypes.ValueRangeConstraint(%s, %s))' % (
-                    __reprIntVal(typeDef['range']['min']),
-                    __reprIntVal(typeDef['range']['max'])
-                    )
+                r = r + '.clone(subtypeSpec=constraint.ValueRangeConstraint(%s, %s))' % (__reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
     if symDef.has_key('default'):
         defVal = __genDefVal(baseType, symDef)
         if classMode:
             if defVal is not None:
-                r = r + 'initialValue = %s\n' % defVal
+                r = r + 'defaultValue = %s\n' % defVal
         else:
             if defVal is not None:
-                r = r + '.set(%s)' % defVal
+                r = r + '.clone(%s)' % defVal
     if classMode:
         r = r + 'pass\n\n'
         
@@ -227,7 +219,7 @@ out.write(
 out.write("# Python version %s\n\n" % str(sys.version_info))
 
 out.write('# Imported just in case new ASN.1 types would be created\n')
-out.write('from pysnmp.asn1 import subtypes\n\n')
+out.write('from pyasn1.type import constraint, namedval\n\n')
 
 out.write('# Imports\n\n')
 
