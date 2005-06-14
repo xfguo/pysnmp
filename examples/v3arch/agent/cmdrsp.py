@@ -1,7 +1,7 @@
 """Command Responder Application (GET PDU)"""
 from pysnmp.entity import engine, config
 from pysnmp.carrier.asynsock.dgram import udp
-from pysnmp.entity.rfc3413 import cmdrsp, error
+from pysnmp.entity.rfc3413 import cmdrsp
 
 # Create SNMP engine with autogenernated engineID and pre-bound
 # to socket transport dispatcher
