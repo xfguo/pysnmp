@@ -44,8 +44,8 @@ config.addRoUser(snmpEngine, 'test-user', 'noAuthNoPriv', (1,3,6))
 #config.addRoUser(snmpEngine, 'test-user', 1, (1,3,6,1,2,1,2,2,1,1))
 #config.addRoUser(snmpEngine, 'test-user', 3, (1,3,6,1,2,1))
 
-getApp = cmdrsp.GetRsp(snmpEngine)
-getApp = cmdrsp.GetNextRsp(snmpEngine)
-getApp = cmdrsp.GetBulkRsp(snmpEngine)
+getApp = cmdrsp.GetCmdRsp(snmpEngine)
+getApp = cmdrsp.NextCmdRsp(snmpEngine)
+getApp = cmdrsp.BulkCmdRsp(snmpEngine)
 
 snmpEngine.transportDispatcher.runDispatcher()
