@@ -42,12 +42,17 @@ def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
         varBinds=varBinds
         )
     
-cmdgen.SnmpGet().sendReq(
+cmdgen.GetCmdGen().sendReq(
     snmpEngine, 'myRouter', (((1,3,6,1,2,1,1,1,0), None),), cbFun
     )
 
 try:
     snmpEngine.transportDispatcher.runDispatcher()
 except error.ApplicationReturn, applicationReturn:
-    for oid, val in applicationReturn['varBinds']:
-        print '%s = %s' % (oid, val)    
+    if applicationReturn['errorIndication']:
+        print applicationReturn['errorIndication']
+    elif applicationReturn['errorStatus']:
+        print repr(applicationReturn['errorStatus'])
+    else:
+        for oid, val in applicationReturn['varBinds']:
+            print '%s = %s' % (oid, val)    

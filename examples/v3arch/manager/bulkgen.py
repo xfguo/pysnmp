@@ -16,7 +16,7 @@ config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
 # Transport addresses
 config.addTargetAddr(
     snmpEngine, 'myRouter', config.snmpUDPDomain,
-    ('127.0.0.1', 1161), 'myParams'    
+    ('127.0.0.1', 161), 'myParams'    
     )
 
 # Transport
@@ -27,16 +27,18 @@ config.addSocketTransport(
     )
 
 def cbFun(sendRequesthandle, errorIndication, errorStatus, errorIndex,
-          varBinds, cbCtx):
+          varBindTable, cbCtx):
     if errorIndication or errorStatus:
         raise error.ApplicationReturn(
             errorIndication=errorIndication,
             errorStatus=errorStatus
             )
-    for oid, val in varBinds: print '%s = %s' % (oid, val)    
+    for varBindRow in varBindTable:
+        for oid, val in varBindRow:
+            print '%s = %s' % (oid, val)    
 
-cmdgen.SnmpBulkWalk().sendReq(
-    snmpEngine, 'myRouter', 0, 25, (((1,3,6,1,2), None),), cbFun
+cmdgen.BulkCmdGen().sendReq(
+    snmpEngine, 'myRouter', 0, 25, (((1,3,6,1,2,1,1), None),), cbFun
     )
 
 try:

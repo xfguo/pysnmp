@@ -34,16 +34,18 @@ config.addSocketTransport(
     )
 
 def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
-          varBinds, cbCtx):
+          varBindTable, cbCtx):
     if errorIndication or errorStatus:
         raise error.ApplicationReturn(
             errorIndication=errorIndication,
             errorStatus=errorStatus
             )
-    for oid, val in varBinds: print '%s = %s' % (oid, val)
+    for varBindRow in varBindTable:
+        for oid, val in varBindRow:
+            print '%s = %s' % (oid, val)    
 
-cmdgen.SnmpWalk().sendReq(
-    snmpEngine, 'myRouter', (((1,3,6,1,2,1), None),), cbFun
+cmdgen.NextCmdGen().sendReq(
+    snmpEngine, 'myRouter', (((1,3,6,1,2,1,1), None),), cbFun
     )
 
 try:
