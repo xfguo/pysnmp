@@ -12,13 +12,14 @@ config.addSocketTransport(
     )
 
 # v1/2 setup
-# addV1System(snmpEngine, 'public')
+config.addV1System(snmpEngine, 'test-agent', 'public')
 
 # v3 setup
 config.addV3User(snmpEngine, 'test-user', 'authkey1', 'md5', 'privkey1', 'des')
 
 # Transport params
-config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
+#config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
+config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 2, 1)
 
 # Transport addresses
 config.addTargetAddr(
