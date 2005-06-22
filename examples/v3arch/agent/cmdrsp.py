@@ -26,7 +26,7 @@ myMibVariable = MibVariable(
 snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.exportSymbols('PYSNMP-EXAMPLE-MIB', myMibVariable=myMibVariable)  # creating MIB
 
 # v1/2 setup
-# addV1System(snmpEngine, 'public')
+config.addV1System(snmpEngine, 'test-agent', 'public')
 
 # v3 setup
 #config.addV3User(snmpEngine, 'test-user', 'authkey1', 'md5', 'privkey1', 'des')
@@ -36,13 +36,11 @@ config.addV3User(snmpEngine, 'test-user', 'authKey1', 'md5', 'privKey1','des',
     
 # VACM setup
 config.addContext(snmpEngine, '')
-#config.addRoUser(snmpEngine, 'test-user', 1, (1,3,6,1,2,1))
-#config.addRoUser(snmpEngine, 'test-user', 2, (1,3,6,1,2,1))
 config.addRoUser(snmpEngine, 'test-user', 'authPriv', (1,3,6))
 config.addRoUser(snmpEngine, 'test-user', 'authNoPriv', (1,3,6))
 config.addRoUser(snmpEngine, 'test-user', 'noAuthNoPriv', (1,3,6))
-#config.addRoUser(snmpEngine, 'test-user', 1, (1,3,6,1,2,1,2,2,1,1))
-#config.addRoUser(snmpEngine, 'test-user', 3, (1,3,6,1,2,1))
+
+config.addRoUser(snmpEngine, 'test-agent', 'noAuthNoPriv', (1,3,6))
 
 getApp = cmdrsp.GetCmdRsp(snmpEngine)
 getApp = cmdrsp.NextCmdRsp(snmpEngine)
