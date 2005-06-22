@@ -5,26 +5,27 @@ from pysnmp.proto import rfc1902
 
 snmpEngine = engine.SnmpEngine()
 
-# Setup transport endpoint
-config.addSocketTransport(
-    snmpEngine,
-    udp.domainName,
-    udp.UdpSocketTransport().openClientMode()
-    )
-
 # v1/2 setup
-# addV1System(snmpEngine, 'public')
+config.addV1System(snmpEngine, 'test-agent', 'public')
 
 # v3 setup
 config.addV3User(snmpEngine, 'test-user', 'authkey1', 'md5', 'privkey1', 'des')
 
 # Transport params
-config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
+#config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
+config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 2, 1)
 
 # Transport addresses
 config.addTargetAddr(
     snmpEngine, 'myRouter', config.snmpUDPDomain,
     ('127.0.0.1', 161), 'myParams'
+    )
+
+# Setup transport endpoint
+config.addSocketTransport(
+    snmpEngine,
+    udp.domainName,
+    udp.UdpSocketTransport().openClientMode()
     )
 
 def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,

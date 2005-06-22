@@ -4,13 +4,6 @@ from pysnmp.entity.rfc3413 import cmdgen, error
 
 snmpEngine = engine.SnmpEngine()
 
-# Setup transport endpoint
-config.addSocketTransport(
-    snmpEngine,
-    udp.domainName,
-    udp.UdpSocketTransport().openClientMode()
-    )
-
 # v1/2 setup
 config.addV1System(snmpEngine, 'test-agent', 'public')
 
@@ -19,7 +12,7 @@ config.addV3User(snmpEngine, 'test-user', 'authkey1', 'md5', 'privkey1', 'des')
 
 # Transport params
 #config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
-config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 2, 1)
+config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 1)
 
 # Transport addresses
 config.addTargetAddr(
@@ -27,10 +20,10 @@ config.addTargetAddr(
     ('127.0.0.1', 161), 'myParams'
     )
 
-# Transport
+# Setup transport endpoint
 config.addSocketTransport(
     snmpEngine,
-    config.snmpUDPDomain,
+    udp.domainName,
     udp.UdpSocketTransport().openClientMode()
     )
 

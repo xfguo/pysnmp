@@ -5,13 +5,14 @@ from pysnmp.carrier.asynsock.dgram import udp
 snmpEngine = engine.SnmpEngine()
 
 # v1/2 setup
-# addV1System(snmpEngine, 'public')
+config.addV1System(snmpEngine, 'test-agent', 'public')
 
 # v3 setup
 config.addV3User(snmpEngine, 'test-user', 'authkey1', 'md5', 'privkey1', 'des')
 
 # Transport params
-config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
+#config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
+config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 1)
 
 # Transport addresses
 config.addTargetAddr(
@@ -35,7 +36,18 @@ def cbFun(sendRequesthandle, errorIndication, errorStatus, errorIndex,
             )
     for varBindRow in varBindTable:
         for oid, val in varBindRow:
-            print '%s = %s' % (oid, val)    
+            print '%s = %s' % (oid, val)
+
+    for oid, val in varBindTable[-1]:
+        if val is not None:
+            break
+    else:
+        raise error.ApplicationReturn(
+            errorIndication=errorIndication,
+            errorStatus=errorStatus,
+            errorIndex=errorIndex,
+            varBinds=varBinds
+            )
 
 cmdgen.BulkCmdGen().sendReq(
     snmpEngine, 'myRouter', 0, 25, (((1,3,6,1,2,1,1), None),), cbFun
