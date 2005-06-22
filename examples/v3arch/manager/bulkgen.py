@@ -42,12 +42,7 @@ def cbFun(sendRequesthandle, errorIndication, errorStatus, errorIndex,
         if val is not None:
             break
     else:
-        raise error.ApplicationReturn(
-            errorIndication=errorIndication,
-            errorStatus=errorStatus,
-            errorIndex=errorIndex,
-            varBinds=varBinds
-            )
+        raise error.ApplicationReturn()
 
 cmdgen.BulkCmdGen().sendReq(
     snmpEngine, 'myRouter', 0, 25, (((1,3,6,1,2,1,1), None),), cbFun
