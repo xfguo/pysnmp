@@ -36,11 +36,10 @@ config.addV3User(snmpEngine, 'test-user', 'authKey1', 'md5', 'privKey1','des',
     
 # VACM setup
 config.addContext(snmpEngine, '')
-config.addRoUser(snmpEngine, 'test-user', 'authPriv', (1,3,6))
-config.addRoUser(snmpEngine, 'test-user', 'authNoPriv', (1,3,6))
-config.addRoUser(snmpEngine, 'test-user', 'noAuthNoPriv', (1,3,6))
+config.addRoUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6))
 
-config.addRoUser(snmpEngine, 'test-agent', 'noAuthNoPriv', (1,3,6))
+config.addRoUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v1
+config.addRoUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v2c
 
 getApp = cmdrsp.GetCmdRsp(snmpEngine)
 getApp = cmdrsp.NextCmdRsp(snmpEngine)
