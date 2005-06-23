@@ -29,18 +29,19 @@ snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.exportSymbols('PYSNMP-EX
 config.addV1System(snmpEngine, 'test-agent', 'public')
 
 # v3 setup
-#config.addV3User(snmpEngine, 'test-user', 'authkey1', 'md5', 'privkey1', 'des')
-config.addV3User(snmpEngine, 'test-user', 'authKey1', 'md5', 'privKey1','des',
-                 '\x1d\xcfY\xe8eS\xb3\xaf\xa5\xd3/\xd5\xd6\x1b\xf0\xcf',
-                 '\xecZ\xb5^\x93\xe1\xd8\\\xb6\x84m\x0f#\xe8E\xe0')
+config.addV3User(snmpEngine, 'test-user', 'authkey1', 'md5', 'privkey1', 'des')
+# Save on key localization
+#config.addV3User(snmpEngine, 'test-user', 'authKey1', 'md5', 'privKey1','des',
+#                 '\x1d\xcfY\xe8eS\xb3\xaf\xa5\xd3/\xd5\xd6\x1b\xf0\xcf',
+#                 '\xecZ\xb5^\x93\xe1\xd8\\\xb6\x84m\x0f#\xe8E\xe0')
     
 # VACM setup
 config.addContext(snmpEngine, '')
-config.addRoUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6))
-
 config.addRoUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v1
 config.addRoUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v2c
+config.addRoUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
 
+# Apps registration
 getApp = cmdrsp.GetCmdRsp(snmpEngine)
 getApp = cmdrsp.NextCmdRsp(snmpEngine)
 getApp = cmdrsp.BulkCmdRsp(snmpEngine)
