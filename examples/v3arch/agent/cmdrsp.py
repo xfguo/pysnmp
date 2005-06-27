@@ -7,14 +7,11 @@ from pysnmp.entity.rfc3413 import cmdrsp
 # to socket transport dispatcher
 snmpEngine = engine.SnmpEngine()
 
-# XXX transport registration and routing should be different
-# for client & server modes
-
 # Setup transport endpoint
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 1161))
+    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 1161)) # 161
     )
 
 # Create and put on-line my managed object
@@ -30,10 +27,6 @@ config.addV1System(snmpEngine, 'test-agent', 'public')
 
 # v3 setup
 config.addV3User(snmpEngine, 'test-user', 'authkey1', 'md5', 'privkey1', 'des')
-# Save on key localization
-#config.addV3User(snmpEngine, 'test-user', 'authKey1', 'md5', 'privKey1','des',
-#                 '\x1d\xcfY\xe8eS\xb3\xaf\xa5\xd3/\xd5\xd6\x1b\xf0\xcf',
-#                 '\xecZ\xb5^\x93\xe1\xd8\\\xb6\x84m\x0f#\xe8E\xe0')
     
 # VACM setup
 config.addContext(snmpEngine, '')
