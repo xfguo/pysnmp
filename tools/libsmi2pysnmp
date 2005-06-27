@@ -6,7 +6,7 @@ from string import split, replace, find, atol, atoi
 from types import StringType, DictType
 import sys, time
 
-version = '0.0.3-alpha'
+version = '0.0.4-alpha'
 
 class Error(StandardError): pass
 
@@ -160,7 +160,7 @@ def __genTypeDef((symName, symDef), classMode=0):
             if classMode:
                 r = r + 'subtypeSpec = %s.subtypeSpec+constraint.SingleValueConstraint(' % parentType
             else:
-                r = r + '.clone(subtypeSpec=constraint.SingleValueConstraint('
+                r = r + '.subtype(subtypeSpec=constraint.SingleValueConstraint('
             for e, v in typeDef.items():
                 if type(v) == DictType and v.has_key('nodetype') \
                        and v['nodetype'] == 'namednumber':
@@ -173,7 +173,7 @@ def __genTypeDef((symName, symDef), classMode=0):
         if classMode:
             r = r + 'namedValues = namedval.NamedValues('
         else:
-            r = r + '.clone(namedValues=namedval.NamedValues('
+            r = r + '.subtype(namedValues=namedval.NamedValues('
         typedesc = typeDef.items()
         typedesc.sort(lambda x,y: cmp(x[1],y[1]))
         for e, v in typedesc:
@@ -196,7 +196,7 @@ def __genTypeDef((symName, symDef), classMode=0):
                 r = r + 'subtypeSpec = %s.subtypeSpec+constraint.ValueRangeConstraint(%s,%s)\n' % (parentType, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
                 r = r + identFiller*identValue
             else:
-                r = r + '.clone(subtypeSpec=constraint.ValueRangeConstraint(%s, %s))' % (__reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
+                r = r + '.subtype(subtypeSpec=constraint.ValueRangeConstraint(%s, %s))' % (__reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
     if symDef.has_key('default'):
         defVal = __genDefVal(baseType, symDef)
         if classMode:
@@ -340,6 +340,10 @@ if nodes:
                             '%s.registerAugmentions((\"%s\", \"%s\"))\n' % (
                             indices['relatedNode'], dstModName, symName
                             ))
+                        out.write(
+                            'apply(%s.setIndexNames, %s.getIndexNames())\n' % (
+                            symName, transOpers(indices['relatedNode'])
+                            ))
 
 if mib.has_key('notifications'):
     notifications = mib['notifications'].items()
@@ -421,3 +425,7 @@ if groups:
     for symName, symObj in groups:
         out.write(', %s=%s' % (symName, symName))
     out.write(')\n')    
+
+# XXX
+# implement API version checking
+# augmention issue
