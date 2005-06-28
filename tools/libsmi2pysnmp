@@ -127,7 +127,17 @@ def __genDefVal(baseType, symDef):
     else:
         # XXX complain
         return
-    
+
+# Ugly kludge against smidump bug which does not distinguish
+# size/range constraints
+__kludgyStringTypes = {
+    'OctetString': 1,
+    'DisplayString': 1,
+    'SnmpAdminString': 1,
+    'JmUTF8StringTC': 1,
+    'JmJobStringTC': 1
+    }
+
 def __genTypeDef((symName, symDef), classMode=0):
     r = ''
     if classMode:
@@ -191,12 +201,16 @@ def __genTypeDef((symName, symDef), classMode=0):
             r = r + identFiller*identValue
         else:
             r = r + ', %s()' % parentType
+        if __kludgyStringTypes.has_key(parentType):
+            __subtypeSpec = 'constraint.ValueSizeConstraint'
+        else:
+            __subtypeSpec = 'constraint.ValueRangeConstraint'
         if typeDef.has_key('range'):
             if classMode:
-                r = r + 'subtypeSpec = %s.subtypeSpec+constraint.ValueRangeConstraint(%s,%s)\n' % (parentType, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
+                r = r + 'subtypeSpec = %s.subtypeSpec+%s(%s,%s)\n' % (parentType, __subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
                 r = r + identFiller*identValue
             else:
-                r = r + '.subtype(subtypeSpec=constraint.ValueRangeConstraint(%s, %s))' % (__reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
+                r = r + '.subtype(subtypeSpec=%s(%s, %s))' % (__subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
     if symDef.has_key('default'):
         defVal = __genDefVal(baseType, symDef)
         if classMode:
@@ -428,4 +442,3 @@ if groups:
 
 # XXX
 # implement API version checking
-# augmention issue
