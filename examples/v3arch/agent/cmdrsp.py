@@ -1,7 +1,7 @@
 """Command Responder Application (GET PDU)"""
 from pysnmp.entity import engine, config
 from pysnmp.carrier.asynsock.dgram import udp
-from pysnmp.entity.rfc3413 import cmdrsp
+from pysnmp.entity.rfc3413 import cmdrsp, context
 
 # Create SNMP engine with autogenernated engineID and pre-bound
 # to socket transport dispatcher
@@ -34,9 +34,12 @@ config.addRoUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v1
 config.addRoUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v2c
 config.addRoUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
 
+# SNMP context
+snmpContext = context.SnmpContext(snmpEngine)
+
 # Apps registration
-getApp = cmdrsp.GetCmdRsp(snmpEngine)
-getApp = cmdrsp.NextCmdRsp(snmpEngine)
-getApp = cmdrsp.BulkCmdRsp(snmpEngine)
+getApp = cmdrsp.GetCmdRsp(snmpEngine, snmpContext)
+getApp = cmdrsp.NextCmdRsp(snmpEngine, snmpContext)
+getApp = cmdrsp.BulkCmdRsp(snmpEngine, snmpContext)
 
 snmpEngine.transportDispatcher.runDispatcher()
