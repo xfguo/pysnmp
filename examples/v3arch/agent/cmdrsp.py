@@ -11,7 +11,7 @@ snmpEngine = engine.SnmpEngine()
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 1161))
+    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 161))
     )
 
 # Create and put on-line my managed object
