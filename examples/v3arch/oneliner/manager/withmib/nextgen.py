@@ -2,7 +2,7 @@
 import string
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 
-cmdGen = cmdgen.CmdGen()
+cmdGen = cmdgen.CommandGenerator()
 
 errorIndication, errorStatus, errorIndex, \
                  varBinds, varBindTable = cmdGen.nextCmd(

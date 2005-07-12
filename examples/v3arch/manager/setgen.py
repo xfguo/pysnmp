@@ -37,7 +37,7 @@ def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
         varBinds=varBinds
         )
     
-cmdgen.SetCmdGen().sendReq(
+cmdgen.SetCommandGenerator().sendReq(
     snmpEngine, 'myRouter',
     (((1,3,6,1,2,1,1,1,0), rfc1902.OctetString('Grinch')),), cbFun
     )

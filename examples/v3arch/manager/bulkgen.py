@@ -44,7 +44,7 @@ def cbFun(sendRequesthandle, errorIndication, errorStatus, errorIndex,
     else:
         raise error.ApplicationReturn()
 
-cmdgen.BulkCmdGen().sendReq(
+cmdgen.BulkCommandGenerator().sendReq(
     snmpEngine, 'myRouter', 0, 25, (((1,3,6,1,2,1,1), None),), cbFun
     )
 

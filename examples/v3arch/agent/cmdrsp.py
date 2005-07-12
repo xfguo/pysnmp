@@ -11,7 +11,7 @@ snmpEngine = engine.SnmpEngine()
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 1161)) # 161
+    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 1161))
     )
 
 # Create and put on-line my managed object
@@ -38,8 +38,8 @@ config.addRoUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
 snmpContext = context.SnmpContext(snmpEngine)
 
 # Apps registration
-getApp = cmdrsp.GetCmdRsp(snmpEngine, snmpContext)
-getApp = cmdrsp.NextCmdRsp(snmpEngine, snmpContext)
-getApp = cmdrsp.BulkCmdRsp(snmpEngine, snmpContext)
+getApp = cmdrsp.GetCommandResponder(snmpEngine, snmpContext)
+getApp = cmdrsp.NextCommandResponder(snmpEngine, snmpContext)
+getApp = cmdrsp.BulkCommandResponder(snmpEngine, snmpContext)
 
 snmpEngine.transportDispatcher.runDispatcher()

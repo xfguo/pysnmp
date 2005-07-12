@@ -1,7 +1,7 @@
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 errorIndication, errorStatus, errorIndex, \
-                 varBinds, varBindTable = cmdgen.CmdGen().bulkCmd(
+                 varBinds, varBindTable = cmdgen.CommandGenerator().bulkCmd(
     # SNMP v2
 #    cmdgen.CommunityData('test-agent', 'public'),
     # SNMP v3
