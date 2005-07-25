@@ -1,6 +1,6 @@
 from pysnmp.entity import engine, config
 from pysnmp.carrier.asynsock.dgram import udp
-from pysnmp.entity.rfc3413 import cmdgen, error
+from pysnmp.entity.rfc3413 import cmdgen
 
 snmpEngine = engine.SnmpEngine()
 
@@ -29,24 +29,23 @@ config.addSocketTransport(
 
 def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
           varBinds, cbCtx):
-    raise error.ApplicationReturn(
-        errorIndication=errorIndication,
-        errorStatus=errorStatus,
-        errorIndex=errorIndex,
-        varBinds=varBinds
-        )
+    cbCtx['errorIndication'] = errorIndication
+    cbCtx['errorStatus'] = errorStatus
+    cbCtx['errorIndex'] = errorIndex
+    cbCtx['varBinds'] = varBinds
+
+# Used to pass data from callback function
+cbCtx = {}
     
 cmdgen.GetCommandGenerator().sendReq(
-    snmpEngine, 'myRouter', (((1,3,6,1,2,1,1,1,0), None),), cbFun
+    snmpEngine, 'myRouter', (((1,3,6,1,2,1,1,1,0), None),), cbFun, cbCtx
     )
 
-try:
-    snmpEngine.transportDispatcher.runDispatcher()
-except error.ApplicationReturn, applicationReturn:
-    if applicationReturn['errorIndication']:
-        print applicationReturn['errorIndication']
-    elif applicationReturn['errorStatus']:
-        print repr(applicationReturn['errorStatus'])
-    else:
-        for oid, val in applicationReturn['varBinds']:
-            print '%s = %s' % (oid, val)    
+snmpEngine.transportDispatcher.runDispatcher()
+if cbCtx['errorIndication']:
+    print cbCtx['errorIndication']
+elif cbCtx['errorStatus']:
+    print repr(cbCtx['errorStatus'])
+else:
+    for oid, val in cbCtx['varBinds']:
+        print '%s = %s' % (oid, val)    

@@ -1,6 +1,6 @@
 from pysnmp.entity import engine, config
 from pysnmp.carrier.asynsock.dgram import udp
-from pysnmp.entity.rfc3413 import cmdgen, error
+from pysnmp.entity.rfc3413 import cmdgen
 from pysnmp.proto import rfc1902
 
 snmpEngine = engine.SnmpEngine()
@@ -13,7 +13,7 @@ config.addV3User(snmpEngine, 'test-user', 'authkey1', 'md5', 'privkey1', 'des')
 
 # Transport params
 #config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
-config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 2, 1)
+config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 0)
 
 # Transport addresses
 config.addTargetAddr(
@@ -30,28 +30,26 @@ config.addSocketTransport(
 
 def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
           varBinds, cbCtx):
-    raise error.ApplicationReturn(
-        errorIndication=errorIndication,
-        errorStatus=errorStatus,
-        errorIndex=errorIndex,
-        varBinds=varBinds
-        )
-    
+    cbCtx['errorIndication'] = errorIndication
+    cbCtx['errorStatus'] = errorStatus
+    cbCtx['errorIndex'] = errorIndex
+    cbCtx['varBinds'] = varBinds
+
+cbCtx = {}
+
 cmdgen.SetCommandGenerator().sendReq(
     snmpEngine, 'myRouter',
-    (((1,3,6,1,2,1,1,1,0), rfc1902.OctetString('Grinch')),), cbFun
+    (((1,3,6,1,2,1,1,1,0), rfc1902.OctetString('Grinch')),), cbFun, cbCtx
     )
 
-try:
-    snmpEngine.transportDispatcher.runDispatcher()
-except error.ApplicationReturn, applicationReturn:
-    if applicationReturn['errorIndication']:
-        print applicationReturn['errorIndication']
-    elif applicationReturn['errorStatus']:
-        print '%s at %s' % (
-            repr(applicationReturn['errorStatus']),
-            applicationReturn['varBinds'][int(applicationReturn['errorIndex'])-1]
-            )
-    else:
-        for o, v in applicationReturn['varBinds']:
-            print '%s = %s' % (o, v)
+snmpEngine.transportDispatcher.runDispatcher()
+if cbCtx['errorIndication']:
+    print cbCtx['errorIndication']
+elif cbCtx['errorStatus']:
+    print '%s at %s' % (
+        repr(cbCtx['errorStatus']),
+        cbCtx['varBinds'][int(cbCtx['errorIndex'])-1]
+        )
+else:
+    for o, v in cbCtx['varBinds']:
+        print '%s = %s' % (o, v)
