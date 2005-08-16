@@ -12,10 +12,11 @@ errorIndication, errorStatus, errorIndex, \
 #    cmdgen.CommunityData('test-agent', 'public'),
     # SNMP v3
     cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
+    # Transport
     cmdgen.UdpTransportTarget(('localhost', 161)),
+    # Request variable(s)
 #    (('TCP-MIB', ''),),
     (('SNMPv2-MIB', ''),),
-#    (('IP-MIB', ''),),
 #    (('IF-MIB', ''),),
 #    (('', 'interfaces'),),
 #    (1,3,6,1,2,1)
@@ -26,11 +27,12 @@ if errorIndication:
     print errorIndication
 else:
     if errorStatus:
-        print '%s at %s\n' % (errorStatus, varBinds[int(errorIndex)-1])
+        print '%s at %s\n' % (
+            errorStatus.prettyOut(errorStatus), varBinds[errorIndex-1]
+            )
     else:
         for varBindTableRow in varBindTable:
-            for varBind in varBindTableRow:
-                oid, val = varBind
+            for oid, val in varBindTableRow:
                 (symName, modName), indices = cmdgen.mibvar.oidToInstanceName(
                     cmdGen.mibViewController, oid
                     )

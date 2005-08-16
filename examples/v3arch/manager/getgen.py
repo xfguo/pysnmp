@@ -47,7 +47,7 @@ snmpEngine.transportDispatcher.runDispatcher()
 if cbCtx['errorIndication']:
     print cbCtx['errorIndication']
 elif cbCtx['errorStatus']:
-    print repr(cbCtx['errorStatus'])
+    print cbCtx['errorStatus'].prettyOut(cbCtx['errorStatus'])
 else:
     for oid, val in cbCtx['varBinds']:
-        print '%s = %s' % (oid, val)    
+        print '%s = %s' % (oid, val.prettyOut(val))

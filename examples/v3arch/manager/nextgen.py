@@ -35,11 +35,11 @@ def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
         print errorIndication
         return
     if errorStatus:
-        print errorStatus
+        print errorStatus.prettyOut(errorStatus)
         return
     for varBindRow in varBindTable:
         for oid, val in varBindRow:
-            print '%s = %s' % (oid, val)    
+            print '%s = %s' % (oid, val.prettyOut(val))
     for oid, val in varBindTable[-1]:
         if val is not None:
             break

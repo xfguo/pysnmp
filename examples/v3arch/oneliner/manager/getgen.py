@@ -14,7 +14,9 @@ if errorIndication:
     print errorIndication
 else:
     if errorStatus:
-        print '%s at %s\n' % (errorStatus, varBinds[errorIndex-1])
+        print '%s at %s\n' % (
+            errorStatus.prettyOut(errorStatus), varBinds[errorIndex-1]
+            )
     else:
-        for varBind in varBinds:
-            print '%s = %s' % varBind
+        for name, val in varBindTableRow:
+            print '%s = %s' % (name, val.prettyOut(val))
