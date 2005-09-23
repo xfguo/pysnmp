@@ -5,7 +5,7 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 cmdGen = cmdgen.CommandGenerator()
 
 errorIndication, errorStatus, errorIndex, \
-                 varBinds, varBindTable = cmdGen.nextCmd(
+                 varBindTable = cmdGen.nextCmd(
     # SNMP v1
 #    cmdgen.CommunityData('test-agent', 'public', 0),
     # SNMP v2
@@ -27,8 +27,8 @@ if errorIndication:
     print errorIndication
 else:
     if errorStatus:
-        print '%s at %s\n' % (
-            errorStatus.prettyOut(errorStatus), varBinds[errorIndex-1]
+        print '%s at OID #%s\n' % (
+            errorStatus.prettyOut(errorStatus), errorIndex
             )
     else:
         for varBindTableRow in varBindTable:
