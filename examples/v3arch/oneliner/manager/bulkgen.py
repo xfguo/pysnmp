@@ -15,8 +15,8 @@ if errorIndication:
     print errorIndication
 else:
     if errorStatus:
-        print '%s at OID #%s\n' % (
-            errorStatus.prettyOut(errorStatus), errorIndex
+        print '%s at %s\n' % (
+            errorStatus.prettyOut(errorStatus), varBindTable[-1][errorIndex]
             )
     else:
         for varBindTableRow in varBindTable:
