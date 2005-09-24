@@ -3,6 +3,8 @@ from pysnmp.proto import rfc1902
 
 errorIndication, errorStatus, \
                  errorIndex, varBinds = cmdgen.CommandGenerator().setCmd(
+    # SNMP v1
+#    cmdgen.CommunityData('test-agent', 'public', 0),
     # SNMP v2
 #    cmdgen.CommunityData('test-agent', 'public'),
     # SNMP v3
