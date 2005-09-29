@@ -5,7 +5,7 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 cmdGen = cmdgen.CommandGenerator()
 
 # Lookup Managed Object name & value at MIB
-oid, suffix = cmdgen.mibvar.instanceNameToOid(
+oid, suffix = cmdgen.mibvar.mibNameToOid(
     cmdGen.mibViewController,
     (('SNMPv2-MIB', 'sysDescr'), 0)
     )
@@ -37,7 +37,7 @@ else:
             )
     else:
         for oid, val in varBinds:
-            (symName, modName), indices = cmdgen.mibvar.oidToInstanceName(
+            (symName, modName), indices = cmdgen.mibvar.oidToMibName(
                 cmdGen.mibViewController, oid
                 )
             val = cmdgen.mibvar.cloneFromMibValue(

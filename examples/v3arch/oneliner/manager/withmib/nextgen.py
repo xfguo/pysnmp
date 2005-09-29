@@ -34,7 +34,7 @@ else:
     else:
         for varBindTableRow in varBindTable:
             for oid, val in varBindTableRow:
-                (symName, modName), indices = cmdgen.mibvar.oidToInstanceName(
+                (symName, modName), indices = cmdgen.mibvar.oidToMibName(
                     cmdGen.mibViewController, oid
                     )
                 val = cmdgen.mibvar.cloneFromMibValue(
