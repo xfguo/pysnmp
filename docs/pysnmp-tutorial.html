@@ -1,0 +1,1689 @@
+<HTML>
+<HEAD>
+<TITLE>PySNMP tutorial</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#ffffff" TEXT="#000000"
+      LINK="#0000bb"  VLINK="#551a8b" ALINK="#ff0000">
+<FONT SIZE=2 FACE="arial, helvetica">
+<TABLE><TR><TD>
+<TABLE ALIGN="CENTER" WIDTH="70%"><TR><TD>
+<H3>
+PySNMP tutorial
+</H3>
+
+<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, September 2005</I>
+
+<H4>
+Network management
+</H4>
+
+<P>
+As networks become more complex, in terms of device population,
+topology and distances, it has been getting more and more important 
+for network administrators to have some easy and convinient way for
+controlling all pieces of the whole network.
+</P>
+
+<P>
+Basic features of a network management system include device information
+retrieval and device remote control. Former often takes shape of gathering
+device operation statistics, while latter can be seen in device remote 
+configuration facilities.
+</P>
+
+<P>
+For any information to be exchanged between entities, some agreement on
+information format and transmission procedure should be settled beforehand.
+This is what is conventionally called a <STRONG>Protocol</STRONG>.
+</P>
+
+<P>
+Large networks nowdays, may host thousands of different devices. 
+To benefit network manager's interoperability and simplicity, any
+device on the network should carry out most common and important management
+operations in a well known, unified way. Therefore, an important feature
+of a network management system would be a <STRONG>Convention on 
+management information naming and presentation</STRONG>.
+</P>
+
+<P>
+Sometimes, management operations should be performed on large number of
+managed devices. For a network manager to complete such a management round
+in a reasonably short period of time, an important feature of a network
+management software would be <STRONG>Performance</STRONG>.
+
+<P>
+Some of network devices may run on strictly limited resources what require
+another property of network management facility: 
+<STRONG>Low resource consumption</STRONG>.
+</P>
+
+<P>
+In practice, the latter requirement translates into low CPU cycles and 
+memory footprint for management software aboard device being managed.
+</P>
+
+<P>
+As networking becomes a more crucial part of our daily lives, security
+issues have become more apparent. As a side note, even Internet 
+technologies, having military roots, did not pay much attention to security
+initially. So, the last key feature of network management appears to be
+<STRONG>Security</STRONG>.
+</P>
+
+<P>
+Data passed back and forth through the course of management operations should
+be at least authentic and sometimes hidden from possible observers.
+</P>
+
+<P>
+All these problems were approached many times during about three decades
+of networking history. Some solutions collapsed over time for one reason or
+another, while others, such as Simple Network Management Protocol (SNMP),
+evolve into an industry standard.
+</P>
+
+<H4>
+SNMP management architecture
+</H4>
+
+<P>
+The SNMP management model includes three distinct entities -- Agent, Manager
+and Proxy talking to each other over network.
+</P>
+
+<P>
+Agent entity is basically a software running somewhere in a networked device
+and having the following distinguishing properties:
+</P>
+
+<UL>
+<LI>SNMP protocol support
+<LI>Access to managed device's internals
+</UL>
+
+<P>
+The latter feature is a source of management information for Agent, as well
+as a target for remote control operations.
+</P>
+
+<P>
+Modern SNMP standards suggest splitting Agent functionality on two parts.
+Such Agents may run SNMP for local processes called <STRONG>Subagents</STRONG>, which
+interface with managed devices internals. Communication between <STRONG>Master 
+Agent</STRONG> and its Subagents is performed using a simplified version
+of original SNMP protocol, known as <STRONG>AgentX</STRONG>, which is designed to run
+only within a single system.
+</P>
+
+<P>
+Manager entity is usually an application used by humans (or daemons) for
+performing various network management tasks, such as device statistics
+retrieval or remote control.
+</P>
+
+<P>
+Sometimes, Agents and Managers may run peer-to-peer within a single entity
+what is called Proxy. Proxies can often be seen in application-level
+firewalling or may serve as SNMP protocol translators between otherwise
+SNMP version-incompatible Managers and Agents.
+</P>
+
+<P>
+For Manager to request Agent for an operation on a particular part of 
+managed device, some convention on device's components naming is needed.
+Once some components are identified, Manager and Agent would have to agree
+upon possible components' states and their semantics.
+</P>
+
+<A NAME="MANAGED-OBJECTS"></A>
+<P>
+SNMP approach to both problems is to represent each component of a device
+as a named object, similar to named variables seen in programming
+languages, and state of a component maps to a value associated with this
+imaginary variable. These are called Managed Objects in SNMP.
+</P>
+
+<A NAME="CONCEPTUAL-TABLES"></A>
+<P>
+For representing a group of similar components of a device, such as network 
+interfaces, Managed Objects can be organized into a so-called 
+<STRONG>conceptual table</STRONG>.
+</STRONG>
+
+<P>
+Manager talks to Agent by sending it messages of several types. Message 
+type implies certain action to be taken. For example, <STRONG>GET</STRONG> message instructs 
+Agent to report back values of Managed Objects those names are indicated in
+message.
+</P>
+
+<P>
+There's also a way for Agent to notify Manager of an event occurred to Agent.
+This is done through so-called <STRONG>Trap</STRONG> messages. Trap message also
+carries Managed Objects and possibly Values, but besides that it has an
+ID of event in form of integer number or a Managed Object.
+</P>
+
+<P>
+For naming Managed Objects, SNMP uses the concept of 
+<A HREF="#OID">Object Identifier</A>. As an example of Managed Object,
+<i>.iso.org.dod.internet.mgmt.mib-2.system.sysName.0</i> represents
+human-readable name of a device where Agent is running.
+</P>
+
+<P>
+Managed Objects values are always instances of 
+<A HREF="#ASN1">ASN.1</A> types (such as Integer) or SNMP-specific subtypes
+(such as IpAddress). As in programming languages, type has an effect of 
+restricting possible set of states Managed Object may ever enter.
+</P>
+
+<P>
+Whenever SNMP entities talk to each other, they refer to Managed Objects whose 
+semantics (and value type) must be known in advance by both parties. SNMP Agent
+may be seen as a primary source of information on Managed Objects, as they are 
+implemented by Agent. In this model, Manager should have a map of Managed 
+Objects contained within each Agent to talk to.
+</P>
+
+<A NAME="MIB"></A>
+<A NAME="SMI"></A>
+<P>
+SNMP standard introduces a set of ASN.1 language constucts (such as ASN.1 
+subtypes and MACROs) which is called <STRONG>Structure of Management Information</STRONG> 
+(<STRONG>SMI</STRONG>). Collections of related Managed Objects described in terms of 
+SMI comprise <STRONG>Management Information Base</STRONG> (<STRONG>MIB</STRONG>) modules.
+</P>
+
+<P>
+Commonly used Managed Objects form core MIBs that become part of SNMP standard. 
+The rest of MIBs are normally created by vendors who build SNMP Agents into 
+their products.
+</P>
+
+<P>
+More often then not, Manager implementations could parse MIB files and
+use Managed Objects information for names resolution, value type determination,
+pretty printing and so on. This feature is known as <STRONG>MIB parser</STRONG> support.
+
+<H4>
+The history of SNMP
+</H4>
+
+<P>
+First SNMP version dates back to 1988 when a set of IETF RFC's
+were first published (
+<A HREF="http://www.ietf.org/rfc/rfc1065.txt">RFC1065</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1066.txt">RFC1066</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1067.txt">RFC1067</A>
+). These documents describe protocol operations
+(in terms of message syntax and semantics), SMI and a few core MIBs. 
+The first version appears to be lightweight and easy to implement. 
+Although, its poor security became notorious over years (Security? Not My 
+Problem!), because cleartext password used for authentication (AKA 
+<STRONG>Community String</STRONG>) is extremely easy to eavedrop and replay, 
+even after almost 20 years, slightly refined standard
+(
+<A HREF="http://www.ietf.org/rfc/rfc1155.txt">RFC1155</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1157.txt">RFC1157</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1212.txt">RFC1212</A>
+) still seems to be the most frequent encounter in modern SNMP devices.
+</P>
+
+<P>
+In effort to fix security issues of SNMPv1 and to make protocol faster for
+operations on large number of Managed Objects, SNMP Working Group at IETF
+came up with SNMPv2. This new protocol offers bulk transfers of Managed
+Objects information (by means of new, GETBULK message payload), improved 
+security and re-worked SMI. But its new party-based security system turned 
+out to be too complex. In the end, security part of SNMPv2 has been dropped 
+in favour of community-based authentication system used in SNMPv1. The result 
+of this compromise is known as SNMPv2c (where "c" stands for community) and 
+is still widely supported without being a standard (
+<A HREF="http://www.ietf.org/rfc/rfc1902.txt">RFC1902</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1903.txt">RFC1903</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1904.txt">RFC1904</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1905.txt">RFC1905</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1906.txt">RFC1906</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1907.txt">RFC1907</A>,
+<A HREF="http://www.ietf.org/rfc/rfc1908.txt">RFC1908</A>
+).
+</P>
+
+<P>
+The other compromise targeted at offering greater security than SNMPv1,
+without falling into complexities of SNMPv2, has been attempted by
+replacing SNMPv2 party-based security system with newly developed 
+user-based security model. This variant of protocol is known as SNMPv2u. 
+Although neither widely implemented nor standardized, <STRONG>User Based Security 
+Model</STRONG> (<STRONG>USM</STRONG>) of SNMPv2u got eventually adopted 
+as one of possibly many SNMPv3 security models.
+</P>
+
+<P>
+As of this writing, SNMPv3 is current standard for SNMP. Although it's based
+heavily on previous SNMP specifications, SNMPv3 offers many innovations but
+also brings significant complexity. Additions to version 3 are mostly about 
+protocol operations. SMI part of standard is inherited intact from SNMPv2.
+</P>
+
+<P>
+SNMPv3 system is designed as a framework that consists of a core, known
+as <STRONG>Message and PDU Dispatcher</STRONG>, and several abstract subsystems:
+<STRONG>Message Processing Subsystem</STRONG> (<STRONG>MP</STRONG>), responsible
+for SNMP message handling, <STRONG>Transport Dispatcher</STRONG>, used for 
+carrying over messages, and <STRONG>Security Subsystem</STRONG>, which deals 
+with message authentication and encryption issues. The framework defines 
+subsystems interfaces to let feature-specific modules to be plugged into 
+SNMPv3 core thus forming particular feature-set of SNMP system. Typical use 
+of this modularity feature could be seen in multiprotocol systems -- legacy 
+SNMP protocols are implemented as version-specific MP and security modules. 
+Native SNMPv3 functionality relies upon v3 message processing and User-Based 
+Security modules.
+</P>
+
+<P>
+Besides highly detailed SNMP system specification, SNMPv3 standard also
+defines a typical set of SNMP applications and their behaviour. These
+applications are Manager, Agent and Proxy (
+<A HREF="http://www.ietf.org/rfc/rfc3411.txt">RFC3411</A>,
+<A HREF="http://www.ietf.org/rfc/rfc3412.txt">RFC3412</A>,
+<A HREF="http://www.ietf.org/rfc/rfc3413.txt">RFC3413</A>,
+<A HREF="http://www.ietf.org/rfc/rfc3414.txt">RFC3414</A>,
+<A HREF="http://www.ietf.org/rfc/rfc3415.txt">RFC3415</A>,
+<A HREF="http://www.ietf.org/rfc/rfc3416.txt">RFC3416</A>,
+<A HREF="http://www.ietf.org/rfc/rfc3417.txt">RFC3417</A>,
+<A HREF="http://www.ietf.org/rfc/rfc3418.txt">RFC3418</A>
+).
+</P>
+
+<H4>
+PySNMP architecture
+</H4>
+
+<P>
+PySNMP stands for a pure-Python SNMP implementation. This software deals with
+darkest corners of SNMP specifications all in Python programming language.
+</P>
+
+<P>
+This paper is dedicated to PySNMP revisions from 4.1.x and up. Previous
+PySNMP versions do not follow the architecture and interfaces described
+in this tutorial.
+</P>
+
+<P>
+From Programmer's point of view, the layout of PySNMP software reflects SNMP 
+protocol evolution. It has been written from ground up, from trivial SNMPv1 up 
+to fully featured SNMPv3. Therefore, several levels of API to SNMP 
+functionality are available:
+<UL>
+<LI>
+<P>
+The most ancient and low-level is SNMPv1/v2c protocol scope. Here
+programmer is supposed to build/parse SNMP messages and their 
+payload -- <STRONG>Protocol Data Unit</STRONG> (<STRONG>PDU</STRONG>), handle protocol-level
+errors, transport issues and so on.
+</P>
+
+<P>
+Although considered rather complex to deal with, this API probably gives best 
+performance, memory footprint and flexibility, unless MIB access and/or
+SNMPv3 support is needed.
+</P>
+</LI>
+
+<LI>
+<P>
+Parts of SNMPv3 standard is expressed in terms of some abstract API to
+SNMP engine and its components. PySNMP implementation adopts this abstract API
+to a great extent, so it's available at Programmer's disposal. As a side
+effect, SNMP RFCs could be referenced for API semantics when programming 
+PySNMP at this level.
+</P>
+
+<P>
+This API is much more higher-level than previous; here Programmer would 
+have to manage two major issues: setting up <STRONG>Local Configuration Datastore</STRONG> 
+(<STRONG>LCD</STRONG>) of SNMP engine and build/parse PDUs. PySNMP system is
+shipped multi-lingual, thus at this level all SNMPv1, SNMPv2c and SNMPv3 
+features are available.
+</P>
+</LI>
+
+<LI>
+<P>
+At last, the highest-level API to SNMP functionality is availble through the
+use of standard SNMPv3 applications. These applications cover the most 
+frequent needs. That's why this API is expected to be the first to 
+start with.
+</P>
+
+<P>
+The Applications API further simplifies Programmer's job by hiding
+LCD management issues (contrary to SNMPv3 engine level). This API could be
+exploited in a one-liner fashion, for quick and simple prototyping.
+</P>
+</LI>
+</UL>
+
+<P>
+The following figure draws major components of PySNMP system along with
+standard Applications.
+</P>
+
+<P ALIGN=CENTER>
+<IMG SRC="pysnmp-arch.gif" USEMAP="#pysnmp-arch" ALT="PySNMP architecture"
+BORDER=0>
+<MAP ID="pysnmp-arch" NAME="pysnmp-arch">
+<!--
+<AREA SHAPE ="rect" COORDS ="445,114,602,146" HREF="#HIGH-LEVEL-PDU-API" 
+ALT="PDU Management" />
+<AREA SHAPE ="rect" COORDS ="479,171,564,206" HREF="#PDU-API" 
+ALT="SNMP PDU" />
+<AREA SHAPE ="rect" COORDS ="428,58,617,216" HREF="#APPS-API" 
+ALT="Applications" />
+<AREA SHAPE ="rect" COORDS ="208,124,333,184" HREF="#LCD-API" 
+ALT="LCD" />
+-->
+<AREA SHAPE ="rect" COORDS ="196,16,629,225" HREF="#ONELINER-APPS" 
+ALT="One-liner Applications" />
+<!--
+<AREA SHAPE ="rect" COORDS ="18,405,145,464" HREF="#TSP-API" 
+ALT="Transport Dispatcher" />
+<AREA SHAPE ="rect" COORDS ="240,279,554,342" HREF="#SNMP-ENGINE-API" 
+ALT="SNMP Engine" />
+-->
+</MAP>
+</P>
+
+<P>
+These standard SNMP applications, such as GET/SET command generators and 
+responders or TRAP notificators and receivers, translate into a set of
+classes desinged by the Visitor pattern. Application classes 
+implement concrete SNMP operations in terms of specific PDU handling,
+while SNMP Engine class acts as a Visitor. A single SNMP Engine can serve 
+many Applications of different types at the same time.
+</P>
+
+<P>
+One of the design choices of SNMPv3 standard is to use a set of dedicated 
+Managed Objects for SNMP engine internal purposes. One reason for that 
+design involves making SNMP engine remotely configurable via SNMP.
+These internally used Managed Objects are collectively called Local 
+Configuration Datastore (LCD). In PySNMP, all SNMP engine configuration
+and statistics is kept in LCD. LCD Configurator is a wrapper aimed at 
+simplifying LCD operations. Technically, LCD Configurator is a set of 
+functions whose names clearly reflect their semantics.
+</P>
+
+<P>
+SNMP Engine, on the above figure, is a Composite class holding references
+to all components of SNMP system. Typical user application has a single
+instance of SNMP Engine class possibly shared by many SNMP Applications
+of all kinds.
+</P>
+
+<P>
+Transport subsystem is used for sending SNMP messages to and accepting them
+from network. The I/O subsystem consists of a an abstract Dispatcher and one 
+or more abstract Transport classes. Concrete Dispatcher implementation 
+is I/O method-specific, consider BSD sockets for example. Concrete Transport
+classes are transport domain-specific. SNMP frequently uses UDP Transport 
+but others are also possible. Dispatcher/Transport classes are designed after
+the Visitor pattern -- Transport instances are Dispatcher visitors. Transport
+Dispatcher interfaces are mostly used by Message And PDU Dispatcher. However,
+when using the SNMPv1/v2c-native API (the lowest-level one), these interfaces
+would be invoked directly.
+</P>
+
+<P>
+The rest of components are not normally accessed directly. They're mentioned
+here for clarification purposes.
+</P>
+
+<P>
+Message And PDU Dispatcher is a heart of SNMP system. Its main responsibilities
+include dispatching PDUs from SNMP Applications through various subsystems 
+all the way down to Transport Dispatcher, and passing SNMP messages coming 
+from network up to SNMP Applications. It maintains logical connection with
+Management Instrumentation Controller which carries out operations on Managed
+Objects, here for the purpose of LCD access.
+</P>
+
+<P>
+Message Processing Modules handle message-level protocol operations for present
+and possibly future versions of SNMP protocol. Most importantly, these include 
+message parsing/building and possibly invoking security services whenever
+required. All MP Modules share standard API used by Message And PDU Dispatcher.
+</P>
+
+<P>
+Message Security Modules perform message authentication and/or encryption.
+As of this writing, User-Based (for v3) and Community (for v1/2c) modules
+are implemented in PySNMP. All Security Modules share standard API used by
+Message Processing subsystem.
+</P>
+
+<P>
+Access Control subsystem uses LCD information to authorize remote access to
+Managed Objects. This is used when serving Agent Applications or Trap receiver in 
+Manager Applications. 
+</P>
+
+<A NAME="ONELINER-APPS"></A>
+<H4>
+One-liner Applications
+</H4>
+
+<P>
+As of this writing, one-liner Applications currently cover Manager-side 
+operations. Agent and Proxy roles could be implemented on top of
+native Applications API.
+</P>
+
+<P>
+There're two kinds of APIs to one-liner Applications: synchronous and
+asynchronous. Both are implemented within the
+<STRONG>pysnmp.entity.rfc3413.oneliner.cmdgen</STRONG> module.
+</P>
+
+<A NAME="ONELINER-APPS"></A>
+<A NAME="SYNCH-ONELINER-APPS"></A>
+<H4>
+Synchronous One-liner Applications
+</H4>
+
+<P>
+This is the simplest and the most high-level API to standard SNMP 
+Applications. It's advised to employ for singular and blocking
+operations as well as for rapid prototyping.
+</P>
+
+<P>
+All Command Generator Applications are implemented within a single class:
+</P>
+
+<A NAME="CommandGenerator"></A>
+<DL>
+<DT>class <STRONG>CommandGenerator</STRONG>([<STRONG>snmpEngine</STRONG>])</DT>
+<DD>
+<P>
+Create a SNMP Command Generator object.
+</P>
+</DD>
+</DL>
+
+<P>
+Methods of the <STRONG>CommandGenerator</STRONG> class instances implement 
+specific request types.
+</P>
+
+<A NAME="CommandGenerator.setCmd"></A>
+<DL>
+<DT><STRONG>getCmd</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>*varNames</STRONG>
+)</DT>
+
+<DD>
+<P>
+Perform SNMP GET request and return a response or error indication.
+</P>
+
+<P>
+The <STRONG>authData</STRONG> is a 
+SNMP <A HREF="#UsmUserData">Security Parameters object</A>,
+<STRONG>transportTarget</STRONG> is a SNMP 
+<A HREF="#UdpTransportTarget">Transport Configuration object</A>
+and <STRONG>*varNames</STRONG> are Managed Objects names 
+(ASN.1 <A HREF="#OID-IMPL">OID</A>s).
+</P>
+
+<P>
+The <STRONG>getCmd</STRONG> method returns a tuple of
+<STRONG>errorIndication</STRONG>, 
+<STRONG>errorStatus</STRONG>,
+<STRONG>errorIndex</STRONG>,
+<STRONG>varBinds</STRONG>. 
+</P>
+
+<P>
+Non-empty <STRONG>errorIndication</STRONG> string indicates SNMP engine-level 
+error.
+</P>
+
+<P>
+The pair of <STRONG>errorStatus</STRONG> and <STRONG>errorIndex</STRONG> 
+variables determines SNMP PDU-level error. If <STRONG>errorStatus</STRONG>
+evaluates to true, this indicates SNMP PDU error caused by Managed Object
+at position <STRONG>errorIndex</STRONG>-1 in <STRONG>varBinds</STRONG>.
+</P>
+
+<P>
+The <STRONG>varBinds</STRONG> is a tuple of Managed Objects. Managed Objects 
+found in response are position-bound to Managed Object names passed in request. 
+Each Managed Object is a tuple of <STRONG>Object Name</STRONG> and 
+<STRONG>Object Value</STRONG>.
+</P>
+</DD>
+</DL>
+
+<A NAME="CommandGenerator.setCmd"></A>
+<DL>
+<DT><STRONG>setCmd</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>*varBinds</STRONG>
+)</DT>
+
+<DD>
+<P>
+Perform SNMP SET request and return a response or error indication.
+</P>
+
+<P>
+The <STRONG>authData</STRONG> and <STRONG>transportTarget</STRONG> parameters
+have he same semantics as in <STRONG>getCmd</STRONG> method.
+</P>
+
+<P>
+The <STRONG>*varBinds</STRONG> input parameter is a tuple of Managed
+Objects to be applied at Agent. The syntax of <STRONG>*varBinds</STRONG>
+is the same as in <STRONG>getCmd</STRONG>.
+</P>
+
+<P>
+The output <STRONG>varBinds</STRONG> parameter has the same meaning as
+in <STRONG>getCmd</STRONG> method.
+</P>
+
+</DD>
+</DL>
+
+<A NAME="CommandGenerator.nextCmd"></A>
+<DL>
+<DT><STRONG>nextCmd</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>*varNames</STRONG>
+)</DT>
+
+<DD>
+<P>
+Perform SNMP GETNEXT request and return a response or error indication.
+The GETNEXT request type implies referring to Managed Objects whose Object
+Names are next to those used in request.
+</P>
+
+<P>
+Input parameters to the <STRONG>nextCmd</STRONG> method are the same as to 
+<STRONG>getCmd</STRONG>.
+</P>
+
+<P>
+The <STRONG>nextCmd</STRONG> method returns a tuple of
+<STRONG>errorIndication</STRONG>, 
+<STRONG>errorStatus</STRONG>,
+<STRONG>errorIndex</STRONG>,
+<STRONG>varBindTable</STRONG>.
+</P>
+
+<P>
+The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG> and
+<STRONG>errorIndex</STRONG> parameters have the same meaning as in
+<STRONG>getCmd</STRONG> method.
+</P>
+
+<P>
+The <STRONG>varBindTable</STRONG> parameter is a tuple of
+<STRONG>varBinds</STRONG>. Each <STRONG>varBind</STRONG> of 
+<STRONG>varBinds</STRONG> in <STRONG>varBindTable</STRONG> represent a 
+set of Managed Objects whose Object Names reside inside 
+<A HREF="#OID">OID</A> sub-tree of Managed Object name passed in request. 
+In other words, call of <STRONG>nextCmd</STRONG> method for a single
+Managed Object might return a sequence of Managed Objects so that Object
+Name passed in request would be a prefix for Object Names returned in response.
+Properties of the <STRONG>varBinds</STRONG> parameter is the same as in
+<STRONG>getCmd</STRONG> method.
+</P>
+</DD>
+</DL>
+
+<A NAME="CommandGenerator.bulkCmd"></A>
+<DL>
+<DT><STRONG>bulkCmd</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>nonRepeaters</STRONG>,
+<STRONG>maxRepetitions</STRONG>,
+<STRONG>*varNames</STRONG>
+)</DT>
+
+<DD>
+<P>
+Perform SNMP GETBULK request and return a response or error indication.
+The GETBULK request type has the same semantics as GETNEXT one except that
+the latter queries a bulk of Managed Objects at once.
+</P>
+
+<P>
+The <STRONG>authData</STRONG>, <STRONG>transportTarget</STRONG>,
+<STRONG>*varNames</STRONG> input parameters to the <STRONG>bulkCmd</STRONG> 
+method are the same as to  <STRONG>nextCmd</STRONG>.
+</P>
+
+<P>
+The <STRONG>nonRepeaters</STRONG> parameter indicates how many of 
+<STRONG>*varNames</STRONG> passed in request should be queried for a single 
+instance with in a request.
+</P>
+
+<P>
+The <STRONG>maxRepetitions</STRONG> parameter indicates for how many instances
+of Managed Objects in the rest of <STRONG>*varNames</STRONG>, besides first 
+<STRONG>nonRepeaters</STRONG> ones, should be queried with single request.
+</P>
+
+<P>
+The <STRONG>bulkCmd</STRONG> method returns a tuple of
+<STRONG>errorIndication</STRONG>, 
+<STRONG>errorStatus</STRONG>,
+<STRONG>errorIndex</STRONG>,
+<STRONG>varBindTable</STRONG>.
+</P>
+
+<P>
+The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG>,
+<STRONG>errorIndex</STRONG> and <STRONG>varBindTable</STRONG> parameters have
+the same meaning as in <STRONG>getCmd</STRONG> method.
+</P>
+</DD>
+</DL>
+
+<P>
+Calls to one-liner Applications API require Security Parameters and
+Transport configuration objects as input parameters. These classes
+serve as convenience shortcuts to SNMP engine configuration facilities
+and for keeping persistent authentication/transport configuration
+between SNMP engine calls.
+</P>
+
+<P>
+Security Parameters object is Security Model specific. 
+<STRONG>UsmUserData</STRONG> class serves SNMPv3 User-Based Security
+Model configuration, while <STRONG>CommunityData</STRONG> class
+is used for Community-Based Security Model of SNMPv1/SNMPv2c.
+</P>
+
+<A NAME="UsmUserData"></A>
+<DL>
+<DT>class <STRONG>UsmUserData</STRONG>(
+<STRONG>securityName</STRONG>,
+<STRONG>authKey=''</STRONG>,
+<STRONG>privKey=''</STRONG>,
+<STRONG>authProtocol=usmNoAuthProtocol</STRONG>,
+<STRONG>privProtocol=usmNoPrivProtocol</STRONG>
+)</DT>
+<DD>
+<P>
+Create an object holding User-Based Security Model specific configuration
+parameters.
+</P>
+<P>
+Mandatory <STRONG>securityName</STRONG> parameter is SNMPv3 USM username
+passed in as a string.
+</P>
+
+<P>
+Optional <STRONG>authKey</STRONG> parameter is a secret key used within 
+USM for SNMP PDU authorization. It's string type. Setting it to a non-empty
+value implies MD5-based PDU authentication to take effect. Default hashing 
+method may be changed by means of further <STRONG>authProtocol</STRONG> 
+parameter.
+</P>
+
+<P>
+Optional <STRONG>privKey</STRONG> parameter is a secret key used within 
+USM for SNMP PDU encryption. It's string type. Setting it to a non-empty
+value implies MD5-based PDU authentication and DES-based encryption to 
+take effect. Default hashing and/or encryption methods may be changed by 
+means of further <STRONG>authProtocol</STRONG> and/or 
+<STRONG>privProtocol</STRONG> parameters.
+</P>
+
+<P>
+Optional <STRONG>authProtocol</STRONG> parameter may be used to specify 
+non-default hash function algorithm. Possible values include
+<STRONG>usmHMACMD5AuthProtocol</STRONG>,
+<STRONG>usmHMACSHAAuthProtocol</STRONG> and
+<STRONG>usmNoAuthProtocol</STRONG>. These symbols are defined in 
+<STRONG>pysnmp.entity.rfc3413.oneliner.cmdgen</STRONG> module.
+</P>
+
+<P>
+Optional <STRONG>privProtocol</STRONG> parameter may be used to specify 
+non-default ciphering algorithm. Possible values include
+<STRONG>usmDESPrivProtocol</STRONG> and
+<STRONG>usmNoPrivProtocol</STRONG>.
+</P>
+</DD>
+</DL>
+
+<A NAME="CommunityData"></A>
+<DL>
+<DT>class <STRONG>CommunityData</STRONG>(
+<STRONG>securityName</STRONG>,
+<STRONG>communityName</STRONG>,
+<STRONG>mpModel=1</STRONG>
+)</DT>
+<DD>
+<P>
+Create an object holding Community-Based Security Model specific configuration
+parameters.
+</P>
+<P>
+Mandatory <STRONG>securityName</STRONG> parameter is Community-Based Security 
+Model username passed in as a string. For most purposes this can be an
+arbitrary string.
+</P>
+
+<P>
+Mandatory <STRONG>communityName</STRONG> parameter is SNMPv1/SNMPv2c Community name 
+passed as a string.
+</P>
+
+<P>
+Optional <STRONG>mpModel</STRONG> parameter indicates whether SNMPv2c 
+(mpModel=1, default) or SNMPv1 (mpModel=0) protocol should be used.
+</P>
+</DD>
+</DL>
+
+<P>
+Transport configuration object is Transport domain specific.
+<STRONG>UdpTransportTarget</STRONG> class represents an Agent
+accessible through UDP domain transport.
+</P>
+
+<A NAME="UdpTransportTarget"></A>
+<DL>
+<DT>class <STRONG>UdpTransportTarget</STRONG>(
+<STRONG>transportAddr</STRONG>
+)</DT>
+<DD>
+<P>
+Create an object representing a single Agent accessible through UDP socket.
+</P>
+<P>
+Mandatory <STRONG>transportAddr</STRONG> parameter indicates destination
+Agent address in form of tuple of <STRONG>FQDN</STRONG>, <STRONG>port</STRONG>
+where <STRONG>FQDN</STRONG> is a string and <STRONG>port</STRONG> is an 
+integer.
+</P>
+</DD>
+</DL>
+
+<P>
+See
+<A HREF="http://pysnmp.sourceforge.net/examples/4.x/v3arch/oneliner/manager/nextgen.html">
+GETNEXT Command Generator
+</A> script as an example on Synchronous One-liner API programming.
+</P>
+
+<A NAME="ASYNCH-ONELINER-APPS"></A>
+<H4>
+Asynchronous One-liner Applications
+</H4>
+
+<P>
+Asynchronous API to one-liner Applications is actually a foundation for
+<A HREF="#SYNCH-ONELINER-APPS">Synchronous</A> version, so they're very similar.
+This Asynchronous API is useful for purposes such as running multiple, 
+possibly different, SNMP Applications at the same time or handling other
+activities inside user's program while SNMP Application is waiting for 
+input/output.
+</P>
+
+<P>
+All Command Generator Applications are implemented within a single class:
+</P>
+
+<A NAME="AsynCommandGenerator"></A>
+<DL>
+<DT>class <STRONG>AsynCommandGenerator</STRONG>([<STRONG>snmpEngine</STRONG>])</DT>
+<DD>
+<P>
+Create an asynchronous SNMP Command Generator object.
+</P>
+</DD>
+</DL>
+
+<P>
+Methods of the <STRONG>AsynCommandGenerator</STRONG> class instances implement 
+specific request types. These methods are similar to those described in the
+<A HREF="#CommandGenerator">CommandGenerator</A> class section except that
+asynchronous interface uses a callback function for delivering responses.
+</P>
+
+<A NAME="AsynCommandGenerator.asyncGetCmd"></A>
+<DL>
+<DT><STRONG>asyncGetCmd</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>varNames</STRONG>,
+(<STRONG>cbFun</STRONG>, <STRONG>cbCtx</STRONG>)
+)</DT>
+
+<DD>
+<P>
+Prepare SNMP GET request to be dispatched. Return the 
+<STRONG>sendRequestHandle</STRONG> value.
+</P>
+
+<P>
+The <STRONG>cbFun</STRONG> parameter is a reference to a callable object
+(such as Python function) that takes the following parameters:
+</P>
+
+<DL>
+<DT><STRONG>cbFun</STRONG>(
+<STRONG>sendRequestHandle</STRONG>,
+<STRONG>errorIndication</STRONG>,
+<STRONG>errorStatus</STRONG>,
+<STRONG>errorIndex</STRONG>,
+<STRONG>varBinds</STRONG>,
+<STRONG>cbCtx</STRONG>
+)</DT>
+
+<DD>
+<P>
+Where <STRONG>sendRequestHandle</STRONG> is an integer value used for matching
+response to request. Its counterpart is returned on request submission by 
+the <STRONG>asyncGetCmd</STRONG> method.
+</P>
+
+<P>
+The <STRONG>cbCtx</STRONG> parameter is a reference to the
+<STRONG>cbCtx</STRONG> object being passed to <STRONG>asyncGetCmd</STRONG> 
+method. Its purpose is to carry opaque application's state from request 
+through response methods.
+</P>
+
+<P>
+The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG>,
+<STRONG>errorIndex</STRONG> and <STRONG>varBinds</STRONG> parameters
+have the same meaning as in <A HREF="#getCmd">CommandGenerator.getCmd</A>
+method.
+</P>
+
+<P>
+If <STRONG>cbFun</STRONG> has no more requests pending and want to complete, it must
+return a true value. Otherwise, it returns false.
+</P>
+</DD>
+</DL>
+
+<P>
+The <STRONG>authData</STRONG>, <STRONG>transportTarget</STRONG> and
+<STRONG>varNames</STRONG> parameters have the same meaning as in
+<A HREF="#CommandGenerator.getCmd">CommandGenerator.getCmd</A>
+method.
+</P>
+
+<P>
+The <STRONG>asyncGetCmd</STRONG> method returns unique
+<STRONG>sendRequestHandle</STRONG> integer value used for
+matching subsequent response to this request.
+</P>
+</DD>
+</DL>
+
+<A NAME="AsynCommandGenerator.asyncSetCmd"></A>
+<DL>
+<DT><STRONG>asyncSetCmd</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>varBinds</STRONG>,
+(<STRONG>cbFun</STRONG>, <STRONG>cbCtx</STRONG>)
+)</DT>
+
+<DD>
+<P>
+Prepare SNMP SET request to be dispatched. Return the 
+<STRONG>sendRequestHandle</STRONG> value.
+</P>
+
+<P>
+The <STRONG>authData</STRONG> and <STRONG>transportTarget</STRONG>
+parameters have the same meaning as in 
+<A HREF="#CommandGenerator.setCmd">CommandGenerator.setCmd</A> method.
+</P>
+
+<P>
+The <STRONG>cbFun</STRONG> and <STRONG>cbCtx</STRONG> parameters
+have the same meaning as in <A HREF="#AsynCommandGenerator.asyncGetCmd">
+AsynCommandGenerator.asyncGetCmd</A> method.
+</P>
+
+<P>
+The <STRONG>varBinds</STRONG> parameter has the same meaning as in 
+<A HREF="#CommandGenerator.setCmd">CommandGenerator.setCmd</A> method
+except that here it is passed in as a tuple.
+</P>
+</DD>
+</DL>
+
+<A NAME="AsynCommandGenerator.asyncNextCmd"></A>
+<DL>
+<DT><STRONG>asyncNextCmd</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>varNames</STRONG>,
+(<STRONG>cbFun</STRONG>, <STRONG>cbCtx</STRONG>)
+)</DT>
+
+<DD>
+<P>
+Prepare SNMP GETNEXT request to be dispatched. Return the 
+<STRONG>sendRequestHandle</STRONG> value.
+</P>
+
+<P>
+The <STRONG>authData</STRONG> and <STRONG>transportTarget</STRONG>
+parameters have the same meaning as in 
+<A HREF="#CommandGenerator.nextCmd">CommandGenerator.nextCmd</A> method.
+</P>
+
+<P>
+The <STRONG>cbFun</STRONG> and <STRONG>cbCtx</STRONG> parameters
+have the same meaning as in <A HREF="#AsynCommandGenerator.asyncGetCmd">
+AsynCommandGenerator.asyncGetCmd</A> method.
+</P>
+
+<P>
+The <STRONG>varNames</STRONG> parameter has the same meaning as in 
+<A HREF="#CommandGenerator.nextCmd">CommandGenerator.nextCmd</A> method
+except that here it is passed in as a tuple.
+</P>
+</DD>
+</DL>
+
+<A NAME="AsynCommandGenerator.asyncBulkCmd"></A>
+<DL>
+<DT><STRONG>asyncBulkCmd</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>nonRepeaters</STRONG>,
+<STRONG>maxRepetitions</STRONG>,
+<STRONG>varNames</STRONG>,
+(<STRONG>cbFun</STRONG>, <STRONG>cbCtx</STRONG>)
+)</DT>
+
+<DD>
+<P>
+Prepare SNMP GETBULK request to be dispatched. Return the 
+<STRONG>sendRequestHandle</STRONG> value.
+</P>
+
+<P>
+The <STRONG>authData</STRONG>, <STRONG>transportTarget</STRONG>,
+<STRONG>nonRepeaters</STRONG> and <STRONG>maxRepetitions</STRONG>
+parameters have the same meaning as in 
+<A HREF="#CommandGenerator.nextCmd">CommandGenerator.nextCmd</A> method.
+</P>
+
+<P>
+The <STRONG>cbFun</STRONG> and <STRONG>cbCtx</STRONG> parameters
+have the same meaning as in <A HREF="#AsynCommandGenerator.asyncGetCmd">
+AsynCommandGenerator.asyncGetCmd</A> method.
+</P>
+
+<P>
+The <STRONG>varNames</STRONG> parameter has the same meaning as in 
+<A HREF="#CommandGenerator.bulkCmd">CommandGenerator.bulkCmd</A> method
+except that here it is passed in as a tuple.
+</P>
+</DD>
+</DL>
+
+
+<P>
+After one or more requests have been submitted by calling one or more 
+of the methods above, Transport Dispatcher must be invoked to get SNMP
+engine running. This is done by calling:
+</P>
+
+<DL>
+<DT><STRONG>
+asynCommandGenerator.snmpEngine.transportDispatcher.runDispatcher
+</STRONG>
+()</DT>
+<DD>
+<P>
+Where <STRONG>asynCommandGenerator</STRONG> is 
+<STRONG>AsynCommandGenerator</STRONG> class instance.
+</P>
+</DL>
+
+<P>
+The <STRONG>runDispatcher</STRONG>() method terminates when no pending requests
+left for running Applications.
+</P>
+
+<H4>
+One-liner MIB services
+</H4>
+
+<P>
+In PySNMP, Managed Objects take shape of class instances that implement various
+<A HREF="#SMI">SMIv2</A> items. Collections of Managed Objects, or
+<A HREF="#MIB">MIB</A>s, translate, in a one-to-one fashion, into Python modules. 
+</P>
+
+<P>
+Automated conversion of MIB text files into Python modules can be done
+through the use of smidump tool of
+<A HREF="http://www.ibr.cs.tu-bs.de/projects/libsmi/">libsmi</A> package
+and <STRONG>libsmi2pysnmp</STRONG> script shipped with PySNMP.
+</P>
+
+<P>
+The same set of Managed Objects could serve both Manager and Agent purposes
+within a single SNMP entity. Both Manager and Agent access Managed Objects
+collection through role-specific Controllers: <STRONG>MibViewController</STRONG>
+for MIB lookup and <STRONG>MibInstrumentationController</STRONG> for
+Managed Objects modifications.
+</P>
+
+<A NAME="MANAGED-OBJECT-INSTANCE-NAME"></A>
+<P>
+At this point it's necessary to refine the definition of the
+Managed Object Name term. When Managed Object syntax and semantics
+is defined in MIB (like Python class definition), Managed Object definition 
+gets a name -- Managed Object Name (like class name in Python). When Managed 
+Object is implemented in Agent, it's a <STRONG>Managed Object Instance</STRONG>
+(like class instance in Python) with a new name. This new name is
+<STRONG>Managed Object Instance Name</STRONG>.
+</P>
+
+<P>
+<STRONG>Managed Object Instance Name</STRONG> is a concatication
+of <STRONG>Managed Object Name</STRONG> and some instance identifier.
+For Managed Objects of scalar type this is, by
+<A HREF="#SMI">SMIv2</A> convention, just a single zero integer (0).
+For <A HREF="#CONCEPTUAL-TABLES">Conceptual Table</A> elements, their
+instance identifier (also known as <STRONG>Index</STRONG>) depends of 
+<STRONG>Conceptual Table</STRONG> definition in MIB.
+</P>
+
+<P>
+All SNMP operations are performed against 
+<STRONG>Managed Object Instances</STRONG>.
+</P>
+
+<P>
+Standard SNMP Applications API includes convenience wrappers that
+simplify most frequent operations on <STRONG>MibViewController</STRONG>.
+This wrapper is implemented in form of several functions defined in
+<STRONG>pysnmp.entiry.rfc3412.mibvar</STRONG> module.
+</P>
+
+<A NAME="mibNameToOid"></A>
+<DL>
+<DT><STRONG>mibNameToOid</STRONG>(
+<STRONG>mibView</STRONG>,
+<STRONG>mibObjectName</STRONG>
+)</DT>
+
+<DD>
+<P>
+Resolve <A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>
+given in as MIB reference into <A HREF="#OID">Object Identifier</A>
+form.
+</P>
+</DD>
+
+<DD>
+<P>
+The <STRONG>mibView</STRONG> parameter is an instance of
+<STRONG>MibViewController</STRONG>.
+</P>
+
+<P>
+The <STRONG>mibObjectName</STRONG> parameter is 
+<A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>.
+It can be specified in several forms:
+</P>
+<UL>
+<LI>
+Tuple or tuple-like <A HREF="#OID-IMPL">Object Identifier</A> such as:
+(1, 3, 6, 1)
+<LI>
+Tuple of numeric and/or string sub-<A HREF="#OID">OID</A>s. The latter represents
+OID labels such as: ('iso', 2, 'dod', 1).
+<LI>
+A tuple of (
+( <STRONG>mibModuleName</STRONG>, 
+  <STRONG>mibSymbolName</STRONG> ),
+<STRONG>indexPart</STRONG>
+)
+where:
+<UL>
+<LI>
+<STRONG>mibModuleName</STRONG> is MIB module name (string) such as "SNMPv2-MIB"
+<LI>
+<STRONG>mibSymbolName</STRONG> is MIB symbolic name (string) such as "sysDescr"
+<LI>
+<STRONG>indexPart</STRONG> is a sequence of Managed Object 
+<A HREF="#MANAGED-OBJECT-INSTANCE-NAME">instance</A>
+index components. For Managed Objects of scalar type this is a single zero 
+integer (0). For
+<A HREF="#CONCEPTUAL-TABLES">Conceptual Table</A> elements, their
+<STRONG>indexPart</STRONG> value(s) would be one or more initializers for
+index components.
+</P>
+
+<P>
+For example, for <A HREF="#OCTETSTRING-IMPL">OctetString</A>-based index, 
+<STRONG>indexPart</STRONG> would be a sequence of strings like
+("my router", "my user"). For <A HREF="#IPADDRESS-IMPL">IpAddress</A>-based
+index, <STRONG>indexPart</STRONG> value would be one or more quad-dotted 
+IP Address ("127.0.0.1") and so on.
+</P>
+</UL>
+
+<P>
+The <STRONG>mibNameToOid</STRONG> function returns a tuple of
+(
+<STRONG>objectName</STRONG>,
+<STRONG>objectIndex</STRONG>
+).
+</P>
+
+<P>
+The <STRONG>objectName</STRONG> is an instance of
+<A HREF="#OID-IMPL">ObjectIdentifier</A> representing Managed 
+Object Name.
+</P>
+
+<P>
+The <STRONG>objectIndex</STRONG> is an instance of
+<A HREF="#OID-IMPL">ObjectIdentifier</A> representing Managed
+Object Name index. Concatination of <STRONG>objectName</STRONG> and
+<STRONG>objectIndex</STRONG> produces full specification of
+<A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>.
+</P>
+</DD>
+</DL>
+
+<A NAME="oidToMibName"></A>
+<DL>
+<DT><STRONG>oidToMibName</STRONG>(
+<STRONG>mibView</STRONG>,
+<STRONG>oid</STRONG>
+)</DT>
+
+<DD>
+<P>
+Resolve <A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>
+from <A HREF="#OID">Object Identifier</A> form into MIB reference.
+</P>
+</DD>
+
+<DD>
+<P>
+The <STRONG>mibView</STRONG> parameter is an instance of
+<STRONG>MibViewController</STRONG>.
+</P>
+
+<P>
+The <STRONG>oid</STRONG> parameter is 
+<A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>
+expressed in <A HREF="#OID-IMPL">ObjectIdentifier</A> form.
+</P>
+
+<P>
+The <STRONG>oidToMibName</STRONG> function returns a tuple of
+(
+<STRONG>mibModuleName</STRONG>,
+<STRONG>mibSymbolName</STRONG>,
+<STRONG>indexPart</STRONG>
+)
+</P>
+
+<P>
+The <STRONG>mibModuleName</STRONG>, <STRONG>mibSymbolName</STRONG> and
+<STRONG>indexPart</STRONG> parameters have the same meaning as in
+<A HREF="#mibNameToOid">mibNameToOid</A> function.
+</P>
+</DD>
+</DL>
+
+<A NAME="cloneFromMibValue"></A>
+<DL>
+<DT><STRONG>cloneFromMibValue</STRONG>(
+<STRONG>mibView</STRONG>,
+<STRONG>mibModuleName</STRONG>,
+<STRONG>mibSymbolName</STRONG>,
+<STRONG>valueInitializer</STRONG>
+)</DT>
+
+<DD>
+<P>
+Create a new instance of Managed Object Value by MIB reference.
+</P>
+</DD>
+
+<DD>
+<P>
+The <STRONG>mibView</STRONG>, <STRONG>mibModuleName</STRONG> and
+<STRONG>mibSymbolName</STRONG> parameters have the same meaning as in
+<A HREF="#mibNameToOid">mibNameToOid</A> function.
+</P>
+
+<P>
+The <STRONG>valueInitializer</STRONG> parameter will be used on
+Managed Object <A HREF="#VAL-IMPL">Value</A> instantiation.
+</P>
+
+<P>
+The <STRONG>cloneFromMibValue</STRONG> function returns a new instance
+of Managed Object <A HREF="#VAL-IMPL">Value</A>.
+</P>
+</DD>
+</DL>
+
+<P>
+See
+<A HREF="http://pysnmp.sourceforge.net/examples/4.x/v3arch/oneliner/manager/withmib/nextgen.html">
+GETNEXT Command Generator with MIB resolution
+</A> script as an example on One-liner API to MIB services.
+</P>
+
+<H4>
+Data model for Managed Objects
+</H4>
+
+<A NAME="OIDVAL-IMPL">
+<P>
+In PySNMP programming context, <A HREF="#MANAGED-OBJECTS">
+Managed Object</A> term (also called <STRONG>Variable-Binding</STRONG> in
+protocol specifications) refers to a tuple of Managed Object Name and 
+Managed Object Value.
+</P>
+
+<P>
+Managed Objects Names and Values are <A HREF="#ASN1">ASN.1</A> types 
+by-definition. Both Names and Values are derived from 
+<A HREF="http://pyasn1.sf.net">PyASN1</A> classes. These are defined in
+<STRONG>pysnmp.proto.rfc1902</STRONG> module.
+</P>
+
+<A NAME="OID-IMPL">
+<P>
+Managed Object Name is a tuple or tuple-like
+<A HREF="#OID">Object Identifier</A> class instance.
+</P>
+
+<DL>
+<DT>class <STRONG>ObjectIdentifier</STRONG>(
+<STRONG>objectIdentifier</STRONG>
+)</DT>
+<DD>
+<P>
+Create an <A HREF="#OID">ASN.1 Object Identifier</A> object. The
+<STRONG>objectIdentifier</STRONG> parameter represents Object Identifier
+value. It should be either a tuple or tuple-like object or a string
+representing Object Identifier in dotted notation (like "1.3.6.1").
+</P>
+
+<P>
+Instances of this class mimic basic properties of Python tuple. Sub-OIDs 
+of an OID translate into tuple components.
+</P>
+
+<P>
+For more information on <STRONG>ObjectIdentifier</STRONG> class properties,
+refer to <A HREF="http://pyasn1.sf.net">PyASN1</A> documentation.
+</P>
+</DD>
+</DL>
+
+<A NAME="VAL-IMPL">
+<P>
+It's PySNMP the design decision to always use <STRONG>SMIv2</STRONG> 
+definitions for Managed Objects regardless of SNMP protocol version being 
+used.
+</P>
+
+<P>
+Managed Object Value is an instance of some
+<A HREF="http://pyasn1.sf.net">PyASN1</A> class or its
+SNMP-specific derivative. The latter case reflects SNMP-specific
+<A HREF="#ASN1">ASN.1</A> sub-type. The list of Managed Object Value
+classes follows.
+</P>
+
+<A NAME="INTEGER-IMPL"></A>
+<DL>
+<DT>class <STRONG>Integer</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Integer</STRONG> object. The <STRONG>value</STRONG>
+parameter should be an integer value. Instances of this class mimic basic 
+properties of a Python integer.
+</P>
+</DD>
+</DL>
+
+<A NAME="INTEGER32-IMPL"></A>
+<DL>
+<DT>class <STRONG>Integer32</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Integer32</STRONG> object. This object is similar to 
+<A HREF="#INTEGER-IMPL">Integer</A> class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="OCTETSTRING-IMPL"></A>
+<DL>
+<DT>class <STRONG>OctetString</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>OctetString</STRONG> object. The <STRONG>value</STRONG>
+parameter should be a string value. Instances of this class mimic basic
+properties of a Python string.
+</P>
+</DD>
+</DL>
+
+<A NAME="IPADDRESS-IMPL"></A>
+<DL>
+<DT>class <STRONG>IpAddress</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>IpAddress</STRONG> object. The <STRONG>value</STRONG>
+parameter should be an IP address expressed in quad-dotted notation (e.g. 
+"127.0.0.1").
+</P>
+</DD>
+</DL>
+
+<A NAME="COUNTER32-IMPL"></A>
+<DL>
+<DT>class <STRONG>Counter32</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Counter32</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="GAUGE32-IMPL"></A>
+<DL>
+<DT>class <STRONG>Gauge32</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Gauge32</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="UNSIGNED32-IMPL"></A>
+<DL>
+<DT>class <STRONG>Unsigned32</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Unsigned32</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="TIMETICKS-IMPL"></A>
+<DL>
+<DT>class <STRONG>TimeTicks</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>TimeTicks</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="OPAQUE-IMPL"></A>
+<DL>
+<DT>class <STRONG>Opaque</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Opaque</STRONG> object. This object is similar to 
+<A HREF="#OCTETSTRING-IMPL">OctetString</A> class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="COUNTER64-IMPL"></A>
+<DL>
+<DT>class <STRONG>Counter64</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Counter64</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="BITS-IMPL"></A>
+<DL>
+<DT>class <STRONG>Bits</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Bits</STRONG> object. The <STRONG>value</STRONG>
+parameter should be sequence of names of bits raised to one. Unmentioned
+bits default to zero.
+</P>
+</DD>
+</DL>
+
+<P>
+For more information on SNMP Managed Value objects properties,
+refer to their base classes in <A HREF="http://pyasn1.sf.net">PyASN1</A> 
+documentation.
+</P>
+
+<HR>
+
+<H4>
+Appendixies
+</H4>
+
+<A NAME="ASN1">
+<H4>
+ASN.1 standard
+</H4>
+
+<P>
+SNMP relies on Abstract Syntax Notation One (ASN.1) 
+<A HREF="http://www.itu.int/ITU-T/studygroups/com17/languages/index.html">
+ITU-T standard
+</A>. It is actually a family of standards targeting network systems 
+interoperability and protocols development automation.
+</P>
+
+<P>
+In theory, ASN.1 technology provides a complete solution for protocol
+development: new protocol could be expressed in terms of 
+data structures described in a specialized formal language.
+</P>
+
+<P>
+The ASN.1 notation is designed purely for data description. All data 
+structures there are based on a small set of elementary data types,
+such as INTEGER or SEQUENCE OF some other types. 
+</P>
+
+<P>
+Whenever protocol designer wants to define a more precise, narrow set of
+valid values for a field, a <STRONG>subtype</STRONG> can be created from a base ASN.1
+type or another subtype by tearing up a <STRONG>constraint</STRONG> on various data
+properties to parent ASN.1 type. For example, a subtype of in INTEGER may
+allow only arbitrary values of an integer.
+</P>
+
+<P>
+Another way to create a <STRONG>subtype</STRONG> from existing type is to add
+or replace ASN.1 <STRONG>tag</STRONG>, which serves like an ID for a type. In this
+new type has all the same properties of its parent type but is now known
+under a different name.
+</P>
+
+<P>
+Once something gets expressed in ASN.1 notation, it could then be  
+automatically translated into a variety of platform-specific implementations.
+They are often take shape of a program written in some common programming
+language like C or Python.
+</P>
+
+<P>
+This is where the major feature of ASN.1 emerges. ASN.1 text could be
+automatically compiled into a high-quality code, that handles all the 
+nightmares of platform-specifics, virtually for free. This code would 
+handle byte-ordering and value ranges, data structures validations and 
+consistency issues.
+</P>
+
+<P>
+But the most useful feature is its ability to represent data in a way 
+suitable for transmission over a communication medium. This is called 
+<A HREF="#ASN1-ENCODING">encoding</A> in ASN.1, and also known as 
+<STRONG>concrete or transfer syntax</STRONG> in computer science.
+</P>
+
+<P>
+SNMP uses these features of ASN.1 for handling Managed Objects and guiding
+protocol operations.
+</P>
+
+<A NAME="OID">
+<H4>
+Object Identifier
+</H4>
+
+<P>
+This technique is a simple, unambigious, decentralized and extensible 
+method of naming anything. It was developed within ASN.1 standard as 
+one of its build-in data types.
+</P>
+
+<P>
+An Object Identifier consists of a sequence of integers. Each integer in
+this sequence maps to a node in a tree, so iterating an OID traverses this
+tree from root to leaf, forming a branch. Nodes in OID tree hold a group of
+conceptually related objects. Nodes become more specific from root to
+leaves. Sub-trees, or parts of OID space, often become a cortesy of various
+organizations and individuals.
+</P>
+
+<P>
+OIDs are conventionally written as a dot-separated sequence of integers, from
+left to right as from root to leaves. For example, .1.3.6.1 is an arbitrary 
+OID.
+</P>
+
+<P>
+For the purpose of making OIDs human-readable, integers in OIDs 
+(AKA sub-OIDs) can be replaced with a textual labels. Consider
+.org.iso.dod.internet as a labeled version of the previous example.
+The numeric and labeled OID representations are invariant and may mix
+within a single OID.
+</P>
+
+<A NAME="ASN1-ENCODING">
+<H4>
+ASN.1 data encoding
+</H4>
+
+<P>
+For several entities to exchange ASN.1 data items some common transmission 
+protocol is needed. This protocol would have to be able to represent 
+ASN.1 values in a platform-native way. This might require handling hardware 
+and/or software specific issues such as varying integer sizes, byte ordering, 
+character encoding and so 
+on.
+</P>
+
+<P>
+Besides data representaion issues, this communication protocol would
+have to break up data being transmitted into small chunks. The reason 
+is that most data transmission technologies handle only a few bits in 
+a channel at any moment of time. After buffering and packing up few bits
+into larger chunks, most link-level protocols still handle information
+in small grains. Typical measurement is eight bit or octet.
+</P>
+
+<P>
+For all the reasons mentioned above, ASN.1 family of standards
+suggests several methods of two-way ASN.1 data convertion protocols.
+They are sometimes reffered to as data <STRONG>encoding</STRONG> or
+<STRONG>serialization</STRONG>.
+</P>
+
+<P>
+SNMP uses somewhat restricted flavour of <STRONG>Basic Encoding Rules</STRONG>
+(BER) for its ASN.1 data serialization purposes. The SNMP-specific 
+restrictions make BER encoding deterministic -- with these restrictions
+applied, there is a one-to-one mapping between ASN.1 value and octet-stream
+produced by BER encoder. Determinism in encoding makes it possible for
+trivial SNMP entities to reduce their SNMP engine implementation to opaque
+octet-streams manipulations.
+</P>
+
+<HR>
+
+<I>
+<P>
+Warning! This document is a draft. 
+It is neither complete nor accurate. 
+Handle with caution!
+</P>
+</I>
+
+</TR></TD></TABLE>
+
+</BODY>
+</HTML>
