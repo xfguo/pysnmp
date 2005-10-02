@@ -21,7 +21,7 @@ Network management
 <P>
 As networks become more complex, in terms of device population,
 topology and distances, it has been getting more and more important 
-for network administrators to have some easy and convinient way for
+for network administrators to have some easy and convenient way for
 controlling all pieces of the whole network.
 </P>
 
@@ -191,7 +191,7 @@ Objects contained within each Agent to talk to.
 <A NAME="MIB"></A>
 <A NAME="SMI"></A>
 <P>
-SNMP standard introduces a set of ASN.1 language constucts (such as ASN.1 
+SNMP standard introduces a set of ASN.1 language constructs (such as ASN.1 
 subtypes and MACROs) which is called <STRONG>Structure of Management Information</STRONG> 
 (<STRONG>SMI</STRONG>). Collections of related Managed Objects described in terms of 
 SMI comprise <STRONG>Management Information Base</STRONG> (<STRONG>MIB</STRONG>) modules.
@@ -223,7 +223,7 @@ were first published (
 The first version appears to be lightweight and easy to implement. 
 Although, its poor security became notorious over years (Security? Not My 
 Problem!), because cleartext password used for authentication (AKA 
-<STRONG>Community String</STRONG>) is extremely easy to eavedrop and replay, 
+<STRONG>Community String</STRONG>) is extremely easy to eavesdrop and replay, 
 even after almost 20 years, slightly refined standard
 (
 <A HREF="http://www.ietf.org/rfc/rfc1155.txt">RFC1155</A>,
@@ -239,7 +239,7 @@ came up with SNMPv2. This new protocol offers bulk transfers of Managed
 Objects information (by means of new, GETBULK message payload), improved 
 security and re-worked SMI. But its new party-based security system turned 
 out to be too complex. In the end, security part of SNMPv2 has been dropped 
-in favour of community-based authentication system used in SNMPv1. The result 
+in favor of community-based authentication system used in SNMPv1. The result 
 of this compromise is known as SNMPv2c (where "c" stands for community) and 
 is still widely supported without being a standard (
 <A HREF="http://www.ietf.org/rfc/rfc1902.txt">RFC1902</A>,
@@ -286,7 +286,7 @@ Security modules.
 
 <P>
 Besides highly detailed SNMP system specification, SNMPv3 standard also
-defines a typical set of SNMP applications and their behaviour. These
+defines a typical set of SNMP applications and their behavior. These
 applications are Manager, Agent and Proxy (
 <A HREF="http://www.ietf.org/rfc/rfc3411.txt">RFC3411</A>,
 <A HREF="http://www.ietf.org/rfc/rfc3412.txt">RFC3412</A>,
@@ -355,7 +355,7 @@ features are available.
 
 <LI>
 <P>
-At last, the highest-level API to SNMP functionality is availble through the
+At last, the highest-level API to SNMP functionality is available through the
 use of standard SNMPv3 applications. These applications cover the most 
 frequent needs. That's why this API is expected to be the first to 
 start with.
@@ -402,7 +402,7 @@ ALT="SNMP Engine" />
 <P>
 These standard SNMP applications, such as GET/SET command generators and 
 responders or TRAP notificators and receivers, translate into a set of
-classes desinged by the Visitor pattern. Application classes 
+classes designed by the Visitor pattern. Application classes 
 implement concrete SNMP operations in terms of specific PDU handling,
 while SNMP Engine class acts as a Visitor. A single SNMP Engine can serve 
 many Applications of different types at the same time.
@@ -1605,7 +1605,7 @@ Object Identifier
 </H4>
 
 <P>
-This technique is a simple, unambigious, decentralized and extensible 
+This technique is a simple, unambiguous, decentralized and extensible 
 method of naming anything. It was developed within ASN.1 standard as 
 one of its build-in data types.
 </P>
@@ -1615,7 +1615,7 @@ An Object Identifier consists of a sequence of integers. Each integer in
 this sequence maps to a node in a tree, so iterating an OID traverses this
 tree from root to leaf, forming a branch. Nodes in OID tree hold a group of
 conceptually related objects. Nodes become more specific from root to
-leaves. Sub-trees, or parts of OID space, often become a cortesy of various
+leaves. Sub-trees, or parts of OID space, often become a courtesy of various
 organizations and individuals.
 </P>
 
@@ -1648,7 +1648,7 @@ on.
 </P>
 
 <P>
-Besides data representaion issues, this communication protocol would
+Besides data representation issues, this communication protocol would
 have to break up data being transmitted into small chunks. The reason 
 is that most data transmission technologies handle only a few bits in 
 a channel at any moment of time. After buffering and packing up few bits
@@ -1658,13 +1658,13 @@ in small grains. Typical measurement is eight bit or octet.
 
 <P>
 For all the reasons mentioned above, ASN.1 family of standards
-suggests several methods of two-way ASN.1 data convertion protocols.
-They are sometimes reffered to as data <STRONG>encoding</STRONG> or
+suggests several methods of two-way ASN.1 data conversion protocols.
+They are sometimes referred to as data <STRONG>encoding</STRONG> or
 <STRONG>serialization</STRONG>.
 </P>
 
 <P>
-SNMP uses somewhat restricted flavour of <STRONG>Basic Encoding Rules</STRONG>
+SNMP uses somewhat restricted flavor of <STRONG>Basic Encoding Rules</STRONG>
 (BER) for its ASN.1 data serialization purposes. The SNMP-specific 
 restrictions make BER encoding deterministic -- with these restrictions
 applied, there is a one-to-one mapping between ASN.1 value and octet-stream
