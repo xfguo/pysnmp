@@ -12,7 +12,7 @@ class Error(StandardError): pass
 
 if len(sys.argv) > 1:
     sys.stderr.write('libsmi-to-pysnmp MIB converter. Run this tool like this:\n\
-libsmi -f python <mib-text-file.txt> | %s > <mib-text-file.py>\n' % sys.argv[0])
+smidump -f python <mib-text-file.txt> | %s > <mib-text-file.py>\n' % sys.argv[0])
     sys.exit(-1)
 
 inputText = ''
