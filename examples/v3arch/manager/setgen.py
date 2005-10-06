@@ -9,9 +9,11 @@ snmpEngine = engine.SnmpEngine()
 config.addV1System(snmpEngine, 'test-agent', 'public')
 
 # v3 setup
-config.addV3User(snmpEngine, 'test-user',
-                 config.usmHMACMD5AuthProtocol, 'authkey1',
-                 config.usmDESPrivProtocol, 'privkey1')
+config.addV3User(
+    snmpEngine, 'test-user',
+    config.usmHMACMD5AuthProtocol, 'authkey1',
+    config.usmDESPrivProtocol, 'privkey1'
+    )
 
 # Transport params
 #config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
