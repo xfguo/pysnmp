@@ -1,6 +1,6 @@
 from pysnmp.entity import engine, config
 from pysnmp.carrier.asynsock.dgram import udp
-from pysnmp.entity.rfc3413 import ntforg
+from pysnmp.entity.rfc3413 import ntforg, context
 
 snmpEngine = engine.SnmpEngine()
 
@@ -39,9 +39,12 @@ config.addSocketTransport(
 def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
           varBinds, cbCtx):
     return
+
+# SNMP context
+snmpContext = context.SnmpContext(snmpEngine)
     
-ntforg.NotificationOriginator().sendNotification(
-    snmpEngine, 'myNotifyName', (1,3,6),(), '', cbFun # XXX coldStart
+ntforg.NotificationOriginator(snmpContext).sendNotification(
+    snmpEngine, 'myNotifyName', (1,3,6,1,6,3,1,1,5,1),(), '', cbFun
     )
 
 snmpEngine.transportDispatcher.runDispatcher()
