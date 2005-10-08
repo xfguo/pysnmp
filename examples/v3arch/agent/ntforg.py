@@ -40,11 +40,15 @@ def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
           varBinds, cbCtx):
     return
 
+# Agent-side VACM setup
+config.addContext(snmpEngine, '')
+config.addTrapUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
+
 # SNMP context
 snmpContext = context.SnmpContext(snmpEngine)
     
 ntforg.NotificationOriginator(snmpContext).sendNotification(
-    snmpEngine, 'myNotifyName', (1,3,6,1,6,3,1,1,5,1),(), '', cbFun
+    snmpEngine, 'myNotifyName', ('SNMPv2-MIB', 'coldStart'),(), '', cbFun
     )
 
 snmpEngine.transportDispatcher.runDispatcher()
