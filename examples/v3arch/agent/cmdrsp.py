@@ -42,8 +42,8 @@ config.addRoUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
 snmpContext = context.SnmpContext(snmpEngine)
 
 # Apps registration
-getApp = cmdrsp.GetCommandResponder(snmpEngine, snmpContext)
-getApp = cmdrsp.NextCommandResponder(snmpEngine, snmpContext)
-getApp = cmdrsp.BulkCommandResponder(snmpEngine, snmpContext)
+cmdrsp.GetCommandResponder(snmpEngine, snmpContext)
+cmdrsp.NextCommandResponder(snmpEngine, snmpContext)
+cmdrsp.BulkCommandResponder(snmpEngine, snmpContext)
 snmpEngine.transportDispatcher.jobStarted(1) # this job would never finish
 snmpEngine.transportDispatcher.runDispatcher()
