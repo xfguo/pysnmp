@@ -9,7 +9,8 @@ errorIndication = ntforg.NotificationOriginator().sendNotification(
     # SNMP v3
     ntforg.UsmUserData('test-user', 'authkey1', 'privkey1'),
     ntforg.UdpTransportTarget(('localhost', 162)),
-    'trap',
+#    'trap',
+    'inform',    
     ('SNMPv2-MIB', 'coldStart'),
     (((1,3,6,1,2,1,1,3,0), v2c.TimeTicks(44100)),)
     )
@@ -18,5 +19,4 @@ if errorIndication:
     print errorIndication
 
 # XXX
-# informs require cbFun?
-# responses do not come back for informs
+# informs require cbFun
