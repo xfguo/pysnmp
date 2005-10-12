@@ -17,6 +17,3 @@ errorIndication = ntforg.NotificationOriginator().sendNotification(
 
 if errorIndication:
     print errorIndication
-
-# XXX
-# informs require cbFun
