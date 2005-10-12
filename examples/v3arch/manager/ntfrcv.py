@@ -11,7 +11,7 @@ snmpEngine = engine.SnmpEngine()
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 1162))
+    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 162))
     )
 
 # v1/2 setup
@@ -22,14 +22,19 @@ config.addV3User(
     snmpEngine, 'test-user',
     config.usmHMACMD5AuthProtocol, 'authkey1',
     config.usmDESPrivProtocol, 'privkey1'
+#    '80004fb81c3dafe69'   # ContextEngineID of Notification Originator
     )
     
 # Callback function for receiving notifications
 def cbFun(snmpEngine,
-          contextEngineID, contextName,
+          contextEngineId, contextName,
           varBinds,
           cbCtx):
-    print contextEngineID, contextName, varBinds
+    print 'Notification from SNMP Engine \"%s\", Context \"%s\"' % (
+        contextEngineId, contextName
+        )
+    for name, val in varBinds:
+        print '%s=%s' % (name, val.prettyOut(val))
 
 # Apps registration
 ntfrcv.NotificationReceiver(snmpEngine, cbFun)
