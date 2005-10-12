@@ -46,10 +46,19 @@ config.addTrapUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
 
 # SNMP context
 snmpContext = context.SnmpContext(snmpEngine)
-    
-ntforg.NotificationOriginator(snmpContext).sendNotification(
+
+def cbFun(snmpEngine, errorIndication):
+    if errorIndication:
+        print errorIndication
+        
+errorIndication = ntforg.NotificationOriginator(snmpContext).sendNotification(
     snmpEngine, 'myNotifyName', ('SNMPv2-MIB', 'coldStart'),
-    (((1,3,6,1,2,1,1,5), v2c.OctetString('Example Notificator')),), ''
+    (((1,3,6,1,2,1,1,5), v2c.OctetString('Example Notificator')),),
+    cbFun
     )
+
+if errorIndication:
+    print errorIndication
+    return
 
 snmpEngine.transportDispatcher.runDispatcher()
