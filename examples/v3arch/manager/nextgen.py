@@ -21,7 +21,7 @@ config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
 # Transport addresses
 config.addTargetAddr(
     snmpEngine, 'myRouter', config.snmpUDPDomain,
-    ('127.0.0.1', 161), 'myParams'    
+    ('127.0.0.1', 161), 'myParams'
     )
 
 # Transport
@@ -41,7 +41,10 @@ def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
         return
     for varBindRow in varBindTable:
         for oid, val in varBindRow:
-            print '%s = %s' % (oid, val.prettyOut(val))
+            if val is None:
+                print oid
+            else:            
+                print '%s = %s' % (oid, val.prettyOut(val))
     for oid, val in varBindTable[-1]:
         if val is not None:
             break
