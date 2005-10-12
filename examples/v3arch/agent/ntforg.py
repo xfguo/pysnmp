@@ -16,18 +16,19 @@ config.addV3User(
     )
 
 # Transport params
-#config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
-config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 0)
+config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
+#config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 0)
 
 # Transport addresses
 config.addTargetAddr(
     snmpEngine, 'myNMS', config.snmpUDPDomain,
-    ('127.0.0.1', 1162), 'myParams', tagList='myManagementStations'
+    ('127.0.0.1', 162), 'myParams', tagList='myManagementStations'
     )
 
 # Notification targets
 config.addNotificationTarget(
-    snmpEngine, 'myNotifyName', 'myParams', 'myManagementStations'
+#    snmpEngine, 'myNotifyName', 'myParams', 'myManagementStations', 'trap'
+    snmpEngine, 'myNotifyName', 'myParams', 'myManagementStations', 'inform'
     )
 
 # Setup transport endpoint
@@ -48,7 +49,7 @@ snmpContext = context.SnmpContext(snmpEngine)
     
 ntforg.NotificationOriginator(snmpContext).sendNotification(
     snmpEngine, 'myNotifyName', ('SNMPv2-MIB', 'coldStart'),
-    (((1,3,6,1,2,1,1,5), v2c.Integer(1)),), ''
+    (((1,3,6,1,2,1,1,5), v2c.OctetString('Example Notificator')),), ''
     )
 
 snmpEngine.transportDispatcher.runDispatcher()
