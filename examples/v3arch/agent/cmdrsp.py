@@ -11,7 +11,7 @@ snmpEngine = engine.SnmpEngine()
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 161))
+    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 1161))
     )
 
 # Create and put on-line my managed object
@@ -34,15 +34,16 @@ config.addV3User(
     
 # VACM setup
 config.addContext(snmpEngine, '')
-config.addRoUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v1
-config.addRoUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v2c
-config.addRoUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
+config.addRwUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v1
+config.addRwUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v2c
+config.addRwUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
 
 # SNMP context
 snmpContext = context.SnmpContext(snmpEngine)
 
 # Apps registration
 cmdrsp.GetCommandResponder(snmpEngine, snmpContext)
+cmdrsp.SetCommandResponder(snmpEngine, snmpContext)
 cmdrsp.NextCommandResponder(snmpEngine, snmpContext)
 cmdrsp.BulkCommandResponder(snmpEngine, snmpContext)
 snmpEngine.transportDispatcher.jobStarted(1) # this job would never finish
