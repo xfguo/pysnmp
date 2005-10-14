@@ -28,7 +28,7 @@ if errorIndication:
 else:
     if errorStatus:
         print '%s at %s\n' % (
-            errorStatus.prettyOut(errorStatus),
+            errorStatus.prettyPrint(),
             varBindTable[-1][int(errorIndex)-1]
             )
     else:
@@ -42,6 +42,6 @@ else:
                       )
                 print '%s::%s.%s = %s' % (
                     modName, symName,
-                    string.join(map(lambda v: v.prettyOut(v), indices), '.'),
-                    val.prettyOut(val)
+                    string.join(map(lambda v: v.prettyPrint(), indices), '.'),
+                    val.prettyPrint()
                     )

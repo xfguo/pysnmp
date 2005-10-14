@@ -33,7 +33,7 @@ if errorIndication:
 else:
     if errorStatus:
         print '%s at %s\n' % (
-            errorStatus.prettyOut(errorStatus), varBinds[int(errorIndex)-1]
+            errorStatus.prettyPrint(), varBinds[int(errorIndex)-1]
             )
     else:
         for oid, val in varBinds:
@@ -45,6 +45,6 @@ else:
                 )
             print '%s::%s.%s = %s' % (
                 modName, symName,
-                string.join(map(lambda v: v.prettyOut(v), indices), '.'),
-                val.prettyOut(val)
+                string.join(map(lambda v: v.prettyPrint(), indices), '.'),
+                val.prettyPrint()
                 )

@@ -17,10 +17,10 @@ if errorIndication:
 else:
     if errorStatus:
         print '%s at %s\n' % (
-            errorStatus.prettyOut(errorStatus),
+            errorStatus.prettyPrint(),
             varBindTable[-1][int(errorIndex)-1]
             )
     else:
         for varBindTableRow in varBindTable:
             for name, val in varBindTableRow:
-                print '%s = %s' % (name, val.prettyOut(val))
+                print '%s=%s' % (name.prettyPrint(), val.prettyPrint())
