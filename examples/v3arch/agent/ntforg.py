@@ -47,7 +47,7 @@ config.addTrapUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
 # SNMP context
 snmpContext = context.SnmpContext(snmpEngine)
 
-def cbFun(snmpEngine, errorIndication):
+def cbFun(snmpEngine, errorIndication, cbCtx):
     if errorIndication:
         print errorIndication
         
@@ -59,6 +59,5 @@ errorIndication = ntforg.NotificationOriginator(snmpContext).sendNotification(
 
 if errorIndication:
     print errorIndication
-    return
-
-snmpEngine.transportDispatcher.runDispatcher()
+else:
+    snmpEngine.transportDispatcher.runDispatcher()
