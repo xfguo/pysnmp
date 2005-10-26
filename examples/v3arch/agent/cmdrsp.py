@@ -11,16 +11,18 @@ snmpEngine = engine.SnmpEngine()
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 1161))
+    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 161))
     )
 
+snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.loadModules('SNMPv2-MIB-INSTRUM')
+
 # Create and put on-line my managed object
-MibVariable, = snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.importSymbols('SNMPv2-SMI', 'MibVariable')
-OctetString, = snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.importSymbols('ASN1', 'OctetString')
-myMibVariable = MibVariable(
-    (1,3,6,1,4,1,20408,2,1), OctetString('hello, NMS!')
-    ).setMaxAccess("readwrite")
-snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.exportSymbols('PYSNMP-EXAMPLE-MIB', myMibVariable=myMibVariable)  # creating MIB
+sysDescr, = snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.importSymbols('SNMPv2-MIB', 'sysDescr')
+MibScalarInstance, = snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.importSymbols('SNMPv2-SMI', 'MibScalarInstance')
+sysDescrInstance = MibScalarInstance(
+    sysDescr.name, (0,), sysDescr.syntax.clone('hello, NMS!')
+    )
+snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.exportSymbols('PYSNMP-EXAMPLE-MIB', sysDescrInstance=sysDescrInstance)  # creating MIB
 
 # v1/2 setup
 config.addV1System(snmpEngine, 'test-agent', 'public')
