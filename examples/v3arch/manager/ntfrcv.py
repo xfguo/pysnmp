@@ -34,7 +34,7 @@ def cbFun(snmpEngine,
         contextEngineId, contextName
         )
     for name, val in varBinds:
-        print '%s=%s' % (name.prettyPrint(), val.prettyPrint())
+        print '%s = %s' % (name.prettyPrint(), val.prettyPrint())
 
 # Apps registration
 ntfrcv.NotificationReceiver(snmpEngine, cbFun)

@@ -52,4 +52,4 @@ elif cbCtx['errorStatus']:
     print cbCtx['errorStatus'].prettyPrint()
 else:
     for oid, val in cbCtx['varBinds']:
-        print '%s=%s' % (oid.prettyPrint(), val.prettyPrint())
+        print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
