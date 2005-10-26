@@ -14,13 +14,11 @@ config.addSocketTransport(
     udp.UdpSocketTransport().openServerMode(('127.0.0.1', 161))
     )
 
-snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.loadModules('SNMPv2-MIB-INSTRUM')
-
 # Create and put on-line my managed object
 sysDescr, = snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.importSymbols('SNMPv2-MIB', 'sysDescr')
 MibScalarInstance, = snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.importSymbols('SNMPv2-SMI', 'MibScalarInstance')
 sysDescrInstance = MibScalarInstance(
-    sysDescr.name, (0,), sysDescr.syntax.clone('hello, NMS!')
+    sysDescr.name, (0,), sysDescr.syntax.clone('Example Command Responder')
     )
 snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.exportSymbols('PYSNMP-EXAMPLE-MIB', sysDescrInstance=sysDescrInstance)  # creating MIB
 
