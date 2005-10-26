@@ -16,8 +16,8 @@ config.addV3User(
     )
 
 # Transport params
-#config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
-config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 0)
+config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
+#config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 0)
 
 # Transport addresses
 config.addTargetAddr(
