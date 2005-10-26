@@ -6,7 +6,7 @@ from string import split, replace, find, atol, atoi
 from types import StringType, DictType
 import sys, time
 
-version = '0.0.4-alpha'
+version = '0.0.5-alpha'
 
 class Error(StandardError): pass
 
@@ -45,7 +45,7 @@ out = sys.stdout
 
 __symsTable = {
     'MODULE-IDENTITY': ('ModuleIdentity',),
-    'OBJECT-TYPE': ('MibVariable', 'MibTable', 'MibTableRow', 'MibTableColumn'),
+    'OBJECT-TYPE': ('MibScalar', 'MibTable', 'MibTableRow', 'MibTableColumn'),
     'NOTIFICATION-TYPE': ('NotificationType',),
     'TEXTUAL-CONVENTION': ('TextualConvention',),
     'MODULE-COMPLIANCE': ('ModuleCompliance',),
@@ -298,7 +298,7 @@ if nodes:
             else:
                 out.write('MibIdentifier(%s)' % __oidToTuple(symDef['oid']))
         if symDef['nodetype'] == 'scalar':
-            out.write('MibVariable(%s' % __oidToTuple(symDef['oid']))
+            out.write('MibScalar(%s' % __oidToTuple(symDef['oid']))
             out.write('%s)' % __genTypeDef((symName, symDef)))
             out.write('.setMaxAccess(\"%s\")' % symDef['access'])
             if symDef.has_key('units'):
@@ -331,9 +331,8 @@ if nodes:
                         ))
                 out.write(')')
         if symDef['nodetype'] == 'column':
-            out.write('MibTableColumn(%s)' % __oidToTuple(symDef['oid']))
-            out.write('.setColumnInitializer(MibVariable(()')
-            out.write('%s)' % __genTypeDef((symName, symDef)))
+            out.write('MibTableColumn(%s' % __oidToTuple(symDef['oid']))
+            out.write(', %s)' % __genTypeDef((symName, symDef)))
             out.write('.setMaxAccess(\"%s\"))' % symDef['access'])
             
         out.write('%s\n' % addLabelForSymbol(symName))
