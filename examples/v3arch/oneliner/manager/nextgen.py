@@ -23,4 +23,4 @@ else:
     else:
         for varBindTableRow in varBindTable:
             for name, val in varBindTableRow:
-                print '%s=%s' % (name.prettyPrint(), val.prettyPrint())
+                print '%s = %s' % (name.prettyPrint(), val.prettyPrint())
