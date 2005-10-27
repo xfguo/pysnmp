@@ -332,8 +332,8 @@ if nodes:
                 out.write(')')
         if symDef['nodetype'] == 'column':
             out.write('MibTableColumn(%s' % __oidToTuple(symDef['oid']))
-            out.write(', %s)' % __genTypeDef((symName, symDef)))
-            out.write('.setMaxAccess(\"%s\"))' % symDef['access'])
+            out.write('%s)' % __genTypeDef((symName, symDef)))
+            out.write('.setMaxAccess(\"%s\")' % symDef['access'])
             
         out.write('%s\n' % addLabelForSymbol(symName))
 
