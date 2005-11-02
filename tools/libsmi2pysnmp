@@ -295,6 +295,13 @@ if nodes:
         if symDef['nodetype'] == 'node':
             if symName == moduleIdentityNode:
                 out.write('ModuleIdentity(%s)' % __oidToTuple(symDef['oid']))
+                if mib.has_key(dstModName):
+                    m = mib[dstModName]
+                    if m.has_key("revisions"):
+                        out.write('.setRevisions((')
+                        for r in m["revisions"]:
+                            out.write('\"%s\",' % r["date"])
+                        out.write('))')
             else:
                 out.write('MibIdentifier(%s)' % __oidToTuple(symDef['oid']))
         if symDef['nodetype'] == 'scalar':
@@ -402,6 +409,12 @@ if groups:
 
 out.write('\n# Exports\n\n')
 
+if moduleIdentityNode:
+    out.write('# Module identity\n')
+    out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)    
+    out.write(', PYSNMP_MODULE_ID=%s' % moduleIdentityNode)
+    out.write(')\n\n')
+    
 if typedefs:
     out.write('# Types\n')
     out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)    
