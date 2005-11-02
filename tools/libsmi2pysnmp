@@ -301,9 +301,6 @@ if nodes:
             out.write('MibScalar(%s' % __oidToTuple(symDef['oid']))
             out.write('%s)' % __genTypeDef((symName, symDef)))
             out.write('.setMaxAccess(\"%s\")' % symDef['access'])
-            if symDef.has_key('status') and symDef['status'] != 'current' \
-                    and symDef['status'] != 'mandatory':
-                out.write('.setStatus(\"%s\")' % symDef['status'])
             if symDef.has_key('units'):
                 out.write('.setUnits(\"%s\")' % symDef['units'])
         if symDef['nodetype'] == 'table':
@@ -337,9 +334,6 @@ if nodes:
             out.write('MibTableColumn(%s' % __oidToTuple(symDef['oid']))
             out.write('%s)' % __genTypeDef((symName, symDef)))
             out.write('.setMaxAccess(\"%s\")' % symDef['access'])
-            if symDef.has_key('status') and symDef['status'] != 'current' \
-                    and symDef['status'] != 'mandatory':
-                out.write('.setStatus(\"%s\")' % symDef['status'])
             
         out.write('%s\n' % addLabelForSymbol(symName))
 
