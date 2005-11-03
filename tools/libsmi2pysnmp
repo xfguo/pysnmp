@@ -138,6 +138,10 @@ __kludgyStringTypes = {
     'JmJobStringTC': 1
     }
 
+__buggySmiTypes = {
+    'NetworkAddress': 'IpAddress' # this is up to smidump, but it does not care
+    }
+
 def __genTypeDef((symName, symDef), classMode=0):
     r = ''
     if classMode:
@@ -153,6 +157,11 @@ def __genTypeDef((symName, symDef), classMode=0):
         parentType = typeDef['parent module']['type']
     else:
         parentType = baseType
+    # Ugly hack to overcome smidump bug in smiv1->smiv2 convertion
+    if __buggySmiTypes.has_key(baseType):
+        baseType = __buggySmiTypes[baseType]
+    if __buggySmiTypes.has_key(parentType):
+        parentType = __buggySmiTypes[parentType]
     if classMode:
         r = r + 'class %s(' % symName
         if typeDef.has_key('format'):
