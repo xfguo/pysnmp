@@ -12,7 +12,7 @@ errorIndication = ntforg.NotificationOriginator().sendNotification(
 #    'trap',
     'inform',    
     ('SNMPv2-MIB', 'coldStart'),
-    (((1,3,6,1,2,1,1,3,0), v2c.TimeTicks(44100)),)
+    ((1,3,6,1,2,1,1,3,0), v2c.TimeTicks(44100))
     )
 
 if errorIndication:
