@@ -597,8 +597,17 @@ is the same as in <STRONG>getCmd</STRONG>.
 </P>
 
 <P>
-The output <STRONG>varBinds</STRONG> parameter has the same meaning as
-in <STRONG>getCmd</STRONG> method.
+The <STRONG>setCmd</STRONG> method returns a tuple of
+<STRONG>errorIndication</STRONG>, 
+<STRONG>errorStatus</STRONG>,
+<STRONG>errorIndex</STRONG>,
+<STRONG>varBinds</STRONG>. 
+</P>
+
+<P>
+The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG> and
+<STRONG>errorIndex</STRONG> parameters have the same meaning as in
+<STRONG>getCmd</STRONG> method.
 </P>
 
 </DD>
@@ -701,6 +710,86 @@ The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG>,
 <STRONG>errorIndex</STRONG> and <STRONG>varBindTable</STRONG> parameters have
 the same meaning as in <STRONG>getCmd</STRONG> method.
 </P>
+</DD>
+</DL>
+
+<P>
+Notification Originator Applications are implemented within a single class:
+</P>
+
+<A NAME="NotificationOriginator"></A>
+<DL>
+<DT>class <STRONG>NotificationOriginator</STRONG>([<STRONG>snmpContext</STRONG>])</DT>
+<DD>
+<P>
+Create a SNMP Notification Originator object.
+</P>
+</DD>
+</DL>
+
+<P>
+The following method of <STRONG>NotificationOriginator</STRONG> class instance 
+implements specific notifications types.
+</P>
+
+<A NAME="NotificationOriginator.sendNotification"></A>
+<DL>
+<DT><STRONG>sendNotification</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>notifyType</STRONG>,
+<STRONG>notificationType</STRONG>,
+<STRONG>*varBinds</STRONG>
+)</DT>
+
+<DD>
+<P>
+Send either unconfirmed (TRAP) or confirmed (INFORM) SNMP notification 
+and possibly return an error indication.
+</P>
+
+<P>
+The <STRONG>authData</STRONG> and <STRONG>transportTarget</STRONG> parameters
+have the same semantics as in <STRONG>CommandGenerator.getCmd</STRONG> method.
+</P>
+
+<P>
+The <STRONG>notifyType</STRONG> parameter determines the type of notification 
+to be generated. Supported values include <STRONG>"trap"</STRONG> for
+unconfirmed notification or <STRONG>"inform"</STRONG> for a confirmed one.
+</P>
+
+<P>
+Be advised, that when using confirmed notification, Notification Receiver
+must know ContextEngineID of Notification Originator to be able to
+process and acknowledge confirmed notification.
+</P>
+
+<P>
+The <STRONG>notificationType</STRONG> parameter indicates the kind of
+event to notify Manager about in form of SMI NOTIFICATION-TYPE object
+name.
+</P>
+
+<P>
+For example: (1, 3, 6, 1, 6, 3, 1, 1, 5, 1) stands for coldStart
+notification of SNMPv2-MIB. This could also be given as a 
+<A HREF="#mibNameToOid">Managed Object Name</A>: ('SNMPv2-MIB', 'coldStart').
+</P>
+
+<P>
+The <STRONG>*varBinds</STRONG> input parameter is a tuple of Managed
+Objects to be passed over to Manager along with Notification. The syntax 
+of <STRONG>*varBinds</STRONG> is the same as in 
+<STRONG>CommandGenerator.getCmd</STRONG>.
+</P>
+
+<P>
+The <STRONG>sendNotification</STRONG> method returns an
+<STRONG>errorIndication</STRONG> parameter which has the same meaning as
+in <STRONG>CommandGenerator.getCmd</STRONG>.
+</P>
+
 </DD>
 </DL>
 
@@ -831,7 +920,10 @@ integer.
 See
 <A HREF="http://pysnmp.sourceforge.net/examples/4.x/v3arch/oneliner/manager/nextgen.html">
 GETNEXT Command Generator
-</A> script as an example on Synchronous One-liner API programming.
+</A> and 
+<A HREF="http://pysnmp.sourceforge.net/examples/4.x/v3arch/oneliner/agent/ntforg.html">
+Notification Originator
+</A> scripts as examples of Synchronous One-liner API programming.
 </P>
 
 <A NAME="ASYNCH-ONELINER-APPS"></A>
@@ -921,8 +1013,8 @@ method.
 </P>
 
 <P>
-If <STRONG>cbFun</STRONG> has no more requests pending and want to complete, it must
-return a true value. Otherwise, it returns false.
+If <STRONG>cbFun</STRONG> has no more requests pending and want to complete, 
+it must return a true value. Otherwise, it returns false.
 </P>
 </DD>
 </DL>
@@ -1050,6 +1142,91 @@ except that here it is passed in as a tuple.
 </DD>
 </DL>
 
+<P>
+The <STRONG>AsynNotificationOriginator</STRONG> class implements specific 
+notification types.
+</P>
+
+<A NAME="AsynNotificationOriginator"></A>
+<DL>
+<DT>class <STRONG>AsynNotificationOriginator</STRONG>([<STRONG>snmpContext</STRONG>])</DT>
+<DD>
+<P>
+Create an asynchronous SNMP Notification Originator object.
+</P>
+</DD>
+</DL>
+
+<P>
+The only method of <STRONG>AsynNotificationOriginator</STRONG> class is
+similar to that described in the <A HREF="#NotificationOriginator">
+NotificationOriginator</A> class section except that asynchronous interface 
+uses a callback function for delivery confirmation when confirmed notification
+are used.
+</P>
+
+<A NAME="AsynNotificationOriginator.asyncSendNotification"></A>
+<DL>
+<DT><STRONG>asyncSendNotification</STRONG>(
+<STRONG>authData</STRONG>,
+<STRONG>transportTarget</STRONG>,
+<STRONG>notifyType</STRONG>,
+<STRONG>notificationType</STRONG>,
+<STRONG>varBinds</STRONG>,
+(<STRONG>cbFun</STRONG>, <STRONG>cbCtx</STRONG>)
+)</DT>
+
+<DD>
+<P>
+Prepare SNMP TRAP or INFORM notification to be dispatched. Return the 
+<STRONG>sendRequestHandle</STRONG> value.
+</P>
+
+<P>
+The <STRONG>cbFun</STRONG> parameter is a reference to a callable object
+(such as Python function) that takes the following parameters:
+</P>
+
+<DL>
+<DT><STRONG>cbFun</STRONG>(
+<STRONG>sendRequestHandle</STRONG>,
+<STRONG>errorIndication</STRONG>,
+<STRONG>cbCtx</STRONG>
+)</DT>
+
+<DD>
+
+<P>
+Where the <STRONG>sendRequestHandle</STRONG>, <STRONG>errorIndication</STRONG>
+and <STRONG>cbCtx</STRONG> parameters have the same meaning as in 
+callback function in 
+<A HREF="#AsynCommandGenerator.asyncGetCmd">AsynCommandGenerator.asynGetCmd</A> method.
+</P>
+
+</DD>
+</DL>
+
+<P>
+The <STRONG>cbCtx</STRONG> parameter has the same meaning as in 
+<A HREF="#AsynCommandGenerator.asyncGetCmd">AsynCommandGenerator.asyncGetCmd</A> method.
+</P>
+
+<P>
+The <STRONG>notifyType</STRONG>, <STRONG>notificationType</STRONG> and 
+<STRONG>varBinds</STRONG> parameters have the same meaning as in 
+<A HREF="#NotificationOriginator.sendNotification">
+NotificationOriginator.sendNotification</A> method
+except that here it is passed in as a tuple.
+</P>
+
+<P>
+The <STRONG>asyncSendNotification</STRONG> method returns unique
+<STRONG>sendRequestHandle</STRONG> integer value used for
+matching subsequent delivery confirmation response to arbitrary notification.
+</P>
+
+</DD>
+</DL>
 
 <P>
 After one or more requests have been submitted by calling one or more 
@@ -1301,7 +1478,7 @@ of Managed Object <A HREF="#VAL-IMPL">Value</A>.
 See
 <A HREF="http://pysnmp.sourceforge.net/examples/4.x/v3arch/oneliner/manager/withmib/nextgen.html">
 GETNEXT Command Generator with MIB resolution
-</A> script as an example on One-liner API to MIB services.
+</A> script as an example of using One-liner API to MIB services.
 </P>
 
 <H4>
