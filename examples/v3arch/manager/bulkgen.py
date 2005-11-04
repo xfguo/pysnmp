@@ -1,3 +1,4 @@
+# GETBULK Command Generator
 from pysnmp.entity import engine, config
 from pysnmp.entity.rfc3413 import cmdgen
 from pysnmp.carrier.asynsock.dgram import udp

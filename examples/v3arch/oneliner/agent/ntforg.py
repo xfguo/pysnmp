@@ -1,3 +1,4 @@
+# Notification Originator (TRAP/INFORM)
 from pysnmp.entity.rfc3413.oneliner import ntforg
 from pysnmp.proto.api import v2c
 

@@ -1,4 +1,4 @@
-"""Notification Receiver Application (TRAP/INFORM PDU)"""
+# Notification Receiver (TRAP/INFORM)
 from pysnmp.entity import engine, config
 from pysnmp.carrier.asynsock.dgram import udp
 from pysnmp.entity.rfc3413 import ntfrcv

@@ -1,3 +1,4 @@
+# GETNEXT Command Generator
 from pysnmp.entity import engine, config
 from pysnmp.carrier.asynsock.dgram import udp
 from pysnmp.entity.rfc3413 import cmdgen

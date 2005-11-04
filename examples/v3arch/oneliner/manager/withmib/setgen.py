@@ -1,4 +1,4 @@
-# SNMP SET with MIB resolution
+# SET Command Generator with MIB resolution
 import string
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 

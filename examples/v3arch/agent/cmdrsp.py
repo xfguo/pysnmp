@@ -1,4 +1,4 @@
-"""Command Responder Application (GET PDU)"""
+# Command Responder
 from pysnmp.entity import engine, config
 from pysnmp.carrier.asynsock.dgram import udp
 from pysnmp.entity.rfc3413 import cmdrsp, context
