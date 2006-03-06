@@ -426,9 +426,14 @@ if moduleIdentityNode:
     
 if typedefs:
     out.write('# Types\n')
-    out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)    
+    out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
+    idx = 1L
     for symName, symObj in typedefs:
+        if idx % 127 == 0:
+            out.write(')\n')
+            out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
         out.write(', %s=%s' % (symName, symName))
+        idx = idx + 1
     out.write(')\n\n')
     
 if nodes:
@@ -448,15 +453,25 @@ if nodes:
 if notifications:
     out.write('# Notifications\n')
     out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
+    idx = 1L
     for symName, symObj in notifications:
+        if idx % 127 == 0:
+            out.write(')\n')
+            out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
         out.write(', %s=%s' % (symName, symName))
+        idx = idx + 1
     out.write(')\n\n')
 
 if groups:
     out.write('# Groups\n')
     out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
+    idx = 1L
     for symName, symObj in groups:
+        if idx % 127 == 0:
+            out.write(')\n')
+            out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
         out.write(', %s=%s' % (symName, symName))
+        idx = idx + 1        
     out.write(')\n')    
 
 # XXX
