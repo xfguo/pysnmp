@@ -22,7 +22,10 @@ shift $((OPTIND-1))
 
 [ $# -gt 1 ] && { echo >&2 "Extra arguments given"; exit 1; }
 
-[ -z $1 ] && { mibFile="-"; } || { mibFile=$1; }
+[ -z $1 ] && { mibFile="-"; } || { 
+    mibFile=$1;
+    export SMIPATH=":$SMIPATH:$(echo $mibFile | sed -e 's/\(.*\)\/.*/\1/g')";
+}        
 
 egrep -q 'FROM *RFC' $mibFile 2> /dev/null && { oldMib='yes'; } || {
     [ $? -eq 1 ] && { oldMib='no'; } || {
@@ -40,13 +43,13 @@ egrep -q 'FROM *RFC' $mibFile 2> /dev/null && { oldMib='yes'; } || {
     }
     $smidump -f python $tmpFile 2> /dev/null | $libsmi2pysnmp || {
         [ -f $tmpFile ] && rm -f $tmpFile;
-        echo >&2 "$smidump -f python $mibFile fails";
+        echo >&2 "$smidump -f python $mibFile | $libsmi2pysnmp fails";
         exit
     }
     rm -f $tmpFile
 } || {
     $smidump -f python $mibFile 2> /dev/null | $libsmi2pysnmp || {
-        echo >&2 "$smidump -f python $mibFile fails";
+        echo >&2 "$smidump -f python $mibFile | $libsmi2pysnmp fails";
         exit
     }
 }
