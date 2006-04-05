@@ -35,18 +35,18 @@ egrep -q 'FROM *RFC' $mibFile 2> /dev/null && { oldMib='yes'; } || {
     tmpFile=/tmp/buildmibs.$$
     $smidump -f smiv2 $mibFile > $tmpFile 2> /dev/null || {
         [ -f $tmpFile ] && rm -f $tmpFile;
-        echo "$smidump -f smiv2 $mibFile fails";
+        echo >&2 "$smidump -f smiv2 $mibFile fails";
         exit ;
     }
     $smidump -f python $tmpFile 2> /dev/null | $libsmi2pysnmp || {
         [ -f $tmpFile ] && rm -f $tmpFile;
-        echo "$smidump -f python $mibFile fails";
+        echo >&2 "$smidump -f python $mibFile fails";
         exit
     }
     rm -f $tmpFile
 } || {
     $smidump -f python $mibFile 2> /dev/null | $libsmi2pysnmp || {
-        echo "$smidump -f python $mibFile fails";
+        echo >&2 "$smidump -f python $mibFile fails";
         exit
     }
 }
