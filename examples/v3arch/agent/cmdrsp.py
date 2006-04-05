@@ -31,12 +31,18 @@ config.addV3User(
     config.usmHMACMD5AuthProtocol, 'authkey1',
     config.usmDESPrivProtocol, 'privkey1'
     )
-    
-# VACM setup
+
+# Install default Agent configuration
+#config.setInitialVacmParameters(snmpEngine)
+#
+# Apply initial VACM configuration to this user
+#config.addVacmGroup(snmpEngine, "initial", 3, "test-user")
+
+# Alternatively, configure VACM from the scratch
 config.addContext(snmpEngine, '')
-config.addRwUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v1
-config.addRwUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v2c
-config.addRwUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
+config.addRwUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv', (1,3,6,1)) # v1
+config.addRwUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv', (1,3,6,1)) # v2c
+config.addRwUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6,1)) # v3
 
 # SNMP context
 snmpContext = context.SnmpContext(snmpEngine)
