@@ -12,7 +12,7 @@
 PySNMP tutorial
 </H3>
 
-<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, September 2005</I>
+<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, October 2005</I>
 
 <H4>
 Network management
@@ -1143,6 +1143,31 @@ except that here it is passed in as a tuple.
 </DL>
 
 <P>
+After one or more requests have been submitted by calling one or more 
+of the methods above, Transport Dispatcher must be invoked to get SNMP
+engine running. This is done by calling:
+</P>
+
+<DL>
+<DT><STRONG>
+asynCommandGenerator.snmpEngine.transportDispatcher.runDispatcher
+</STRONG>
+()</DT>
+
+<DD>
+<P>
+Where <STRONG>asynCommandGenerator</STRONG> is
+<STRONG>AsynCommandGenerator</STRONG> class instance.
+</P>
+</DD>
+</DL>
+
+<P>
+The <STRONG>runDispatcher</STRONG>() method terminates when no pending requests
+left for running Applications.
+</P>
+
+<P>
 The <STRONG>AsynNotificationOriginator</STRONG> class implements specific 
 notification types.
 </P>
@@ -1229,26 +1254,28 @@ matching subsequent delivery confirmation response to arbitrary notification.
 </DL>
 
 <P>
-After one or more requests have been submitted by calling one or more 
-of the methods above, Transport Dispatcher must be invoked to get SNMP
-engine running. This is done by calling:
+After one or more notifications have been submitted by calling the
+<STRONG>sendNotification</STRONG> method, Transport Dispatcher must be 
+invoked to get SNMP engine running. This is done by calling:
 </P>
 
 <DL>
 <DT><STRONG>
-asynCommandGenerator.snmpEngine.transportDispatcher.runDispatcher
+asynNotificationOriginator.snmpEngine.transportDispatcher.runDispatcher
 </STRONG>
 ()</DT>
+
 <DD>
 <P>
-Where <STRONG>asynCommandGenerator</STRONG> is 
-<STRONG>AsynCommandGenerator</STRONG> class instance.
+Where <STRONG>asynNotificationOriginator</STRONG> is
+<STRONG>AsynNotificationOriginator</STRONG> class instance.
 </P>
+</DD>
 </DL>
 
 <P>
-The <STRONG>runDispatcher</STRONG>() method terminates when no pending requests
-left for running Applications.
+The <STRONG>runDispatcher</STRONG>() method terminates when no unconfirmed
+notifications left for running Applications.
 </P>
 
 <H4>
