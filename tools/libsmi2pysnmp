@@ -6,7 +6,7 @@ from string import split, replace, find, atol, atoi
 from types import StringType, DictType
 import sys, time
 
-version = '0.0.5-alpha'
+version = '0.0.6-alpha'
 
 class Error(StandardError): pass
 
