@@ -12,8 +12,55 @@
 PySNMP tutorial
 </H3>
 
-<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, October 2005</I>
+<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, April 2006</I>
 
+<P><B>Table of contents</B></P>
+<UL>
+<LI>Introduction
+<UL>
+<LI><A HREF="#NETWORK-MANAGEMENT">Network Management</A>
+<LI><A HREF="#SNMP-MANAGEMENT-ARCHITECTURE">SNMP management architecture</A>
+<LI><A HREF="#HISTORY-OF-SNMP">The history of SNMP</A>
+</UL>
+<LI>Programming with PySNMP
+<UL>
+<LI><A HREF="#PYSNMP-ARCHITECTURE">PySNMP architecture</A>
+<LI><A HREF="#ONELINER-APPS">One-liner Applications</A>
+<UL>
+<LI><A HREF="#SYNCH-ONELINER-APPS">Synchronous One-liner Applications</A>
+<UL>
+<LI><A HREF="#CommandGenerator">Command Generator</A>
+<LI><A HREF="#NotificationOriginator">Notification Originator</A
+<LI><A HREF="#SECURITY-CONFIGURATION">Security configuration</A>
+<UL>
+<LI><A HREF="#UsmUserData">User-Based Security Model configuration</A>
+<LI><A HREF="#CommunityData">Community-Based Security Model configuration</A>
+</UL>
+<LI><A HREF="#TRANSPORT-CONFIGURATION">Transport configuration</A>
+<UL>
+<LI><A HREF="#UdpTransportTarget">UDP Transport Target</A>
+</UL>
+</UL>
+<LI><A HREF="#ASYNCH-ONELINER-APPS">Asynchronous One-liner Applications</A>
+<UL>
+<LI><A HREF="#AsynCommandGenerator">Asynchronous Command Generator</A>
+<LI><A HREF="#AsynNotificationOriginator">Asynchronous Notification Originator</A
+</UL>
+</UL>
+<LI><A HREF="#MIB-SERVICES">MIB services</A>
+<UL>
+<LI><A HREF="#MIB-VIEW-ONELINER">MIB view One-liner API</A>
+<LI>Managed Objects API</A>
+</UL>
+<LI><A HREF="#MANAGED-OBJECTS-DATA-MODEL">Data model for Managed Objects</A>
+</UL>
+<LI><A HREF="#APPENDIXIES">Appendixies</A>
+<UL>
+<LI><A HREF="#ASN1">ASN.1 standard</A>
+</UL>
+</UL>
+
+<A NAME="NETWORK-MANAGEMENT"></A>
 <H4>
 Network management
 </H4>
@@ -84,6 +131,7 @@ another, while others, such as Simple Network Management Protocol (SNMP),
 evolve into an industry standard.
 </P>
 
+<A NAME="MANAGEMENT-ARCHITECTURE"></A>
 <H4>
 SNMP management architecture
 </H4>
@@ -208,6 +256,7 @@ More often then not, Manager implementations could parse MIB files and
 use Managed Objects information for names resolution, value type determination,
 pretty printing and so on. This feature is known as <STRONG>MIB parser</STRONG> support.
 
+<A NAME="HISTORY-OF-SNMP"></A>
 <H4>
 The history of SNMP
 </H4>
@@ -299,6 +348,7 @@ applications are Manager, Agent and Proxy (
 ).
 </P>
 
+<A NAME="PYSNMP-ARCHITECTURE"></A>
 <H4>
 PySNMP architecture
 </H4>
@@ -490,7 +540,6 @@ asynchronous. Both are implemented within the
 <STRONG>pysnmp.entity.rfc3413.oneliner.cmdgen</STRONG> module.
 </P>
 
-<A NAME="ONELINER-APPS"></A>
 <A NAME="SYNCH-ONELINER-APPS"></A>
 <H4>
 Synchronous One-liner Applications
@@ -793,6 +842,7 @@ in <STRONG>CommandGenerator.getCmd</STRONG>.
 </DD>
 </DL>
 
+<A NAME="SECURITY-CONFIGURATION"></A>
 <P>
 Calls to one-liner Applications API require Security Parameters and
 Transport configuration objects as input parameters. These classes
@@ -892,6 +942,7 @@ Optional <STRONG>mpModel</STRONG> parameter indicates whether SNMPv2c
 </DD>
 </DL>
 
+<A NAME="TRANSPORT-CONFIGURATION"></A>
 <P>
 Transport configuration object is Transport domain specific.
 <STRONG>UdpTransportTarget</STRONG> class represents an Agent
@@ -1278,8 +1329,9 @@ The <STRONG>runDispatcher</STRONG>() method terminates when no unconfirmed
 notifications left for running Applications.
 </P>
 
+<A NAME="MIB-SERVICES"></A>
 <H4>
-One-liner MIB services
+MIB services
 </H4>
 
 <P>
@@ -1329,6 +1381,7 @@ All SNMP operations are performed against
 <STRONG>Managed Object Instances</STRONG>.
 </P>
 
+<A NAME="MIB-VIEW-ONELINER"></A>
 <P>
 Standard SNMP Applications API includes convenience wrappers that
 simplify most frequent operations on <STRONG>MibViewController</STRONG>.
@@ -1508,6 +1561,7 @@ GETNEXT Command Generator with MIB resolution
 </A> script as an example of using One-liner API to MIB services.
 </P>
 
+<A NAME="MANAGED-OBJECTS-DATA-MODEL"></A>
 <H4>
 Data model for Managed Objects
 </H4>
@@ -1732,6 +1786,7 @@ documentation.
 
 <HR>
 
+<A NAME="APPENDIXIES"></A>
 <H4>
 Appendixies
 </H4>
