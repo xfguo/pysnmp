@@ -20,7 +20,7 @@ MibScalarInstance, = snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.imp
 sysDescrInstance = MibScalarInstance(
     sysDescr.name, (0,), sysDescr.syntax.clone('Example Command Responder')
     )
-snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.exportSymbols('PYSNMP-EXAMPLE-MIB', sysDescrInstance=sysDescrInstance)  # creating MIB
+snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.exportSymbols('PYSNMP-EXAMPLE-MIB', sysDescrInstance)  # add anonymous Managed Object Instance
 
 # v1/2 setup
 config.addV1System(snmpEngine, 'test-agent', 'public')
