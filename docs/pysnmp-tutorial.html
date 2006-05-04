@@ -50,7 +50,7 @@ PySNMP tutorial
 <LI><A HREF="#DATA-MODEL-MANAGED-OBJECTS">Data model for Managed Objects</A>
 <LI><A HREF="#MIB-BUILDER">MIB builder</A>
 <LI><A HREF="#MIB-VIEW-CONTROLLER">MIB view controller</A>
-<LI><A HREF="#IMPLEMENTING-MANAGED-OBJECTS">Implementing Managed Objects</A>
+<LI><A HREF="#IMPLEMENTING-MANAGED-OBJECTS-INSTANCES">Implementing Managed Objects Instances</A>
 <LI>Managed Objects API</A>
 </UL>
 <LI><A HREF="#MANAGED-OBJECTS-DATA-MODEL">Data model for Managed Objects</A>
@@ -1336,7 +1336,31 @@ MIB services
 </H4>
 
 <P>
-In PySNMP, Managed Objects take shape of class instances that implement various
+PySNMP supports both Manager and Agent-side operations on 
+<A HREF="#MANAGED-OBJECTS">Managed Objects</A>,
+including MIB lookup and custom Managed Objects implementation.
+</P>
+
+<P>
+Managed Objects, <A HREF="#DATA-MODEL-MANAGED-OBJECTS">implemented in 
+Python code</A>, is the basis for PySNMP MIB services. Managed Objects 
+are collected into a pool and then managed by a 
+<A HREF="#MIB-BUILDER">MIB builder</A>. Both Manager and Agent 
+applications deal with their Managed Objects through role-specific 
+<A HREF="#MibViewController">MIB view</A> and 
+<A HREF="#MibInstrumentationController">MIB instrumentation</A>. The same 
+set of Managed Objects could serve both Manager and Agent purposes within 
+a single SNMP entity.
+</P>
+
+<A NAME="DATA-MODEL-MANAGED-OBJECTS"></A>
+<H4>
+Data model for Managed Objects
+</H4>
+
+<P>
+In PySNMP, <A HREF="#MANAGED-OBJECTS">Managed Objects</A> take shape of 
+Python class instances that implement various
 <A HREF="#SMI">SMIv2</A> items. Collections of Managed Objects, or
 <A HREF="#MIB">MIB</A>s, translate, in a one-to-one fashion, into Python 
 modules. 
@@ -1346,47 +1370,36 @@ modules.
 Automated conversion of MIB text files into Python modules can be done
 through the use of smidump tool of
 <A HREF="http://www.ibr.cs.tu-bs.de/projects/libsmi/">libsmi</A> package
-and <STRONG>libsmi2pysnmp</STRONG> script shipped with PySNMP.
+and "<STRONG>build-pysnmp-mib</STRONG>" script shipped with PySNMP.
 </P>
 
 <P>
-The same set of Managed Objects could serve both Manager and Agent purposes
-within a single SNMP entity. Both Manager and Agent access Managed Objects
-collection through role-specific Controllers: 
-<STRONG>MibViewController</STRONG> for MIB lookup and 
-<STRONG>MibInstrumentationController</STRONG> for Managed Objects 
-modifications.
-</P>
-
-<A NAME="DATA-MODEL-MANAGED-OBJECTS"></A>
-<H4>
-Data model for Managed Objects
-</H4>
-
-<P>
-In PySNMP, Managed Objects are implemented as a collection of Python classes.
+The <STRONG>pysnmp.smi.mibs.SNMPv2-SMI</STRONG> module
+implements the following classes:
 </P>
 
 <A NAME="MibScalar"></A>
 <DL>
 <DT>class <STRONG>MibScalar</STRONG>(
-<STRONG>objectName</STRONG>,
-<STRONG>objectSyntax</STRONG>
+<STRONG>name</STRONG>, <STRONG>syntax</STRONG>
 )</DT>
 <DD>
 <P>
 Create a definition of scalar Managed Object with name 
-<STRONG>Object Name</STRONG> and associated value of type 
-<STRONG>Object Syntax</STRONG>.
+<STRONG>name</STRONG> and associated value of type 
+<STRONG>syntax</STRONG>.
+</P>
+
+<A NAME="MANAGED-OBJECT-NAME"></A>
+<P>
+The <STRONG>name</STRONG> parameter represents an
+<A HREF="#OID">Object Identifier</A> which can be expressed as
+either a tuple of integers or tuple-like 
+<A HREF="#OID-IMPL">Object Identifier</A> class instance.
 </P>
 
 <P>
-The <STRONG>objectName</STRONG> parameter is a tuple of integers or tuple-like 
-<A HREF="#OID">Object Identifier</A> class instance.
-</P>
-
-<P>
-The <STRONG>objectSyntax</STRONG> parameter represents Managed Object's
+The <STRONG>syntax</STRONG> parameter represents Managed Object's
 <A HREF="#MANAGED-OBJECT-SYNTAX">value type</A>.
 </P>
 </DD>
@@ -1419,27 +1432,26 @@ Each of these methods return certain property of Managed Object.
 <A NAME="MibScalarInstance"></A>
 <DL>
 <DT>class <STRONG>MibScalarInstance</STRONG>(
-<STRONG>objectName</STRONG>,
-<STRONG>objectSyntax</STRONG>
+<STRONG>name</STRONG>, <STRONG>syntax</STRONG>
 )</DT>
 <DD>
 <P>
 Create an instance of scalar Managed Object or 
 <A HREF="#CONCEPTUAL-TABLES">Conceptual Table</A> element
-with name <STRONG>objectName</STRONG> and associated value
-<STRONG>objectSyntax</STRONG>.
+with name <STRONG>name</STRONG> and associated value
+<STRONG>syntax</STRONG>.
 </P>
 
 <P>
-<STRONG>objectName</STRONG> of Managed Object instance is a concatination
-of <STRONG>objectName</STRONG> of Managed Object definition and some
+The <STRONG>name</STRONG> of Managed Object instance is a concatination
+of <STRONG>name</STRONG> of Managed Object definition and some
 instance identifier. For scalar types, instance identifier is a single
 zero (0,). For <A HREF="#CONCEPTUAL-TABLES">Conceptual Table</A> elements
 instance identifier is a concatination of table indices.
 </P>
 
 <P>
-The <STRONG>objectName</STRONG> and <STRONG>objectSyntax</STRONG> parameters
+The <STRONG>name</STRONG> and <STRONG>syntax</STRONG> parameters
 have the same meaning as in <A HREF="#MibScalar">MibScalar</A> class. 
 </P>
 </DD>
@@ -1448,24 +1460,23 @@ have the same meaning as in <A HREF="#MibScalar">MibScalar</A> class.
 <A NAME="MibTableColumn"></A>
 <DL>
 <DT>class <STRONG>MibTableColumn</STRONG>(
-<STRONG>objectName</STRONG>,
-<STRONG>objectSyntax</STRONG>
+<STRONG>name</STRONG>, <STRONG>syntax</STRONG>
 )</DT>
 <DD>
 <P>
 Create a definition of 
 <A HREF="#CONCEPTUAL-TABLES">Conceptual Table</A> Column with
-name <STRONG>objectName</STRONG> and associated value of type 
-<STRONG>objectSyntax</STRONG>.
+name <STRONG>name</STRONG> and associated value of type 
+<STRONG>syntax</STRONG>.
 </P>
 
 <P>
-The <STRONG>objectName</STRONG> parameter has the same meaning as in
+The <STRONG>name</STRONG> parameter has the same meaning as in
 <A HREF="#MibScalar">MibScalar</A> class.
 </P>
 
 <P>
-The <STRONG>objectSyntax</STRONG> parameter represents
+The <STRONG>syntax</STRONG> parameter represents
 <A HREF="#MANAGED-OBJECT-SYNTAX">type</A> of the value associated with
 columnar Managed Object.
 </P>
@@ -1475,17 +1486,17 @@ columnar Managed Object.
 <A NAME="MibTableRow"></A>
 <DL>
 <DT>class <STRONG>MibTableRow</STRONG>(
-<STRONG>objectName</STRONG>
+<STRONG>name</STRONG>
 )</DT>
 <DD>
 <P>
 Create a definition of 
 <A HREF="#CONCEPTUAL-TABLES">Conceptual Table</A> Row with
-name <STRONG>objectName</STRONG>.
+name <STRONG>name</STRONG>.
 </P>
 
 <P>
-The <STRONG>objectName</STRONG> parameter has the same meaning as in
+The <STRONG>name</STRONG> parameter has the same meaning as in
 <A HREF="#MibScalar">MibScalar</A> class.
 </P>
 </DD>
@@ -1534,41 +1545,75 @@ The number of types of returned index values depend on MIB Table definition.
 <A NAME="MibTable"></A>
 <DL>
 <DT>class <STRONG>MibTable</STRONG>(
-<STRONG>objectName</STRONG>
+<STRONG>name</STRONG>
 )</DT>
 <DD>
 <P>
 Create a definition of 
 <A HREF="#CONCEPTUAL-TABLES">Conceptual Table</A> with name
-<STRONG>objectName</STRONG>.
+<STRONG>name</STRONG>.
 </P>
 
 <P>
-The <STRONG>objectName</STRONG> parameter has the same meaning as in
+The <STRONG>name</STRONG> parameter has the same meaning as in
 <A HREF="#MibScalar">MibScalar</A> class.
 </P>
 </DD>
 </DL>
 
 <P>
-All SNMP operations are performed against 
-<STRONG>Managed Object Instances</STRONG>.
+The following examples explain how MIB text could be expressed in terms of
+PySNMP SMI data model. First example is on a scalar:
 </P>
 
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+myManagedObject = MibScalar((1, 3, 6, 1, 4, 1, 20408, 2, 1), OctetString()).setMaxAccess("readonly")
+</PRE>
+</TD></TR></TABLE>
 
+<P>
+Managed Object Instance can be put into a stand-alone PySNMP SMI module or
+be implemented inside Agent application. Managed Object Instance will be 
+associated with its parent Managed Object, by the
+<A HREF="#MIB-BUILDER">MIB building part of PySNMP</A>, 
+on the basis of their names relation.
+</P>
 
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+myManagedObjectInstance = MibScalarInstance(myManagedObject.getName() + (0,), myManagedObject.getSyntax().clone('my string'))
+</PRE>
+</TD></TR></TABLE>
 
+<P>
+Let's consider SNMP Conceptual Table created in an "MY-MIB.py" file:
+</P>
 
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+myTable = MibTable((1, 3, 6, 1, 4, 1, 20408, 2, 1))
+myTableEntry = MibTableRow(myTable.getName() + (1,)).setIndexNames((0, "MY-MIB", "myTableIndex"))
+myTableIndex = MibTableColumn(myTableEntry.getName() + (1,), Integer())
+myTableValue = MibTableColumn(myTableEntry.getName() + (2,), OctetString())
+</PRE>
+</TD></TR></TABLE>
 
+<P>
+Populate Managed Objects table with Managed Objects Instance in the first 
+column.
+</P>
 
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+myTableValueInstance = MibScalarInstance(myTableValue.getName() + (1,), myTableValue.getSyntax().clone('my value'))
+</PRE>
+</TD></TR></TABLE>
 
-
-
-
-
-
-
-
+<P>
+For more real-life cases, refer to modules in <B>pysnmp.smi.mibs</B> 
+sub-package.
+</P>
 
 <A NAME="MIB-BUILDER"></A>
 <H4>
@@ -1578,7 +1623,7 @@ MIB builder
 <P>
 The pythonized MIB modules are then managed by the
 <STRONG>MibBuilder</STRONG> class from <STRONG>pysnmp.smi.builder</STRONG>
-sub-package.
+module.
 </P>
 
 <A NAME="MibBuilder"></A>
@@ -1613,7 +1658,6 @@ Search path is managed by the <STRONG>getMibPath()</STRONG> and
 The <STRONG>loadModules</STRONG> method may be further invoked implicitly 
 on dependent MIB modules import.
 </P>
-
 </DD>
 </DL>
 
@@ -1662,13 +1706,368 @@ don't have to have MIB names, unless Application wants to access
 Managed Objects Instances by MIB name, so these may be exported through
 <STRONG>*anonymousSyms</STRONG>.
 </P>
+</DD>
+</DL>
 
 <P>
-<PRE>
+In the following example MIB builder will be created, MIB modules
+loaded up and Managed Object definition looked up by symbolic name:
+</P>
 
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.smi import builder
+>>>
+>>> # create MIB builder
+... mibBuilder = builder.MibBuilder().loadModules('SNMPv2-MIB', 'IF-MIB')
+>>>
+>>> # get Managed Object definition by symbol name
+... mibNode, = mibBuilder.importSymbols('SNMPv2-MIB', 'sysDescr')
+>>> print mibNode.getName()
+(1, 3, 6, 1, 2, 1, 1, 1)
+>>> print repr(mibNode.getSyntax())
+DisplayString('')
+>>>
+</PRE>
+</TD></TR></TABLE>
+</P>
+
+<A NAME="#MIB-VIEW-CONTROLLER"></A>
+<H4>
+MIB view controller
+</H4>
+
+<P>
+The <STRONG>pysnmp.smi.view</STRONG> module contains the following items:
+</P>
+
+<A NAME="MibViewController"></A>
+<DL>
+<DT>class <STRONG>MibViewController</STRONG>(<STRONG>mibBuilder</STRONG>)</DT>
+<DD>
+<P>
+The <STRONG>MibViewController</STRONG> class instance tackles 
+<A HREF="#DATA-MODEL-MANAGED-OBJECTS">Managed Objects</A>,
+constructed by <A HREF="#MibBuilder">MibBuilder</A>, for their properties
+and provide efficient/ordered access to Managed Objects properties.
+Most important of these are OID names and labels.
+</P>
+<P>
+The <STRONG>mibBuilder</STRONG> argument is an instance of
+<A HREF="#MibBuilder">MibBuilder</A> class.
 </P>
 </DD>
 </DL>
+
+<P>
+The <STRONG>MibViewController</STRONG> class implements the following
+methods:
+</P>
+
+<A NAME="MibViewController.getNodeName"></A>
+<DL>
+<DT><STRONG>getNodeName</STRONG>(<STRONG>name</STRONG>)</DT>
+
+<A NAME="MIB-VIEW-MANAGED-OBJECT-NAME"></A>
+<DD>
+<P>
+The <STRONG>name</STRONG> parameter is 
+<A HREF="#MANAGED-OBJECTS">Managed Object</A> name.
+It can be either a tuple representing sub-<A HREF="#OID">OID</A>s
+or <A HREF="#OID-IMPL">Object Identifier</A> class instance. Sub-OIDs
+can be a mix of integers and string labels. For example, the following
+are valid values of <STRONG>name</STRONG>:
+</P>
+<UL>
+<LI>
+(1, 3, 6, 1)
+<LI>
+('iso', 'org', 'dod', 'internet')
+<LI>
+('iso', 2, 'dod', 1)
+<LI>
+pysnmp.proto.rfc1902.ObjectIdentifier("1.3.6.1")
+</UL>
+</P>
+<P>
+The <STRONG>getNodeName</STRONG> method returns a tuple of 
+(<STRONG>oid</STRONG>, <STRONG>label</STRONG>, <STRONG>suffix</STRONG>)
+where:
+<UL>
+<LI>The <STRONG>oid</STRONG> and <STRONG>label</STRONG> are tuples of sub-OIDs
+of best (longest) matched Managed Object in integer and label forms 
+respectively.
+<LI>The <STRONG>suffix</STRONG> parameter is the unmatched, trailing part of 
+original <STRONG>name</STRONG> parameter. 
+<P>
+If a Managed Object is looked up with <STRONG>getNodeName</STRONG> method 
+and an exact match occured, <STRONG>suffix</STRONG> would be an empty tuple. 
+</P>
+<P>
+If <STRONG>suffix</STRONG> is not empty, it indicates either an index part of 
+<A HREF="#CONCEPTUAL-TABLES">Conceptual Table</A> instance name
+(which can be further parsed into index values by
+<A HREF="#MibTableRow.getInstIdFromIndices">MibTableRow class methods</A>) or
+a partial Managed Object name match.
+</P>
+<P>In order to distinguish MIB Table element match from a failure, see if 
+closest matched Managed Object <STRONG>oid</STRONG> (MIB symbol 
+<STRONG>label</STRONG>[-1]) is an instance of 
+<A HREF="#MibTableColumn">MibTableColumn</A> class.
+</P>
+<P>
+If even partial match fails, the <STRONG>SmiError</STRONG> exception is
+raised.
+</P>
+</UL>
+</P>
+</UL>
+</P>
+</DD>
+</DL>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.smi import builder, view
+>>>
+>>> mibBuilder = builder.MibBuilder().loadModules('SNMPv2-MIB')
+>>> mibViewController = view.MibViewController(mibBuilder)
+>>> 
+>>> oid, label, suffix = mibViewController.getNodeName((1,3,6,1,2,'mib-2',1,'sysDescr'))
+>>> print oid
+(1, 3, 6, 1, 2, 1, 1, 1)
+>>> print label
+('iso', 'org', 'dod', 'internet', 'mgmt', 'mib-2', 'system', 'sysDescr')
+>>> print suffix
+()
+</PRE>
+</TD></TR></TABLE>
+</P>
+
+<A NAME="MibViewController.getNextNodeName"></A>
+<DL>
+<DT><STRONG>getNextNodeName</STRONG>(
+<STRONG>name</STRONG>, <STRONG>modName</STRONG>=''
+)</DT>
+<DD>
+<P>
+The <STRONG>getNextNodeName</STRONG> method works the same as
+<A HREF="#MibViewController.getNodeName">getNodeName</A> but it deals 
+with Managed Object whose name appears to be next to the <STRONG>name</STRONG>
+given on input.
+</P>
+<P>
+The <STRONG>modName</STRONG> parameter is MIB module name as seen by
+<A HREF="#MibBuilder">MibBuilder</A>. Use this parameter to restrict 
+by-<STRONG>name</STRONG> to particular MIB module's
+scope.
+</P>
+</DD>
+</DL>
+
+<A NAME="MibViewController.getFirstNodeName"></A>
+<DL>
+<DT><STRONG>getFirstNodeName</STRONG>(<STRONG>modName</STRONG>='')</DT>
+<DD>
+<P>
+The <STRONG>getFirstNodeName</STRONG> method works the same as
+<A HREF="#MibViewController.getNodeName">getNodeName</A> but it returns
+Managed Object whose name appears to be the first among others within 
+MIB module <STRONG>modName</STRONG>.
+</P>
+<P>
+If no <STRONG>modName</STRONG> is given, the whole OID namespace is assumed.
+</P>
+</DD>
+</DL>
+
+<A NAME="MibViewController.getNodeLocation"></A>
+<DL>
+<DT><STRONG>getNodeLocation</STRONG>(<STRONG>name</STRONG>)</DT>
+<DD>
+<P>
+The <STRONG>getNodeLocation</STRONG> method returns MIB location of
+Managed Object by OID <STRONG>name</STRONG> as a tuple of
+(<STRONG>modName</STRONG>, <STRONG>mibName</STRONG>, <STRONG>suffix</STRONG>).
+</P>
+<P>
+<P>
+The <STRONG>modName</STRONG> and <STRONG>mibName</STRONG> parameters are
+as used in <A HREF="#MibBuilder">MibBuilder</A> interface. The 
+<STRONG>suffix</STRONG> parameter is as described in 
+<A HREF="MIB-VIEW-MANAGED-OBJECT-NAME">getNodeName</A>() method.
+</P>
+</DD>
+</DL>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.smi import builder, view
+>>>
+>>> mibBuilder = builder.MibBuilder().loadModules('SNMPv2-MIB')
+>>> mibViewController = view.MibViewController(mibBuilder)
+>>> 
+>>> modName, symName, suffix = mibViewController.getNodeLocation((1,3,6,1,2,1,1,1,123))
+>>> print modName
+SNMPv2-MIB
+>>> print symName
+sysDescr
+>>> print suffix
+(123,)
+</PRE>
+</TD></TR></TABLE>
+</P>
+
+<A NAME="#IMPLEMENTING-MANAGED-OBJECTS-INSTANCES"></A>
+<H4>
+Implementing Managed Objects Instances
+</H4>
+<P>
+SNMP defines four types of operations on Managed Objects Instances. 
+For scalars, these are:
+<UL>
+<LI>Get Managed Object Instance value (though SNMP GET request)
+<LI>Modify Managed Object Instance value (though SNMP SET request)
+</UL>
+</P>
+<P>
+Conceptual Tables additionaly support:
+</P>
+<P>
+<UL>
+<LI>Table row creation (through SNMP SET against a special-purpose
+<B>RowStatus</B> column instance)
+<LI>Table row removal (similary, through SNMP SET against <B>RowStatus</B> 
+column instance)
+</UL>
+</P>
+
+<A NAME="MANAGEMENT-INSTRUMENTATION-API"></A>
+
+<P>
+A single SNMP request may invoke an operation on multiple Managed 
+Objects Instances. In SNMP design, it must either succeed on all 
+Managed Objects Instances or be rolled back and reported as a 
+failure otherwise.
+</P>
+
+<P>
+PySNMP Managed Objects Instances are implemented by the
+<A HREF="#MibScalarInstance">MibScalarInstance</A> objects
+or derivatives. The MibScalarInstance class supports a whole
+bunch of Managed Object Instance tackling methods being invoked by 
+SNMP engine in response to incoming SNMP request. Default implementation
+handles all standard SNMP functionality like MIB and VACM-grain
+access control, so it's safe for a custom Managed Object Instance
+implementation to rely on these defaults. However, overloading 
+some of these methods may be used for tapping on Managed Object
+Instances tackling event sequence what may be useful for interfacing
+MibScalarInstance objects to real-life, third party systems. Overloading
+method should still pass control to overloaded method not to interfere 
+with behind-the-scene SMI workings.
+</P>
+
+<P>
+The parameters of these Management Instrumentation API methods don't make 
+much sense to custom implementation, so it's normally safe to just pass 
+them down to the overloaded method.
+</P>
+
+<P>
+The MibScalarInstance class implement the following Management Instrumentation
+API methods:
+</P>
+
+<P>
+<A NAME="MibScalarInstance.readTest"></A>
+<DL>
+<DT><STRONG>readTest</STRONG>(
+<STRONG>name</STRONG>,
+<STRONG>val</STRONG>,
+<STRONG>idx</STRONG>,
+(<STRONG>acFun</STRONG>, <STRONG>acCtx</STRONG>)
+)</DT>
+<DD>
+<P>
+The <STRONG>readTest</STRONG> method is invoked by SNMP engine in response
+to SNMP GET request prior to performing actual Managed Object Instance 
+value read to give implementation a chance to ensure that subsequent 
+value read is likely to succeed.
+</P>
+<P>
+If custom Managed Object Instance implementation choose not to allow
+read access to this object for reasons beyond the scope of MIB and/or
+VACM access control systems, it should raise a SMI exception.
+</P>
+</DD>
+</DL>
+
+<P>
+<A NAME="MibScalarInstance.readGet"></A>
+<DL>
+<DT><STRONG>readGet</STRONG>(
+<STRONG>name</STRONG>,
+<STRONG>val</STRONG>,
+<STRONG>idx</STRONG>,
+(<STRONG>acFun</STRONG>, <STRONG>acCtx</STRONG>)
+)</DT>
+<DD>
+<P>
+The <STRONG>readGet</STRONG> method is invoked by SNMP engine to fetch
+Managed Object Instance's value. This method must return a tuple
+of (<STRONG>name</STRONG>, <STRONG>value</STRONG>). Custom implementation
+may get its own value from whatever source. Default implementation
+returns the value of <STRONG>getSyntax</STRONG>().
+</P>
+</DD>
+</DL>
+
+<P>
+<A NAME="MibScalarInstance.readTestNext"></A>
+<DL>
+<DT><STRONG>readTestNext</STRONG>(
+<STRONG>name</STRONG>,
+<STRONG>val</STRONG>,
+<STRONG>idx</STRONG>,
+(<STRONG>acFun</STRONG>, <STRONG>acCtx</STRONG>)
+)</DT>
+<DD>
+<P>
+The <STRONG>readTestNext</STRONG> method is invoked by SNMP engine in response
+to SNMP GETNEXT request prior to performing actual Managed Object Instance 
+value read to give implementation a chance to ensure that subsequent value 
+read is likely to succeed.
+</P>
+<P>
+If custom Managed Object Instance implementation choose not to allow
+read access to this object for reasons beyond the scope of MIB and/or
+VACM access control systems, it should raise a SMI exception.
+</P>
+</DD>
+</DL>
+
+<P>
+<A NAME="MibScalarInstance.readGetNext"></A>
+<DL>
+<DT><STRONG>readGetNext</STRONG>(
+<STRONG>name</STRONG>,
+<STRONG>val</STRONG>,
+<STRONG>idx</STRONG>,
+(<STRONG>acFun</STRONG>, <STRONG>acCtx</STRONG>)
+)</DT>
+<DD>
+<P>
+The <STRONG>readGetNext</STRONG> method is invoked by SNMP engine to fetch
+Managed Object Instance's value. This method must return a tuple
+of (<STRONG>name</STRONG>, <STRONG>value</STRONG>). Custom implementation
+may get its own value from whatever source. Default implementation
+returns the value of <STRONG>getSyntax</STRONG>().
+</P>
+</DD>
+</DL>
+
+
+
 
 
 
