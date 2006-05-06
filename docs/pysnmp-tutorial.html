@@ -2022,7 +2022,7 @@ myManagedObjectInstance = MibScalarInstance(
 )
 
 mibBuilder.exportSymbols(
-  'MYFILE-MIB', myManagedObjectInstance=myManagedObjectInstance
+  'FILESIZE-MIB', myManagedObjectInstance=myManagedObjectInstance
 )
 </PRE>
 </TD></TR></TABLE>
@@ -2162,7 +2162,7 @@ class FileWatcherInstance(MibScalarInstance):
     apply(MibScalarInstance.readTest, (self,) + args)
     try:
       os.stat('/var/adm/messages')
-    except:
+    except StandardError, why:
       raise SmiError('%s: %s' % (self, why))
 
   def readGet(self, *args):
@@ -2175,7 +2175,7 @@ class FileWatcherInstance(MibScalarInstance):
       raise SmiError('%s: %s' % (self, why))
 
 mibBuilder.exportSymbols(
-  'MYFILE-MIB', FileWatcherInstance((1,3,6,1,4,1,20408,1), Integer())
+  'FILESIZE-MIB', FileWatcherInstance((1,3,6,1,4,1,20408,1), Integer())
 )
 </PRE>
 </TD></TR></TABLE>
@@ -2270,9 +2270,53 @@ third-party system out of value modification state.
 </P>
 
 <P>
+The following is a re-implementation of SMI-to-filesystem binding for
+file modification:
+</P>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+class MyFileInstance(MibScalarInstance):
+  def writeTest(self, name, value, *args):
+    apply(MibScalarInstance.writeTest, (self, name, value) + args)
+    try:
+      open('/tmp/myfile.new', 'w').write(value)
+    except StandardError, why:
+      raise SmiError('%s: %s' % (self, why))
+
+  def writeCommit(self, *args):
+    apply(MibScalarInstance.writeCommit, (self,) + args)
+    try:
+      os.rename('/tmp/myfile', '/tmp/myfile.old')
+      os.rename('/tmp/myfile.new', /tmp/myfile')
+    except StandardError, why:
+      raise SmiError('%s: %s' % (self, why))
+
+  def writeCleanup(self, *args):
+    apply(MibScalarInstance.writeCleanup, (self,) + args)
+    try:
+      os.unlink('/tmp/myfile.old')
+    except StandardError, why:
+      raise SmiError('%s: %s' % (self, why))
+
+  def writeUndo(self, *args):
+    apply(MibScalarInstance.writeUndo, (self,) + args)
+    try:
+      os.rename('/tmp/myfile.old', '/tmp/myfile')
+    except StandardError, why:
+      raise SmiError('%s: %s' % (self, why))
+
+mibBuilder.exportSymbols(
+  'MYFILE-MIB', MyFileInstance((1,3,6,1,4,1,20408,1), OctetString())
+)
+</PRE>
+</TD></TR></TABLE>
+
+<P>
 Table row management methods implemented by 
 <A HREF="#MibTableColumn">MibTableColumn</A> class and
-invoked by SNMP engine in response to SNMP SET request:
+invoked by SNMP engine in response to SNMP SET request against
+Table Column Instance (table cell) object:
 </P>
 
 
