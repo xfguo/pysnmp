@@ -1942,7 +1942,101 @@ column instance)
 </UL>
 </P>
 
-<A NAME="MANAGEMENT-INSTRUMENTATION-API"></A>
+<P>
+PySNMP Managed Objects Instances are implemented by the
+<A HREF="#MibScalarInstance">MibScalarInstance</A> objects
+while a value associated with Managed Object Instance is
+represented by its <B>syntax</B> initialization parameter.
+</P>
+
+<P>
+There are two distinct approaches to Managed Objects Instances
+implementation in PySNMP. The first one is simpler to use
+but it only works for relatively static Managed Objects. The other
+is universal but it is more complex to deal with.
+</P>
+
+<H4>
+Associated value gatewaying
+</H4>
+
+<P>
+This method only works for scalars and static tables (meaning no row
+creation and deletion is performed through SNMP). Also, it is not
+safe with this method to modify dependent values though a single
+request as failed modification won't roll back others in the bulk.
+</P>
+
+<P>
+Whenever SNMP Agent receives read or modification request against arbitrary
+Managed Object Instance, it ends up <B>clone</B>()'ing <B>syntax</B>
+parameter of <A HREF="#MibScalarInstance">MibScalarInstance</A> object.
+Read queries (e.g. GET/GETNEXT/GETBULK) trigger <B>clone</B> method
+invocation without passing it new value, while new value will be
+fed to the <B>clone</B> method on modification request.
+</P>
+
+<P>
+This value-based gatewaying method works by listening on the <B>clone</B>()
+method of <B>MibScalarInstance</B> associated value thus fetching current
+or applying new state of some outer system represented by arbitrary Managed
+Object Instance.
+</P>
+
+<P>
+Consider SMI-to-filesystem gateway for example, where a Managed Object 
+Instance would represent particular file contents. File contents would
+be solely dependent on SNMP updates.
+</P>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+class MyFile(OctetString):
+  def clone(self, value=None):
+    if value is not None:
+      # SNMP SET
+      open('/tmp/myfile', 'w').write(value)
+
+    # SNMP S/GET*
+    return OctetString.clone(self, open('/tmp/myfile', 'r').read())
+
+mibBuilder.exportSymbols(
+  'MYFILE-MIB', MibScalarInstance((1, 3, 6, 1, 4, 1, 20408, 1), MyFile())
+)
+</PRE>
+</TD></TR></TABLE>
+</P>
+
+<P>
+A variation of this through-value SMI gatewaying method would be for a
+third-party system to keep Managed Object Instance value synchronized
+with system's current state. Take file size monitor for instance -- the
+following code would be run periodically to measure most recent file size 
+and re-build its SMI projection:
+</P>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+myManagedObjectInstance = MibScalarInstance(
+  (1, 3, 6, 1, 4, 1, 20408, 1), Integer(os.stat('/var/adm/messages')[6])
+)
+
+mibBuilder.exportSymbols(
+  'MYFILE-MIB', myManagedObjectInstance=myManagedObjectInstance
+)
+</PRE>
+</TD></TR></TABLE>
+
+<H4>
+Tapping on Management Instrumentation API
+</H4>
+
+<P>
+This is a generic SMI Managed Objects Instances to real-life objects 
+mapping method. It works for scalars and tables of any origin, though, 
+programming with it involves customization of PySNMP SMI base classes 
+what adds up to usage complexity.
+</P>
 
 <P>
 A single SNMP request may invoke an operation on multiple Managed 
@@ -1951,125 +2045,235 @@ Managed Objects Instances or be rolled back and reported as a
 failure otherwise.
 </P>
 
+<A NAME="MANAGEMENT-INSTRUMENTATION-API"></A>
+
 <P>
-PySNMP Managed Objects Instances are implemented by the
-<A HREF="#MibScalarInstance">MibScalarInstance</A> objects
-or derivatives. The MibScalarInstance class supports a whole
-bunch of Managed Object Instance tackling methods being invoked by 
-SNMP engine in response to incoming SNMP request. Default implementation
-handles all standard SNMP functionality like MIB and VACM-grain
-access control, so it's safe for a custom Managed Object Instance
-implementation to rely on these defaults. However, overloading 
-some of these methods may be used for tapping on Managed Object
-Instances tackling event sequence what may be useful for interfacing
-MibScalarInstance objects to real-life, third party systems. Overloading
-method should still pass control to overloaded method not to interfere 
-with behind-the-scene SMI workings.
+SNMP engine talks to its Managed Objects through a protocol which is
+comprised from a collection of API methods (further refered to as
+<B>Management Instrumentation API</B>), implemented by 
+<A HREF="#DATA-MODEL-MANAGED-OBJECTS">Managed Objects classes</A>
+and a definite sequence of their invocation. Default handlers implemented
+in Managed Objects classes read/modify/create the <STRONG>syntax</STRONG> 
+parameter, passed on instantiation, to 
+<A HREF="#MibScalarInstance">MibScalarInstance</A> objects for scalars 
+and <A HREF="#MibTableColumn">MibTableColumn</A> for tables. The essence 
+of this Management Instrumentation Tapping technique is to listen on 
+Management Instrumentation API methods for gaining control over particular 
+Managed Object at request processing points.
 </P>
 
 <P>
-The parameters of these Management Instrumentation API methods don't make 
-much sense to custom implementation, so it's normally safe to just pass 
-them down to the overloaded method.
+Formal parameters passed to Management Instrumentation API methods don't make 
+much sense to custom implementation, so they are partially documented here and,
+in most cases, should be blindly <B>passed down</B> as-is to the overloaded
+method to not to interfere with behind-the-scene SMI workings.
 </P>
 
 <P>
-The MibScalarInstance class implement the following Management Instrumentation
-API methods:
+Value read methods implemented by 
+<A HREF="#DATA-MODEL-MANAGED-OBJECTS">Managed Objects</A> and
+invoked by SNMP engine in response to SNMP GET/GETNEXT/GETBULK requests:
 </P>
 
 <P>
-<A NAME="MibScalarInstance.readTest"></A>
+<A NAME="readTest"></A>
 <DL>
 <DT><STRONG>readTest</STRONG>(
-<STRONG>name</STRONG>,
-<STRONG>val</STRONG>,
-<STRONG>idx</STRONG>,
-(<STRONG>acFun</STRONG>, <STRONG>acCtx</STRONG>)
+<STRONG>self</STRONG>,
+*<STRONG>args</STRONG>
 )</DT>
 <DD>
 <P>
-The <STRONG>readTest</STRONG> method is invoked by SNMP engine in response
-to SNMP GET request prior to performing actual Managed Object Instance 
-value read to give implementation a chance to ensure that subsequent 
-value read is likely to succeed.
-</P>
-<P>
-If custom Managed Object Instance implementation choose not to allow
-read access to this object for reasons beyond the scope of MIB and/or
-VACM access control systems, it should raise a SMI exception.
+The <STRONG>readTest</STRONG> method is invoked by SNMP engine prior to 
+performing actual Managed Object Instance value read to give 
+implementation a chance to ensure that subsequent value read is likely 
+to succeed.
 </P>
 </DD>
 </DL>
+</P>
 
 <P>
-<A NAME="MibScalarInstance.readGet"></A>
+<A NAME="readGet"></A>
 <DL>
 <DT><STRONG>readGet</STRONG>(
-<STRONG>name</STRONG>,
-<STRONG>val</STRONG>,
-<STRONG>idx</STRONG>,
-(<STRONG>acFun</STRONG>, <STRONG>acCtx</STRONG>)
+<STRONG>self</STRONG>,
+*<STRONG>args</STRONG>
 )</DT>
 <DD>
 <P>
 The <STRONG>readGet</STRONG> method is invoked by SNMP engine to fetch
 Managed Object Instance's value. This method must return a tuple
-of (<STRONG>name</STRONG>, <STRONG>value</STRONG>). Custom implementation
-may get its own value from whatever source. Default implementation
-returns the value of <STRONG>getSyntax</STRONG>().
+of (<STRONG>name</STRONG>, <STRONG>value</STRONG>) which is
+returned by overloaded method invocation. Custom implementation 
+may replace the <STRONG>value</STRONG> part by its own version taken
+from third-party sources.
 </P>
 </DD>
 </DL>
+</P>
 
 <P>
-<A NAME="MibScalarInstance.readTestNext"></A>
+<A NAME="readTestNext"></A>
 <DL>
 <DT><STRONG>readTestNext</STRONG>(
-<STRONG>name</STRONG>,
-<STRONG>val</STRONG>,
-<STRONG>idx</STRONG>,
-(<STRONG>acFun</STRONG>, <STRONG>acCtx</STRONG>)
+<STRONG>self</STRONG>,
+*<STRONG>args</STRONG>
 )</DT>
 <DD>
 <P>
-The <STRONG>readTestNext</STRONG> method is invoked by SNMP engine in response
-to SNMP GETNEXT request prior to performing actual Managed Object Instance 
-value read to give implementation a chance to ensure that subsequent value 
-read is likely to succeed.
-</P>
-<P>
-If custom Managed Object Instance implementation choose not to allow
-read access to this object for reasons beyond the scope of MIB and/or
-VACM access control systems, it should raise a SMI exception.
+The <STRONG>readTestNext</STRONG> method is invoked by SNMP engine prior 
+to performing actual Managed Object Instance value read to give 
+implementation a chance to ensure that subsequent value read is likely 
+to succeed.
 </P>
 </DD>
 </DL>
+</P>
 
 <P>
-<A NAME="MibScalarInstance.readGetNext"></A>
+<A NAME="readGetNext"></A>
 <DL>
 <DT><STRONG>readGetNext</STRONG>(
-<STRONG>name</STRONG>,
-<STRONG>val</STRONG>,
-<STRONG>idx</STRONG>,
-(<STRONG>acFun</STRONG>, <STRONG>acCtx</STRONG>)
+<STRONG>self</STRONG>,
+*<STRONG>args</STRONG>
 )</DT>
 <DD>
 <P>
-The <STRONG>readGetNext</STRONG> method is invoked by SNMP engine to fetch
-Managed Object Instance's value. This method must return a tuple
-of (<STRONG>name</STRONG>, <STRONG>value</STRONG>). Custom implementation
-may get its own value from whatever source. Default implementation
-returns the value of <STRONG>getSyntax</STRONG>().
+The <STRONG>readGetNext</STRONG> method is invoked by SNMP engine 
+to fetch Managed Object Instance's value. This method must return a tuple 
+of (<STRONG>name</STRONG>, <STRONG>value</STRONG>) which is returned by 
+overloaded method invocation. Custom implementation may replace the 
+<STRONG>value</STRONG> part by its own version taken from third-party 
+sources.
 </P>
 </DD>
 </DL>
+</P>
 
+<P>
+The following is a re-implementation of file size monitor:
+</P>
 
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+class FileWatcherInstance(MibScalarInstance):
+  def readTest(self, *args):
+    apply(MibScalarInstance.readTest, (self,) + args)
+    try:
+      os.stat('/var/adm/messages')
+    except:
+      raise SmiError('%s: %s' % (self, why))
 
+  def readGet(self, *args):
+    apply(MibScalarInstance.readGet, (self,) + args)
+    try:
+      return self.getName(), self.getSyntax().clone(
+        os.stat('/var/adm/messages')[6]
+      )
+    except StandardError, why:
+      raise SmiError('%s: %s' % (self, why))
 
+mibBuilder.exportSymbols(
+  'MYFILE-MIB', FileWatcherInstance((1,3,6,1,4,1,20408,1), Integer())
+)
+</PRE>
+</TD></TR></TABLE>
 
+<P>
+Value modification methods implemented by 
+<A HREF="#DATA-MODEL-MANAGED-OBJECTS">Managed Objects</A> and
+invoked by SNMP engine in response to SNMP SET request:
+</P>
+
+<P>
+<A NAME="writeTest"></A>
+<DL>
+<DT><STRONG>writeTest</STRONG>(
+<STRONG>self</STRONG>,
+<STRONG>name</STRONG>,
+<STRONG>value</STRONG>,
+*<STRONG>args</STRONG>
+)</DT>
+<DD>
+<P>
+The <STRONG>writeTest</STRONG> method is invoked by SNMP engine prior to 
+performing actual Managed Object Instance value modification to give 
+implementation a chance to ensure that subsequent value modification 
+is likely to succeed.
+</P>
+<P>
+Upon successful completion, this method brings Managed Object Instance into 
+a state of pending modification which ends through either calling
+<A HREF="#writeCleanup">writeCleanup</A>() on success or
+<A HREF="#writeUndo">writeUndo</A>() on failure.
+</DD>
+</DL>
+</P>
+
+<P>
+<A NAME="writeCommit"></A>
+<DL>
+<DT><STRONG>writeCommit</STRONG>(
+<STRONG>self</STRONG>,
+*<STRONG>args</STRONG>
+)</DT>
+<DD>
+<P>
+The <STRONG>writeCommit</STRONG> method is invoked by SNMP engine by way of
+request processing in attempt to apply pending <STRONG>value</STRONG>,
+previously passed to Managed Object Instance through 
+<A HREF="#writeTest">writeTest</A> method. Custom implementation may 
+attempt to apply pending <STRONG>value</STRONG> to a third-party system.
+</P>
+</DD>
+</DL>
+</P>
+
+<P>
+<A NAME="writeCleanup"></A>
+<DL>
+<DT><STRONG>writeCleanup</STRONG>(
+<STRONG>self</STRONG>,
+*<STRONG>args</STRONG>
+)</DT>
+<DD>
+<P>
+The <STRONG>writeCleanup</STRONG> method is invoked by SNMP engine by way of
+request processing to bring Managed Object Instance out of
+pending value modification state. Custom implementation may attempt to
+bring a third-party system out of value modification state.
+</P>
+</DD>
+</DL>
+</P>
+
+<P>
+<A NAME="writeUndo"></A>
+<DL>
+<DT><STRONG>writeUndo</STRONG>(
+<STRONG>self</STRONG>,
+*<STRONG>args</STRONG>
+)</DT>
+<DD>
+<P>
+The <STRONG>writeUndo</STRONG> method is invoked by SNMP engine by way of
+request processing to drop the <STRONG>value</STRONG> applied
+to Managed Object Instance by the previously called 
+<A HREF="#writeCommit">writeCommit</A>() method and re-assign previous value.
+This method also brings Managed Object Instance out of pending value 
+modification state. Custom implementation may attempt to bring a 
+third-party system out of value modification state.
+</P>
+</DD>
+</DL>
+</P>
+
+<P>
+Table row management methods implemented by 
+<A HREF="#MibTableColumn">MibTableColumn</A> class and
+invoked by SNMP engine in response to SNMP SET request:
+</P>
 
 
 
