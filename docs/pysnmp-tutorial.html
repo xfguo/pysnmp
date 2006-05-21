@@ -8,52 +8,55 @@
 <FONT SIZE=2 FACE="arial, helvetica">
 <TABLE><TR><TD>
 <TABLE ALIGN="CENTER" WIDTH="70%"><TR><TD>
-<H3>
+<H4>
 PySNMP tutorial
-</H3>
+</H4>
 
-<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, April 2006</I>
+<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, May 2006</I>
 
 <P><B>Table of contents</B></P>
 <UL>
-<LI><A HREF="#NETWORK-MANAGEMENT-BASICS">Network management basics</A>
+<LI><A HREF="#NETWORK-MANAGEMENT-BASICS">1. Network management basics</A>
 <UL>
-<LI><A HREF="#SNMP-MANAGEMENT-ARCHITECTURE">SNMP management architecture</A>
-<LI><A HREF="#HISTORY-OF-SNMP">The history of SNMP</A>
+<LI><A HREF="#SNMP-MANAGEMENT-ARCHITECTURE">1.1 SNMP management architecture</A>
+<LI><A HREF="#HISTORY-OF-SNMP">1.2 The history of SNMP</A>
 </UL>
-<LI><A HREF="#PYSNMP-PROGRAMMING">Programming with PySNMP</A>
+<LI><A HREF="#PYSNMP-PROGRAMMING">2. Programming with PySNMP</A>
 <UL>
-<LI><A HREF="#ONELINER-APPS">One-liner Applications</A>
+<LI><A HREF="#ONELINER-APPS">2.1 One-line Applications</A>
 <UL>
-<LI><A HREF="#SYNCH-ONELINER-APPS">Synchronous One-liner Applications</A>
+<LI><A HREF="#SYNCH-ONELINER-APPS">2.1.1 Synchronous Applications</A>
 <UL>
-<LI><A HREF="#CommandGenerator">Command Generator</A>
-<LI><A HREF="#NotificationOriginator">Notification Originator</A
-<LI><A HREF="#SECURITY-CONFIGURATION">Security configuration</A>
-<UL>
-<LI><A HREF="#UsmUserData">User-Based Security Model configuration</A>
-<LI><A HREF="#CommunityData">Community-Based Security Model configuration</A>
+<LI><A HREF="#CommandGenerator">2.1.1.1 Command Generator</A>
+<LI><A HREF="#NotificationOriginator">2.1.1.2 Notification Originator</A
 </UL>
-<LI><A HREF="#TRANSPORT-CONFIGURATION">Transport configuration</A>
+<LI><A HREF="#ASYNCH-ONELINER-APPS">2.1.2 Asynchronous Applications</A>
 <UL>
-<LI><A HREF="#UdpTransportTarget">UDP Transport Target</A>
+<LI><A HREF="#AsynCommandGenerator">2.1.2.1 Asynchronous Command Generator</A>
+<LI><A HREF="#AsynNotificationOriginator">2.1.2.2 Asynchronous Notification Originator</A
 </UL>
-</UL>
-<LI><A HREF="#ASYNCH-ONELINER-APPS">Asynchronous One-liner Applications</A>
+<LI><A HREF="#SECURITY-CONFIGURATION">2.1.3 Security configuration</A>
 <UL>
-<LI><A HREF="#AsynCommandGenerator">Asynchronous Command Generator</A>
-<LI><A HREF="#AsynNotificationOriginator">Asynchronous Notification Originator</A
+<LI><A HREF="#UsmUserData">2.1.3.1 User-Based Security Model configuration</A>
+<LI><A HREF="#CommunityData">2.1.3.2 Community-Based Security Model configuration</A>
 </UL>
-</UL>
-<LI><A HREF="#MIB-SERVICES">MIB services</A>
+<LI><A HREF="#TRANSPORT-CONFIGURATION">2.1.4 Transport configuration</A>
 <UL>
-<LI><A HREF="#DATA-MODEL-MANAGED-OBJECTS">Data model for Managed Objects</A>
-<LI><A HREF="#MIB-BUILDER">MIB builder</A>
-<LI><A HREF="#MIB-VIEW-CONTROLLER">MIB view controller</A>
-<LI><A HREF="#IMPLEMENTING-MANAGED-OBJECTS-INSTANCES">Implementing Managed Objects Instances</A>
-<LI>Managed Objects API</A>
+<LI><A HREF="#UdpTransportTarget">2.1.4.1 UDP Transport Target</A>
 </UL>
-<LI><A HREF="#MANAGED-OBJECTS-DATA-MODEL">Data model for Managed Objects</A>
+</UL>
+<LI><A HREF="#MANAGED-OBJECT-NAME-VALUE">2.2 Managed Objects names and values</A>
+<LI><A HREF="#MIB-SERVICES">2.3 MIB services</A>
+<UL>
+<LI><A HREF="#DATA-MODEL-MANAGED-OBJECTS">2.3.1 Data model for Managed Objects</A>
+<LI><A HREF="#MIB-BUILDER">2.3.2 MIB builder</A>
+<LI><A HREF="#MIB-VIEW-CONTROLLER">2.3.3 MIB view controller</A>
+<LI><A HREF="#IMPLEMENTING-MANAGED-OBJECTS-INSTANCES">2.3.4 Implementing Managed Objects Instances</A>
+<UL>
+<LI><A HREF="#ASSOCIATED-VALUE-GATEWAYING">2.3.4.1 Associated value gatewaying</A>
+<LI><A HREF="#TAPPING-ON-MANAGEMENT-INSTRUM">2.3.4.2 Tapping on Management Instrumentation API</A>
+</UL>
+</UL>
 </UL>
 <LI><A HREF="#APPENDIXIES">Appendixies</A>
 <UL>
@@ -63,7 +66,7 @@ PySNMP tutorial
 
 <A NAME="NETWORK-MANAGEMENT-BASICS"></A>
 <H4>
-Network management basics
+1. Network management basics
 </H4>
 
 <P>
@@ -132,9 +135,9 @@ another, while others, such as Simple Network Management Protocol (SNMP),
 evolve into an industry standard.
 </P>
 
-<A NAME="MANAGEMENT-ARCHITECTURE"></A>
+<A NAME="SNMP-MANAGEMENT-ARCHITECTURE"></A>
 <H4>
-SNMP management architecture
+1.1 SNMP management architecture
 </H4>
 
 <P>
@@ -259,7 +262,7 @@ pretty printing and so on. This feature is known as <STRONG>MIB parser</STRONG> 
 
 <A NAME="HISTORY-OF-SNMP"></A>
 <H4>
-The history of SNMP
+1.2 The history of SNMP
 </H4>
 
 <P>
@@ -351,7 +354,7 @@ applications are Manager, Agent and Proxy (
 
 <A NAME="PYSNMP-PROGRAMMING"></A>
 <H4>
-Programming with PySNMP
+2. Programming with PySNMP
 </H4>
 
 <P>
@@ -440,7 +443,7 @@ ALT="Applications" />
 ALT="LCD" />
 -->
 <AREA SHAPE ="rect" COORDS ="196,16,629,225" HREF="#ONELINER-APPS" 
-ALT="One-liner Applications" />
+ALT="One-line Applications" />
 <!--
 <AREA SHAPE ="rect" COORDS ="18,405,145,464" HREF="#TSP-API" 
 ALT="Transport Dispatcher" />
@@ -526,24 +529,24 @@ Manager Applications.
 
 <A NAME="ONELINER-APPS"></A>
 <H4>
-One-liner Applications
+2.1 One-line Applications
 </H4>
 
 <P>
-As of this writing, one-liner Applications currently cover Manager-side 
+As of this writing, one-line Applications currently cover Manager-side 
 operations. Agent and Proxy roles could be implemented on top of
 native Applications API.
 </P>
 
 <P>
-There're two kinds of APIs to one-liner Applications: synchronous and
+There're two kinds of APIs to one-line Applications: synchronous and
 asynchronous. Both are implemented within the
 <STRONG>pysnmp.entity.rfc3413.oneliner.cmdgen</STRONG> module.
 </P>
 
 <A NAME="SYNCH-ONELINER-APPS"></A>
 <H4>
-Synchronous One-liner Applications
+2.1.1 Synchronous One-line Applications
 </H4>
 
 <P>
@@ -622,6 +625,27 @@ Each Managed Object is a tuple of <STRONG>Object Name</STRONG> and
 </DD>
 </DL>
 
+<P>
+The following code performs SNMP GET operation over SNMPv1:
+</P>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.entity.rfc3413.oneliner import cmdgen
+>>> errorIndication, errorStatus, errorIndex, varBinds = cmdgen.CommandGenerator().getCmd(
+... cmdgen.CommunityData('my-agent', 'public', 0),
+... cmdgen.UdpTransportTarget(('localhost', 161)),
+... (1,3,6,1,2,1,1,1,0)
+... )
+>>> print errorIndication
+None
+>>> print errorStatus
+0
+>>> print varBinds
+[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux my.domain.com 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+</PRE>
+</TD></TR></TABLE>
+
 <A NAME="CommandGenerator.setCmd"></A>
 <DL>
 <DT><STRONG>setCmd</STRONG>(
@@ -662,6 +686,28 @@ The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG> and
 
 </DD>
 </DL>
+
+<P>
+The following code performs SNMP SET operation over SNMPv2c:
+</P>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.entity.rfc3413.oneliner import cmdgen
+>>> from pysnmp.proto import rfc1902
+>>> errorIndication, errorStatus, errorIndex, varBinds = cmdgen.CommandGenerator().setCmd(
+... cmdgen.CommunityData('my-agent', 'public', 1),
+... cmdgen.UdpTransportTarget(('localhost', 161)),
+... ((1,3,6,1,2,1,1,1,0), rfc1902.OctetString('my system description'))
+... )
+>>> print errorIndication
+None
+>>> print errorStatus
+17
+>>> print errorStatus.prettyPrint()
+notWritable(17)
+</PRE>
+</TD></TR></TABLE>
 
 <A NAME="CommandGenerator.nextCmd"></A>
 <DL>
@@ -711,6 +757,34 @@ Properties of the <STRONG>varBinds</STRONG> parameter is the same as in
 </P>
 </DD>
 </DL>
+
+<P>
+The following code performs SNMP GETNEXT operation against a MIB subtree
+over SNMPv3:
+</P>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.entity.rfc3413.oneliner import cmdgen
+>>> errorIndication, errorStatus, errorIndex, varBinds = cmdgen.CommandGenerator().nextCmd(
+... cmdgen.UsmUserData('my-user', 'my-authkey', 'my-privkey'),
+... cmdgen.UdpTransportTarget(('localhost', 161)),
+... (1,3,6,1,2,1,1)
+... )
+>>> print errorIndication
+None
+>>> print errorStatus
+0
+>>> for varBindTableRow in varBindTable:
+...     print varBindTableRow
+...
+[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux my.domain.com 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+[(ObjectName('1.3.6.1.2.1.1.2.0'), ObjectIdentifier('1.3.6.1.4.1.8072.3.2.10'))]
+[ skipped ]
+[(ObjectName('1.3.6.1.2.1.1.9.1.4.9'), TimeTicks('17'))]
+>>>
+</PRE>
+</TD></TR></TABLE>
 
 <A NAME="CommandGenerator.bulkCmd"></A>
 <DL>
@@ -762,6 +836,35 @@ the same meaning as in <STRONG>getCmd</STRONG> method.
 </P>
 </DD>
 </DL>
+
+<P>
+The following code performs SNMP GETBULK operation against a MIB subtree
+over SNMPv3:
+</P>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.entity.rfc3413.oneliner import cmdgen
+>>> errorIndication, errorStatus, errorIndex, varBinds = cmdgen.CommandGenerator().bulkCmd(
+... cmdgen.UsmUserData('my-user', 'my-authkey', 'my-privkey'),
+... cmdgen.UdpTransportTarget(('localhost', 161)),
+... 0, 25, # nonRepeaters, maxRepetitions
+... (1,3,6,1,2,1,1)
+... )
+>>> print errorIndication
+None
+>>> print errorStatus
+0
+>>> for varBindTableRow in varBindTable:
+...     print varBindTableRow
+...
+[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux my.domain.com 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+[(ObjectName('1.3.6.1.2.1.1.2.0'), ObjectIdentifier('1.3.6.1.4.1.8072.3.2.10'))]
+[ skipped ]
+[(ObjectName('1.3.6.1.2.1.1.9.1.4.9'), TimeTicks('17'))]
+>>>
+</PRE>
+</TD></TR></TABLE>
 
 <P>
 Notification Originator Applications are implemented within a single class:
@@ -818,13 +921,8 @@ process and acknowledge confirmed notification.
 <P>
 The <STRONG>notificationType</STRONG> parameter indicates the kind of
 event to notify Manager about in form of SMI NOTIFICATION-TYPE object
-name.
-</P>
-
-<P>
-For example: (1, 3, 6, 1, 6, 3, 1, 1, 5, 1) stands for coldStart
-notification of SNMPv2-MIB. This could also be given as a 
-<A HREF="#mibNameToOid">Managed Object Name</A>: ('SNMPv2-MIB', 'coldStart').
+name. For instance, ('SNMPv2-MIB', 'coldStart') is a value of coldStart
+notification type as defined in SNMPv2-MIB module.
 </P>
 
 <P>
@@ -843,148 +941,35 @@ in <STRONG>CommandGenerator.getCmd</STRONG>.
 </DD>
 </DL>
 
-<A NAME="SECURITY-CONFIGURATION"></A>
 <P>
-Calls to one-liner Applications API require Security Parameters and
-Transport configuration objects as input parameters. These classes
-serve as convenience shortcuts to SNMP engine configuration facilities
-and for keeping persistent authentication/transport configuration
-between SNMP engine calls.
+The following code sends SNMP TRAP over SNMPv3:
 </P>
 
-<P>
-Security Parameters object is Security Model specific. 
-<STRONG>UsmUserData</STRONG> class serves SNMPv3 User-Based Security
-Model configuration, while <STRONG>CommunityData</STRONG> class
-is used for Community-Based Security Model of SNMPv1/SNMPv2c.
-</P>
-
-<A NAME="UsmUserData"></A>
-<DL>
-<DT>class <STRONG>UsmUserData</STRONG>(
-<STRONG>securityName</STRONG>,
-<STRONG>authKey=''</STRONG>,
-<STRONG>privKey=''</STRONG>,
-<STRONG>authProtocol=usmNoAuthProtocol</STRONG>,
-<STRONG>privProtocol=usmNoPrivProtocol</STRONG>
-)</DT>
-<DD>
-<P>
-Create an object holding User-Based Security Model specific configuration
-parameters.
-</P>
-<P>
-Mandatory <STRONG>securityName</STRONG> parameter is SNMPv3 USM username
-passed in as a string.
-</P>
-
-<P>
-Optional <STRONG>authKey</STRONG> parameter is a secret key used within 
-USM for SNMP PDU authorization. It's string type. Setting it to a non-empty
-value implies MD5-based PDU authentication to take effect. Default hashing 
-method may be changed by means of further <STRONG>authProtocol</STRONG> 
-parameter.
-</P>
-
-<P>
-Optional <STRONG>privKey</STRONG> parameter is a secret key used within 
-USM for SNMP PDU encryption. It's string type. Setting it to a non-empty
-value implies MD5-based PDU authentication and DES-based encryption to 
-take effect. Default hashing and/or encryption methods may be changed by 
-means of further <STRONG>authProtocol</STRONG> and/or 
-<STRONG>privProtocol</STRONG> parameters.
-</P>
-
-<P>
-Optional <STRONG>authProtocol</STRONG> parameter may be used to specify 
-non-default hash function algorithm. Possible values include
-<STRONG>usmHMACMD5AuthProtocol</STRONG>,
-<STRONG>usmHMACSHAAuthProtocol</STRONG> and
-<STRONG>usmNoAuthProtocol</STRONG>. These symbols are defined in 
-<STRONG>pysnmp.entity.rfc3413.oneliner.cmdgen</STRONG> module.
-</P>
-
-<P>
-Optional <STRONG>privProtocol</STRONG> parameter may be used to specify 
-non-default ciphering algorithm. Possible values include
-<STRONG>usmDESPrivProtocol</STRONG> and
-<STRONG>usmNoPrivProtocol</STRONG>.
-</P>
-</DD>
-</DL>
-
-<A NAME="CommunityData"></A>
-<DL>
-<DT>class <STRONG>CommunityData</STRONG>(
-<STRONG>securityName</STRONG>,
-<STRONG>communityName</STRONG>,
-<STRONG>mpModel=1</STRONG>
-)</DT>
-<DD>
-<P>
-Create an object holding Community-Based Security Model specific configuration
-parameters.
-</P>
-<P>
-Mandatory <STRONG>securityName</STRONG> parameter is Community-Based Security 
-Model username passed in as a string. For most purposes this can be an
-arbitrary string.
-</P>
-
-<P>
-Mandatory <STRONG>communityName</STRONG> parameter is SNMPv1/SNMPv2c Community name 
-passed as a string.
-</P>
-
-<P>
-Optional <STRONG>mpModel</STRONG> parameter indicates whether SNMPv2c 
-(mpModel=1, default) or SNMPv1 (mpModel=0) protocol should be used.
-</P>
-</DD>
-</DL>
-
-<A NAME="TRANSPORT-CONFIGURATION"></A>
-<P>
-Transport configuration object is Transport domain specific.
-<STRONG>UdpTransportTarget</STRONG> class represents an Agent
-accessible through UDP domain transport.
-</P>
-
-<A NAME="UdpTransportTarget"></A>
-<DL>
-<DT>class <STRONG>UdpTransportTarget</STRONG>(
-<STRONG>transportAddr</STRONG>
-)</DT>
-<DD>
-<P>
-Create an object representing a single Agent accessible through UDP socket.
-</P>
-<P>
-Mandatory <STRONG>transportAddr</STRONG> parameter indicates destination
-Agent address in form of tuple of <STRONG>FQDN</STRONG>, <STRONG>port</STRONG>
-where <STRONG>FQDN</STRONG> is a string and <STRONG>port</STRONG> is an 
-integer.
-</P>
-</DD>
-</DL>
-
-<P>
-See
-<A HREF="http://pysnmp.sourceforge.net/examples/4.x/v3arch/oneliner/manager/nextgen.html">
-GETNEXT Command Generator
-</A> and 
-<A HREF="http://pysnmp.sourceforge.net/examples/4.x/v3arch/oneliner/agent/ntforg.html">
-Notification Originator
-</A> scripts as examples of Synchronous One-liner API programming.
-</P>
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.entity.rfc3413.oneliner import cmdgen, ntforg
+>>> from pysnmp.proto.api import v2c
+>>> errorIndication = ntforg.NotificationOriginator().sendNotification(
+... cmdgen.UsmUserData('my-user', 'my-authkey', 'my-privkey'),
+... cmdgen.UdpTransportTarget(('localhost', 162)),
+... 'trap',
+... ('SNMPv2-MIB', 'coldStart'),
+... ((1,3,6,1,2,1,1,3,0), v2c.TimeTicks(44100))
+)
+>>> print errorIndication
+None
+>>> print errorStatus
+0
+</PRE>
+</TD></TR></TABLE>
 
 <A NAME="ASYNCH-ONELINER-APPS"></A>
 <H4>
-Asynchronous One-liner Applications
+2.1.2 Asynchronous One-line Applications
 </H4>
 
 <P>
-Asynchronous API to one-liner Applications is actually a foundation for
+Asynchronous API to one-line Applications is actually a foundation for
 <A HREF="#SYNCH-ONELINER-APPS">Synchronous</A> version, so they're very similar.
 This Asynchronous API is useful for purposes such as running multiple, 
 possibly different, SNMP Applications at the same time or handling other
@@ -1220,6 +1205,41 @@ left for running Applications.
 </P>
 
 <P>
+The following code performs SNMP GET operation asynchronously through
+SNMPv3:
+</P>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.entity.rfc3413.oneliner import cmdgen
+>>>
+>>> def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex, varBinds, cbCtx):
+...     print 'sendRequestHandle =', sendRequestHandle
+...     print 'errorIndication =', errorIndication
+...     print 'errorStatus =', errorStatus
+...     print 'varBinds =', varBinds
+...     print 'cbCtx =', cbCtx
+...
+>>> asynCommandGenerator = cmdgen.AsynCommandGenerator()
+>>> # This is a non-blocking call
+>>> sendRequestHandle = asynCommandGenerator.asyncGetCmd(
+... cmdgen.UsmUserData('my-user', 'my-authkey', 'my-privkey'), 
+... cmdgen.UdpTransportTarget(('localhost', 161)), 
+... ((1,3,6,1,2,1,1,1,0),), 
+... (cbFun, None))
+>>> print sendRequestHandle
+1
+>>> asynCommandGenerator.snmpEngine.transportDispatcher.runDispatcher()
+sendRequestHandle = 1
+errorIndication = None
+errorStatus = 0
+varBinds = [(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux my.domain.com 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+cbCtx = None
+>>>
+</PRE>
+</TD></TR></TABLE>
+
+<P>
 The <STRONG>AsynNotificationOriginator</STRONG> class implements specific 
 notification types.
 </P>
@@ -1330,9 +1350,397 @@ The <STRONG>runDispatcher</STRONG>() method terminates when no unconfirmed
 notifications left for running Applications.
 </P>
 
+<P>
+The following code sends SNMP INFORM notification asynchronously through
+SNMPv3:
+</P>
+
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+>>> from pysnmp.entity.rfc3413.oneliner import cmdgen, ntforg
+>>> from pysnmp.proto.api import v2c
+>>>
+>>> def cbFun(sendRequestHandle, errorIndication, cbCtx):
+...     print 'sendRequestHandle =', sendRequestHandle
+...     print 'errorIndication =', errorIndication
+...     print 'cbCtx =', cbCtx
+...
+>>> asynNotificationOriginator = ntforg.AsynNotificationOriginator()
+>>> # This is a non-blocking call
+>>> sendRequestHandle = asynNotificationOriginator.asyncSendNotification(
+... cmdgen.UsmUserData('my-user', 'my-authkey', 'my-privkey'),
+... cmdgen.UdpTransportTarget(('localhost', 162)),
+... 'inform',
+... ('SNMPv2-MIB', 'coldStart'),
+... ((1,3,6,1,2,1,1,1,0), v2c.TimeTicks(44100)),
+... (cbFun, None))
+>>> print sendRequestHandle
+1
+>>> asynNotificationOriginator.snmpEngine.transportDispatcher.runDispatcher()
+sendRequestHandle = 1
+errorIndication = None
+cbCtx = None
+>>>
+</PRE>
+</TD></TR></TABLE>
+
+<A NAME="SECURITY-CONFIGURATION"></A>
+<H4>
+2.1.3 Security configuration
+</H4>
+<P>
+Calls to one-line Applications API require Security Parameters and
+Transport configuration objects as input parameters. These classes
+serve as convenience shortcuts to SNMP engine configuration facilities
+and for keeping persistent authentication/transport configuration
+between SNMP engine calls.
+</P>
+
+<P>
+Security Parameters object is Security Model specific. 
+<STRONG>UsmUserData</STRONG> class serves SNMPv3 User-Based Security
+Model configuration, while <STRONG>CommunityData</STRONG> class
+is used for Community-Based Security Model of SNMPv1/SNMPv2c.
+</P>
+
+<A NAME="UsmUserData"></A>
+<DL>
+<DT>class <STRONG>UsmUserData</STRONG>(
+<STRONG>securityName</STRONG>,
+<STRONG>authKey=''</STRONG>,
+<STRONG>privKey=''</STRONG>,
+<STRONG>authProtocol=usmNoAuthProtocol</STRONG>,
+<STRONG>privProtocol=usmNoPrivProtocol</STRONG>
+)</DT>
+<DD>
+<P>
+Create an object holding User-Based Security Model specific configuration
+parameters.
+</P>
+<P>
+Mandatory <STRONG>securityName</STRONG> parameter is SNMPv3 USM username
+passed in as a string.
+</P>
+
+<P>
+Optional <STRONG>authKey</STRONG> parameter is a secret key used within 
+USM for SNMP PDU authorization. It's string type. Setting it to a non-empty
+value implies MD5-based PDU authentication to take effect. Default hashing 
+method may be changed by means of further <STRONG>authProtocol</STRONG> 
+parameter.
+</P>
+
+<P>
+Optional <STRONG>privKey</STRONG> parameter is a secret key used within 
+USM for SNMP PDU encryption. It's string type. Setting it to a non-empty
+value implies MD5-based PDU authentication and DES-based encryption to 
+take effect. Default hashing and/or encryption methods may be changed by 
+means of further <STRONG>authProtocol</STRONG> and/or 
+<STRONG>privProtocol</STRONG> parameters.
+</P>
+
+<P>
+Optional <STRONG>authProtocol</STRONG> parameter may be used to specify 
+non-default hash function algorithm. Possible values include
+<STRONG>usmHMACMD5AuthProtocol</STRONG>,
+<STRONG>usmHMACSHAAuthProtocol</STRONG> and
+<STRONG>usmNoAuthProtocol</STRONG>. These symbols are defined in 
+<STRONG>pysnmp.entity.rfc3413.oneliner.cmdgen</STRONG> module.
+</P>
+
+<P>
+Optional <STRONG>privProtocol</STRONG> parameter may be used to specify 
+non-default ciphering algorithm. Possible values include
+<STRONG>usmDESPrivProtocol</STRONG> and
+<STRONG>usmNoPrivProtocol</STRONG>.
+</P>
+</DD>
+</DL>
+
+<A NAME="CommunityData"></A>
+<DL>
+<DT>class <STRONG>CommunityData</STRONG>(
+<STRONG>securityName</STRONG>,
+<STRONG>communityName</STRONG>,
+<STRONG>mpModel=1</STRONG>
+)</DT>
+<DD>
+<P>
+Create an object holding Community-Based Security Model specific configuration
+parameters.
+</P>
+<P>
+Mandatory <STRONG>securityName</STRONG> parameter is Community-Based Security 
+Model username passed in as a string. For most purposes this can be an
+arbitrary string.
+</P>
+
+<P>
+Mandatory <STRONG>communityName</STRONG> parameter is SNMPv1/SNMPv2c Community name 
+passed as a string.
+</P>
+
+<P>
+Optional <STRONG>mpModel</STRONG> parameter indicates whether SNMPv2c 
+(mpModel=1, default) or SNMPv1 (mpModel=0) protocol should be used.
+</P>
+</DD>
+</DL>
+
+<A NAME="TRANSPORT-CONFIGURATION"></A>
+<H4>
+2.1.4 Transport configuration
+</H4>
+<P>
+Transport configuration object is Transport domain specific.
+<STRONG>UdpTransportTarget</STRONG> class represents an Agent
+accessible through UDP domain transport.
+</P>
+
+<A NAME="UdpTransportTarget"></A>
+<DL>
+<DT>class <STRONG>UdpTransportTarget</STRONG>(
+<STRONG>transportAddr</STRONG>
+)</DT>
+<DD>
+<P>
+Create an object representing a single Agent accessible through UDP socket.
+</P>
+<P>
+Mandatory <STRONG>transportAddr</STRONG> parameter indicates destination
+Agent address in form of tuple of <STRONG>FQDN</STRONG>, <STRONG>port</STRONG>
+where <STRONG>FQDN</STRONG> is a string and <STRONG>port</STRONG> is an 
+integer.
+</P>
+</DD>
+</DL>
+
+<A NAME="MANAGED-OBJECT-NAME-VALUE"></A>
+<H4>
+2.2 Managed Objects names and values
+</H4>
+
+<A NAME="OIDVAL-IMPL">
+<P>
+In PySNMP programming context, <A HREF="#MANAGED-OBJECTS">
+Managed Object</A> term (also called <STRONG>Variable-Binding</STRONG> in
+protocol specifications) refers to a tuple of Managed Object (or 
+Managed Object Instance) Name and Managed Object Instance Value.
+</P>
+
+<P>
+Managed Objects Names and Values are <A HREF="#ASN1">ASN.1</A> types.
+Both Names and Values are derived from 
+<A HREF="http://pyasn1.sf.net">PyASN1</A> classes. These are defined in
+<STRONG>pysnmp.proto.rfc1902</STRONG> module.
+</P>
+
+<A NAME="OID-IMPL">
+<P>
+Managed Object Name is a tuple or tuple-like
+<A HREF="#OID">Object Identifier</A> class instance.
+</P>
+
+<DL>
+<DT>class <STRONG>ObjectIdentifier</STRONG>(
+<STRONG>objectIdentifier</STRONG>
+)</DT>
+<DD>
+<P>
+Create an <A HREF="#OID">ASN.1 Object Identifier</A> object. The
+<STRONG>objectIdentifier</STRONG> parameter represents Object Identifier
+value. It should be either a tuple or tuple-like object or a string
+representing Object Identifier in dotted notation (like "1.3.6.1").
+</P>
+
+<P>
+Instances of this class mimic basic properties of Python tuple. Sub-OIDs 
+of an OID translate into tuple components.
+</P>
+
+<P>
+For more information on <STRONG>ObjectIdentifier</STRONG> class properties,
+refer to <A HREF="http://pyasn1.sf.net">PyASN1</A> documentation.
+</P>
+</DD>
+</DL>
+
+<A NAME="VAL-IMPL">
+<P>
+It's PySNMP the design decision to always use <A HREF="#SMI">SMIv2</A>
+definitions for Managed Objects regardless of SNMP protocol version being 
+used.
+</P>
+
+<P>
+Managed Object Instance Value is an instance of some
+<A HREF="http://pyasn1.sf.net">PyASN1</A> class or its
+SNMP-specific derivative. The latter case reflects SNMP-specific
+<A HREF="#ASN1">ASN.1</A> sub-type. The list of Managed Object 
+Instance Value classes follows.
+</P>
+
+<A NAME="INTEGER-IMPL"></A>
+<DL>
+<DT>class <STRONG>Integer</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Integer</STRONG> object. The <STRONG>value</STRONG>
+parameter should be an integer value. Instances of this class mimic basic 
+properties of a Python integer.
+</P>
+</DD>
+</DL>
+
+<A NAME="INTEGER32-IMPL"></A>
+<DL>
+<DT>class <STRONG>Integer32</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Integer32</STRONG> object. This object is similar to 
+<A HREF="#INTEGER-IMPL">Integer</A> class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="OCTETSTRING-IMPL"></A>
+<DL>
+<DT>class <STRONG>OctetString</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>OctetString</STRONG> object. The <STRONG>value</STRONG>
+parameter should be a string value. Instances of this class mimic basic
+properties of a Python string.
+</P>
+</DD>
+</DL>
+
+<A NAME="IPADDRESS-IMPL"></A>
+<DL>
+<DT>class <STRONG>IpAddress</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>IpAddress</STRONG> object. The <STRONG>value</STRONG>
+parameter should be an IP address expressed in quad-dotted notation (e.g. 
+"127.0.0.1").
+</P>
+</DD>
+</DL>
+
+<A NAME="COUNTER32-IMPL"></A>
+<DL>
+<DT>class <STRONG>Counter32</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Counter32</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="GAUGE32-IMPL"></A>
+<DL>
+<DT>class <STRONG>Gauge32</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Gauge32</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="UNSIGNED32-IMPL"></A>
+<DL>
+<DT>class <STRONG>Unsigned32</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Unsigned32</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="TIMETICKS-IMPL"></A>
+<DL>
+<DT>class <STRONG>TimeTicks</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>TimeTicks</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="OPAQUE-IMPL"></A>
+<DL>
+<DT>class <STRONG>Opaque</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Opaque</STRONG> object. This object is similar to 
+<A HREF="#OCTETSTRING-IMPL">OctetString</A> class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="COUNTER64-IMPL"></A>
+<DL>
+<DT>class <STRONG>Counter64</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Counter64</STRONG> object. Besides different value 
+constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
+class instance.
+</P>
+</DD>
+</DL>
+
+<A NAME="BITS-IMPL"></A>
+<DL>
+<DT>class <STRONG>Bits</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>Bits</STRONG> object. The <STRONG>value</STRONG>
+parameter should be sequence of names of bits raised to one. Unmentioned
+bits default to zero.
+</P>
+</DD>
+</DL>
+
+<P>
+For more information on SNMP Managed Value objects properties,
+refer to their base classes in <A HREF="http://pyasn1.sf.net">PyASN1</A> 
+documentation.
+</P>
+
 <A NAME="MIB-SERVICES"></A>
 <H4>
-MIB services
+2.3 MIB services
 </H4>
 
 <P>
@@ -1355,7 +1763,7 @@ a single SNMP entity.
 
 <A NAME="DATA-MODEL-MANAGED-OBJECTS"></A>
 <H4>
-Data model for Managed Objects
+2.3.1 Data model for Managed Objects
 </H4>
 
 <P>
@@ -1381,7 +1789,8 @@ implements the following classes:
 <A NAME="MibScalar"></A>
 <DL>
 <DT>class <STRONG>MibScalar</STRONG>(
-<STRONG>name</STRONG>, <STRONG>syntax</STRONG>
+<STRONG>name</STRONG>, 
+<STRONG>syntax</STRONG>
 )</DT>
 <DD>
 <P>
@@ -1479,6 +1888,27 @@ The <STRONG>name</STRONG> parameter has the same meaning as in
 The <STRONG>syntax</STRONG> parameter represents
 <A HREF="#MANAGED-OBJECT-SYNTAX">type</A> of the value associated with
 columnar Managed Object.
+</P>
+
+</DD>
+</DL>
+
+<P>
+The <STRONG>MibTableColumn</STRONG> class implements the following
+methods:
+</P>
+
+<A NAME="MibTableColumn.setProtoInstance"></A>
+<DL>
+<DT><STRONG>setProtoInstance</STRONG>(
+<STRONG>instanceClass</STRONG>
+)</DT>
+<DD>
+<P>
+Configure <STRONG>MibTableColumn</STRONG> object to instantiate
+<STRONG>instanceClass</STRONG> when creating Columnar Objects.
+By default, <A HREF="#MibScalarInstance">MibScalarInstance</A>
+is instantiated.
 </P>
 </DD>
 </DL>
@@ -1617,7 +2047,7 @@ sub-package.
 
 <A NAME="MIB-BUILDER"></A>
 <H4>
-MIB builder
+2.3.2 MIB builder
 </H4>
 
 <P>
@@ -1631,7 +2061,7 @@ module.
 <DT>class <STRONG>MibBuilder</STRONG>()</DT>
 <DD>
 <P>
-Create MIB modules loader and indexer.
+Create MIB modules loader/evaluator/indexer.
 </P>
 </DD>
 </DL>
@@ -1644,9 +2074,17 @@ Create MIB modules loader and indexer.
 
 <DD>
 <P>
-Locate in search path and load up Managed Objects from MIB modules 
-specified by <STRONG>*modNames</STRONG> parameter(s). Store Managed 
-Objects in-memory and index them by their MIB names.
+Locate in search path and evaluate each of <STRONG>*modNames</STRONG>
+through Python <STRONG>execfile</STRONG>() passing a reference to 
+<STRONG>MibBuilder</STRONG> class instance to module's global scope. 
+Evaluating modules might register their objects at 
+<STRONG>MibBuilder</STRONG> through 
+<A HREF="#MibBuilder.exportSymbols">exportSymbols</A>() call.
+</P>
+
+<P>
+MIB builder would then create an in-memory index of registered MIB 
+objects by MIB names.
 </P>
 
 <P>
@@ -1655,7 +2093,7 @@ Search path is managed by the <STRONG>getMibPath()</STRONG> and
 </P>
 
 <P>
-The <STRONG>loadModules</STRONG> method may be further invoked implicitly 
+The <STRONG>loadModules</STRONG> method may be further invoked recursively
 on dependent MIB modules import.
 </P>
 </DD>
@@ -1732,13 +2170,15 @@ DisplayString('')
 </TD></TR></TABLE>
 </P>
 
-<A NAME="#MIB-VIEW-CONTROLLER"></A>
+<A NAME="MIB-VIEW-CONTROLLER"></A>
 <H4>
-MIB view controller
+2.3.3 MIB view controller
 </H4>
 
 <P>
-The <STRONG>pysnmp.smi.view</STRONG> module contains the following items:
+The following facilities are intended for Manager-side access to MIB 
+definitions. The <STRONG>pysnmp.smi.view</STRONG> module contains the 
+following items:
 </P>
 
 <A NAME="MibViewController"></A>
@@ -1918,10 +2358,15 @@ sysDescr
 </TD></TR></TABLE>
 </P>
 
-<A NAME="#IMPLEMENTING-MANAGED-OBJECTS-INSTANCES"></A>
+<A NAME="IMPLEMENTING-MANAGED-OBJECTS-INSTANCES"></A>
 <H4>
-Implementing Managed Objects Instances
+2.3.4 Implementing Managed Objects Instances
 </H4>
+<P>
+The following chapter explains SNMP Agent-controlled Managed Object 
+Instances to real-life objects mapping.
+</P>
+
 <P>
 SNMP defines four types of operations on Managed Objects Instances. 
 For scalars, these are:
@@ -1956,8 +2401,9 @@ but it only works for relatively static Managed Objects. The other
 is universal but it is more complex to deal with.
 </P>
 
+<A NAME="ASSOCIATED-VALUE-GATEWAYING"></A>
 <H4>
-Associated value gatewaying
+2.3.4.1 Associated value gatewaying
 </H4>
 
 <P>
@@ -2027,8 +2473,9 @@ mibBuilder.exportSymbols(
 </PRE>
 </TD></TR></TABLE>
 
+<A NAME="TAPPING-ON-MANAGEMENT-INSTRUM"></A>
 <H4>
-Tapping on Management Instrumentation API
+2.3.4.2 Tapping on Management Instrumentation API
 </H4>
 
 <P>
@@ -2063,7 +2510,7 @@ Managed Object at request processing points.
 </P>
 
 <P>
-Formal parameters passed to Management Instrumentation API methods don't make 
+Formal parameters of Management Instrumentation API methods don't make 
 much sense to custom implementation, so they are partially documented here and,
 in most cases, should be blindly <B>passed down</B> as-is to the overloaded
 method to not to interfere with behind-the-scene SMI workings.
@@ -2072,14 +2519,14 @@ method to not to interfere with behind-the-scene SMI workings.
 <P>
 Value read methods implemented by 
 <A HREF="#DATA-MODEL-MANAGED-OBJECTS">Managed Objects</A> and
-invoked by SNMP engine in response to SNMP GET/GETNEXT/GETBULK requests:
+invoked by SNMP engine in response to SNMP GET/GETNEXT/GETBULK requests
+are:
 </P>
 
 <P>
 <A NAME="readTest"></A>
 <DL>
 <DT><STRONG>readTest</STRONG>(
-<STRONG>self</STRONG>,
 *<STRONG>args</STRONG>
 )</DT>
 <DD>
@@ -2097,7 +2544,6 @@ to succeed.
 <A NAME="readGet"></A>
 <DL>
 <DT><STRONG>readGet</STRONG>(
-<STRONG>self</STRONG>,
 *<STRONG>args</STRONG>
 )</DT>
 <DD>
@@ -2117,7 +2563,6 @@ from third-party sources.
 <A NAME="readTestNext"></A>
 <DL>
 <DT><STRONG>readTestNext</STRONG>(
-<STRONG>self</STRONG>,
 *<STRONG>args</STRONG>
 )</DT>
 <DD>
@@ -2135,7 +2580,6 @@ to succeed.
 <A NAME="readGetNext"></A>
 <DL>
 <DT><STRONG>readGetNext</STRONG>(
-<STRONG>self</STRONG>,
 *<STRONG>args</STRONG>
 )</DT>
 <DD>
@@ -2166,11 +2610,9 @@ class FileWatcherInstance(MibScalarInstance):
       raise SmiError('%s: %s' % (self, why))
 
   def readGet(self, *args):
-    apply(MibScalarInstance.readGet, (self,) + args)
+    name, val = apply(MibScalarInstance.readGet, (self,) + args)
     try:
-      return self.getName(), self.getSyntax().clone(
-        os.stat('/var/adm/messages')[6]
-      )
+      return name, val.clone(os.stat('/var/adm/messages')[6])
     except StandardError, why:
       raise SmiError('%s: %s' % (self, why))
 
@@ -2190,7 +2632,6 @@ invoked by SNMP engine in response to SNMP SET request:
 <A NAME="writeTest"></A>
 <DL>
 <DT><STRONG>writeTest</STRONG>(
-<STRONG>self</STRONG>,
 <STRONG>name</STRONG>,
 <STRONG>value</STRONG>,
 *<STRONG>args</STRONG>
@@ -2215,7 +2656,6 @@ a state of pending modification which ends through either calling
 <A NAME="writeCommit"></A>
 <DL>
 <DT><STRONG>writeCommit</STRONG>(
-<STRONG>self</STRONG>,
 *<STRONG>args</STRONG>
 )</DT>
 <DD>
@@ -2234,7 +2674,6 @@ attempt to apply pending <STRONG>value</STRONG> to a third-party system.
 <A NAME="writeCleanup"></A>
 <DL>
 <DT><STRONG>writeCleanup</STRONG>(
-<STRONG>self</STRONG>,
 *<STRONG>args</STRONG>
 )</DT>
 <DD>
@@ -2252,7 +2691,6 @@ bring a third-party system out of value modification state.
 <A NAME="writeUndo"></A>
 <DL>
 <DT><STRONG>writeUndo</STRONG>(
-<STRONG>self</STRONG>,
 *<STRONG>args</STRONG>
 )</DT>
 <DD>
@@ -2313,422 +2751,147 @@ mibBuilder.exportSymbols(
 </TD></TR></TABLE>
 
 <P>
-Table row management methods implemented by 
-<A HREF="#MibTableColumn">MibTableColumn</A> class and
+Table row creation methods implemented by
+<A HREF="#DATA-MODEL-MANAGED-OBJECTS">Managed Objects</A> and
 invoked by SNMP engine in response to SNMP SET request against
-Table Column Instance (table cell) object:
+a non-existent or <B>SNMPv2-TC::RowStatus</B> type Table Column 
+Instance (table cell) object:
 </P>
-
-
-
-
-
-<A NAME="MIB-VIEW-ONELINER"></A>
-<H4>
-MIB view One-liner API
-</H4>
 
 <P>
-Standard SNMP Applications API includes convenience wrappers that
-simplify most frequent operations on <STRONG>MibViewController</STRONG>.
-This wrapper is implemented in form of several functions defined in
-<STRONG>pysnmp.entiry.rfc3412.mibvar</STRONG> module.
-</P>
-
-<A NAME="mibNameToOid"></A>
+<A NAME="createTest"></A>
 <DL>
-<DT><STRONG>mibNameToOid</STRONG>(
-<STRONG>mibView</STRONG>,
-<STRONG>mibObjectName</STRONG>
-)</DT>
-
-<DD>
-<P>
-Resolve <A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>
-given as MIB reference into <A HREF="#OID">Object Identifier</A>
-form.
-</P>
-</DD>
-
-<DD>
-<P>
-The <STRONG>mibView</STRONG> parameter is an instance of
-<STRONG>MibViewController</STRONG>.
-</P>
-
-<P>
-The <STRONG>mibObjectName</STRONG> parameter is 
-<A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>.
-It can be specified in several forms:
-</P>
-<UL>
-<LI>
-Tuple or tuple-like <A HREF="#OID-IMPL">Object Identifier</A> such as:
-(1, 3, 6, 1)
-<LI>
-Tuple of numeric and/or string sub-<A HREF="#OID">OID</A>s. The latter represents
-OID labels such as: ('iso', 2, 'dod', 1).
-<LI>
-A tuple of (
-( <STRONG>mibModuleName</STRONG>, 
-  <STRONG>mibSymbolName</STRONG> ),
-<STRONG>indexPart</STRONG>
-)
-where:
-<UL>
-<LI>
-<STRONG>mibModuleName</STRONG> is MIB module name (string) such as "SNMPv2-MIB"
-<LI>
-<STRONG>mibSymbolName</STRONG> is MIB symbolic name (string) such as "sysDescr"
-<LI>
-<STRONG>indexPart</STRONG> is a sequence of Managed Object 
-<A HREF="#MANAGED-OBJECT-INSTANCE-NAME">instance</A>
-index components. For Managed Objects of scalar type this is a single zero 
-integer (0). For
-<A HREF="#CONCEPTUAL-TABLES">Conceptual Table</A> elements, their
-<STRONG>indexPart</STRONG> value(s) would be one or more initializers for
-index components.
-</P>
-
-<P>
-For example, for <A HREF="#OCTETSTRING-IMPL">OctetString</A>-based index, 
-<STRONG>indexPart</STRONG> would be a sequence of strings like
-("my router", "my user"). For <A HREF="#IPADDRESS-IMPL">IpAddress</A>-based
-index, <STRONG>indexPart</STRONG> value would be one or more quad-dotted 
-IP Address ("127.0.0.1") and so on.
-</P>
-</UL>
-
-<P>
-The <STRONG>mibNameToOid</STRONG> function returns a tuple of
-(
-<STRONG>objectName</STRONG>,
-<STRONG>objectIndex</STRONG>
-).
-</P>
-
-<P>
-The <STRONG>objectName</STRONG> is an instance of
-<A HREF="#OID-IMPL">ObjectIdentifier</A> representing Managed 
-Object Name.
-</P>
-
-<P>
-The <STRONG>objectIndex</STRONG> is an instance of
-<A HREF="#OID-IMPL">ObjectIdentifier</A> representing Managed
-Object Name index. Concatination of <STRONG>objectName</STRONG> and
-<STRONG>objectIndex</STRONG> produces full specification of
-<A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>.
-</P>
-</DD>
-</DL>
-
-<A NAME="oidToMibName"></A>
-<DL>
-<DT><STRONG>oidToMibName</STRONG>(
-<STRONG>mibView</STRONG>,
-<STRONG>oid</STRONG>
-)</DT>
-
-<DD>
-<P>
-Resolve <A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>
-from <A HREF="#OID">Object Identifier</A> form into MIB reference.
-</P>
-</DD>
-
-<DD>
-<P>
-The <STRONG>mibView</STRONG> parameter is an instance of
-<STRONG>MibViewController</STRONG>.
-</P>
-
-<P>
-The <STRONG>oid</STRONG> parameter is 
-<A HREF="#MANAGED-OBJECT-INSTANCE-NAME">Managed Object Instance Name</A>
-expressed in <A HREF="#OID-IMPL">ObjectIdentifier</A> form.
-</P>
-
-<P>
-The <STRONG>oidToMibName</STRONG> function returns a tuple of
-(
-<STRONG>mibModuleName</STRONG>,
-<STRONG>mibSymbolName</STRONG>,
-<STRONG>indexPart</STRONG>
-)
-</P>
-
-<P>
-The <STRONG>mibModuleName</STRONG>, <STRONG>mibSymbolName</STRONG> and
-<STRONG>indexPart</STRONG> parameters have the same meaning as in
-<A HREF="#mibNameToOid">mibNameToOid</A> function.
-</P>
-</DD>
-</DL>
-
-<A NAME="cloneFromMibValue"></A>
-<DL>
-<DT><STRONG>cloneFromMibValue</STRONG>(
-<STRONG>mibView</STRONG>,
-<STRONG>mibModuleName</STRONG>,
-<STRONG>mibSymbolName</STRONG>,
-<STRONG>valueInitializer</STRONG>
-)</DT>
-
-<DD>
-<P>
-Create a new instance of Managed Object Value by MIB reference.
-</P>
-</DD>
-
-<DD>
-<P>
-The <STRONG>mibView</STRONG>, <STRONG>mibModuleName</STRONG> and
-<STRONG>mibSymbolName</STRONG> parameters have the same meaning as in
-<A HREF="#mibNameToOid">mibNameToOid</A> function.
-</P>
-
-<P>
-The <STRONG>valueInitializer</STRONG> parameter will be used on
-Managed Object <A HREF="#VAL-IMPL">Value</A> instantiation.
-</P>
-
-<P>
-The <STRONG>cloneFromMibValue</STRONG> function returns a new instance
-of Managed Object <A HREF="#VAL-IMPL">Value</A>.
-</P>
-</DD>
-</DL>
-
-<P>
-See
-<A HREF="http://pysnmp.sourceforge.net/examples/4.x/v3arch/oneliner/manager/withmib/nextgen.html">
-GETNEXT Command Generator with MIB resolution
-</A> script as an example of using One-liner API to MIB services.
-</P>
-
-
-<A NAME="MANAGED-OBJECTS-SYNTAX"></A>
-<H4>
-Managed Objects syntax
-</H4>
-
-<A NAME="OIDVAL-IMPL">
-<P>
-In PySNMP programming context, <A HREF="#MANAGED-OBJECTS">
-Managed Object</A> term (also called <STRONG>Variable-Binding</STRONG> in
-protocol specifications) refers to a tuple of Managed Object Name and 
-Managed Object Value.
-</P>
-
-<P>
-Managed Objects Names and Values are <A HREF="#ASN1">ASN.1</A> types 
-by-definition. Both Names and Values are derived from 
-<A HREF="http://pyasn1.sf.net">PyASN1</A> classes. These are defined in
-<STRONG>pysnmp.proto.rfc1902</STRONG> module.
-</P>
-
-<A NAME="OID-IMPL">
-<P>
-Managed Object Name is a tuple or tuple-like
-<A HREF="#OID">Object Identifier</A> class instance.
-</P>
-
-<DL>
-<DT>class <STRONG>ObjectIdentifier</STRONG>(
-<STRONG>objectIdentifier</STRONG>
+<DT><STRONG>createTest</STRONG>(
+<STRONG>name</STRONG>,
+<STRONG>value</STRONG>,
+*<STRONG>args</STRONG>
 )</DT>
 <DD>
 <P>
-Create an <A HREF="#OID">ASN.1 Object Identifier</A> object. The
-<STRONG>objectIdentifier</STRONG> parameter represents Object Identifier
-value. It should be either a tuple or tuple-like object or a string
-representing Object Identifier in dotted notation (like "1.3.6.1").
+The <STRONG>createTest</STRONG> method is invoked by SNMP engine as a 
+first step of Columnar Instance (e.g. Managed Object Instance) creation
+to make sure the column instance could be created and optionally supplied
+value is good. Custom implementation may attempt to create a new object
+at a third-party system.
 </P>
-
 <P>
-Instances of this class mimic basic properties of Python tuple. Sub-OIDs 
-of an OID translate into tuple components.
+The <STRONG>name</STRONG> and <STRONG>value</STRONG> parameters hold
+OID/value pair as arrived in request.
 </P>
-
 <P>
-For more information on <STRONG>ObjectIdentifier</STRONG> class properties,
-refer to <A HREF="http://pyasn1.sf.net">PyASN1</A> documentation.
+Upon successful completion, this method brings Managed Object Instance into 
+a state of pending creation which ends through either calling
+<A HREF="#createCleanup">createCleanup</A>() on success or
+<A HREF="#createUndo">createUndo</A>() on failure.
 </P>
 </DD>
 </DL>
-
-<A NAME="VAL-IMPL">
-<P>
-It's PySNMP the design decision to always use <STRONG>SMIv2</STRONG> 
-definitions for Managed Objects regardless of SNMP protocol version being 
-used.
 </P>
 
 <P>
-Managed Object Value is an instance of some
-<A HREF="http://pyasn1.sf.net">PyASN1</A> class or its
-SNMP-specific derivative. The latter case reflects SNMP-specific
-<A HREF="#ASN1">ASN.1</A> sub-type. The list of Managed Object Value
-classes follows.
-</P>
-
-<A NAME="INTEGER-IMPL"></A>
+<A NAME="createCommit"></A>
 <DL>
-<DT>class <STRONG>Integer</STRONG>(
-<STRONG>value</STRONG>
+<DT><STRONG>createCommit</STRONG>(
+*<STRONG>args</STRONG>
 )</DT>
 <DD>
 <P>
-Create a SMIv2 <STRONG>Integer</STRONG> object. The <STRONG>value</STRONG>
-parameter should be an integer value. Instances of this class mimic basic 
-properties of a Python integer.
+The <STRONG>createCommit</STRONG> method is invoked by SNMP engine by way 
+of Columnar Object creation to indicate that newly created Columnar Object
+has been brough on-line and in attempt to apply [optional] pending 
+<STRONG>value</STRONG>, as passed through 
+<A HREF="#createTest">createTest</A>() method. Custom implementation may
+bring previously created object on-line at a third-party system.
 </P>
 </DD>
 </DL>
+</P>
 
-<A NAME="INTEGER32-IMPL"></A>
+<P>
+<A NAME="createCleanup"></A>
 <DL>
-<DT>class <STRONG>Integer32</STRONG>(
-<STRONG>value</STRONG>
+<DT><STRONG>createCleanup</STRONG>(
+*<STRONG>args</STRONG>
 )</DT>
 <DD>
 <P>
-Create a SMIv2 <STRONG>Integer32</STRONG> object. This object is similar to 
-<A HREF="#INTEGER-IMPL">Integer</A> class instance.
+The <STRONG>createCleanup</STRONG> method is invoked by SNMP engine by way
+of Columnar Instance creation to indicate a success. Custom implementation 
+may pass this information to a third-party system.
 </P>
 </DD>
 </DL>
+</P>
 
-<A NAME="OCTETSTRING-IMPL"></A>
+<P>
+<A NAME="createUndo"></A>
 <DL>
-<DT>class <STRONG>OctetString</STRONG>(
-<STRONG>value</STRONG>
+<DT><STRONG>createUndo</STRONG>(
+*<STRONG>args</STRONG>
 )</DT>
 <DD>
 <P>
-Create a SMIv2 <STRONG>OctetString</STRONG> object. The <STRONG>value</STRONG>
-parameter should be a string value. Instances of this class mimic basic
-properties of a Python string.
+The <STRONG>createUndo</STRONG> method is invoked by SNMP engine by way
+of Columnar Instance creation to indicate a failure. Custom implementation 
+may destroy previously created object at a third-party system.
 </P>
 </DD>
 </DL>
-
-<A NAME="IPADDRESS-IMPL"></A>
-<DL>
-<DT>class <STRONG>IpAddress</STRONG>(
-<STRONG>value</STRONG>
-)</DT>
-<DD>
-<P>
-Create a SMIv2 <STRONG>IpAddress</STRONG> object. The <STRONG>value</STRONG>
-parameter should be an IP address expressed in quad-dotted notation (e.g. 
-"127.0.0.1").
 </P>
-</DD>
-</DL>
 
-<A NAME="COUNTER32-IMPL"></A>
-<DL>
-<DT>class <STRONG>Counter32</STRONG>(
-<STRONG>value</STRONG>
-)</DT>
-<DD>
 <P>
-Create a SMIv2 <STRONG>Counter32</STRONG> object. Besides different value 
-constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
-class instance.
+The following is a SMI-to-filesystem binding for file creation:
 </P>
-</DD>
-</DL>
 
-<A NAME="GAUGE32-IMPL"></A>
-<DL>
-<DT>class <STRONG>Gauge32</STRONG>(
-<STRONG>value</STRONG>
-)</DT>
-<DD>
-<P>
-Create a SMIv2 <STRONG>Gauge32</STRONG> object. Besides different value 
-constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
-class instance.
-</P>
-</DD>
-</DL>
+<TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
+<PRE>
+class MyFileInstance(MibScalarInstance):
+  def createTest(self, name, value, mibTree, *args):
+    apply(MibScalarInstance.createTest, (self,) + args)
 
-<A NAME="UNSIGNED32-IMPL"></A>
-<DL>
-<DT>class <STRONG>Unsigned32</STRONG>(
-<STRONG>value</STRONG>
-)</DT>
-<DD>
-<P>
-Create a SMIv2 <STRONG>Unsigned32</STRONG> object. Besides different value 
-constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
-class instance.
-</P>
-</DD>
-</DL>
+    # Build path to file to create from column index
+    myFileEntry, = mibBuilder.importSymbols('MYFILE-MIB', 'myFileEntry')
+    indices = myFileEntry.getIndicesFromInstId(name[myFileEntry.getName()+1:])
+    self.__myFile = apply(os.path.join, indices)
 
-<A NAME="TIMETICKS-IMPL"></A>
-<DL>
-<DT>class <STRONG>TimeTicks</STRONG>(
-<STRONG>value</STRONG>
-)</DT>
-<DD>
-<P>
-Create a SMIv2 <STRONG>TimeTicks</STRONG> object. Besides different value 
-constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
-class instance.
-</P>
-</DD>
-</DL>
+    try:
+      open('%s.new' % self.__myFile, 'w')
+    except StandardError, why:
+      raise SmiError('%s: %s' % (self, why))
 
-<A NAME="OPAQUE-IMPL"></A>
-<DL>
-<DT>class <STRONG>Opaque</STRONG>(
-<STRONG>value</STRONG>
-)</DT>
-<DD>
-<P>
-Create a SMIv2 <STRONG>Opaque</STRONG> object. This object is similar to 
-<A HREF="#OCTETSTRING-IMPL">OctetString</A> class instance.
-</P>
-</DD>
-</DL>
+  def createCommit(self, *args):
+    apply(MibScalarInstance.createCommit, (self,) + args)
+    try:
+      os.rename(self.__myFile, '%s.old' % self.__myFile)
+      os.rename('%s.new' % self.__myFile, self.__myFile)
+    except StandardError, why:
+      raise SmiError('%s: %s' % (self, why))
 
-<A NAME="COUNTER64-IMPL"></A>
-<DL>
-<DT>class <STRONG>Counter64</STRONG>(
-<STRONG>value</STRONG>
-)</DT>
-<DD>
-<P>
-Create a SMIv2 <STRONG>Counter64</STRONG> object. Besides different value 
-constraints, this object is similar to <A HREF="#INTEGER-IMPL">Integer</A>
-class instance.
-</P>
-</DD>
-</DL>
+  def createCleanup(self, *args):
+    apply(MibScalarInstance.createCleanup, (self,) + args)
+    try:
+      os.unlink('%s.old' % self.__myFile)
+    except StandardError, why:
+      raise SmiError('%s: %s' % (self, why))
 
-<A NAME="BITS-IMPL"></A>
-<DL>
-<DT>class <STRONG>Bits</STRONG>(
-<STRONG>value</STRONG>
-)</DT>
-<DD>
-<P>
-Create a SMIv2 <STRONG>Bits</STRONG> object. The <STRONG>value</STRONG>
-parameter should be sequence of names of bits raised to one. Unmentioned
-bits default to zero.
-</P>
-</DD>
-</DL>
+  def createUndo(self, *args):
+    apply(MibScalarInstance.createUndo, (self,) + args)
+    try:
+      os.rename('%s.old' % self.__myFile, self.__myFile)
+    except StandardError, why:
+      raise SmiError('%s: %s' % (self, why))
+
+# Register custom Managed Object Instance at Column
+myFileColumn, = mibBuilder.importSymbols('MYFILE-MIB', 'myFileColumn')
+myFileColumn.setProtoInstance(MyFileInstance)
+</PRE>
+</TD></TR></TABLE>
 
 <P>
-For more information on SNMP Managed Value objects properties,
-refer to their base classes in <A HREF="http://pyasn1.sf.net">PyASN1</A> 
-documentation.
+In the above example, it is assumed that there is a MIB module named
+<STRONG>MYFILE-MIB</STRONG> where
+<A HREF="#MibTableColumn">a MIB table column</A> named
+<STRONG>myFileColumn</STRONG> is defined.
 </P>
 
 <HR>
@@ -2885,7 +3048,7 @@ octet-streams manipulations.
 <P>
 Warning! This document is a draft. 
 It is neither complete nor accurate. 
-Handle with caution!
+Take it with a grain of salt!
 </P>
 </I>
 
