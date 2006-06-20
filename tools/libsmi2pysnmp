@@ -2,7 +2,7 @@
 # Walk libsmi-generated tree of MIB symbols and build pysnmp.smi
 # compliant module
 from exceptions import StandardError
-from string import split, replace, find, atol, atoi
+from string import split, join, replace, find, atol, atoi
 from types import StringType, DictType
 import sys, time
 
@@ -299,6 +299,7 @@ else:
     
 if nodes:
     out.write('\n# Objects\n\n')            
+    row_create = {}
     for symName, symDef in nodes:
         out.write('%s = ' % transOpers(symName))
         if symDef['nodetype'] == 'node':
@@ -322,6 +323,12 @@ if nodes:
         if symDef['nodetype'] == 'table':
             out.write('MibTable(%s)' % __oidToTuple(symDef['oid']))
         if symDef['nodetype'] == 'row':
+            # determine if row creation is permitted, and store
+            # status for later inspection by column nodes.
+            if symDef.has_key('create'):
+                row_create[symDef['oid']] = symDef['create']
+            else:
+                row_create[symDef['oid']] = 'false'
             out.write('MibTableRow(%s)' % __oidToTuple(symDef['oid']))
             if symDef['linkage'] and type(symDef['linkage'][0]) == StringType:
                 out.write('.setIndexNames(')
@@ -349,7 +356,14 @@ if nodes:
         if symDef['nodetype'] == 'column':
             out.write('MibTableColumn(%s' % __oidToTuple(symDef['oid']))
             out.write('%s)' % __genTypeDef((symName, symDef)))
-            out.write('.setMaxAccess(\"%s\")' % symDef['access'])
+            # smidump does not tag columns as read-create.
+            # we must check the parent row object to determine if column is
+            # createable
+            parent = join(split(symDef['oid'], '.')[:-1], '.')
+            if row_create[parent] == 'true' and symDef['access']=='readwrite':
+                out.write('.setMaxAccess(\"%s\")' % 'readcreate')
+            else:
+                out.write('.setMaxAccess(\"%s\")' % symDef['access'])
             
         out.write('%s\n' % addLabelForSymbol(symName))
 
