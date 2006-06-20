@@ -210,6 +210,10 @@ def __genTypeDef((symName, symDef), classMode=0):
             r = r + identFiller*identValue
         else:
             r = r + ', %s()' % parentType
+        if classMode:
+            if typeDef.has_key('format'):
+                r = r + 'displayHint = \"%s\"\n' % typeDef['format']
+                r = r + identFiller*identValue
         if __kludgyStringTypes.has_key(parentType):
             __subtypeSpec = 'constraint.ValueSizeConstraint'
         else:
