@@ -218,12 +218,34 @@ def __genTypeDef((symName, symDef), classMode=0):
             __subtypeSpec = 'constraint.ValueSizeConstraint'
         else:
             __subtypeSpec = 'constraint.ValueRangeConstraint'
+ 
+        single_range = 0
         if typeDef.has_key('range'):
+           single_range = 1
+        if typeDef.has_key('ranges'):
+            # if more than one size/range is given, then we need to 
+            # create a ContraintsUnion to hold all of them.
+            if len(typeDef['ranges']) > 1:
+                single_range = 0
+                if classMode:
+                    r = r + 'subtypeSpec = %s.subtypeSpec+constraint.ConstraintsUnion(' % parentType
+                else:
+                    r = r + '.subtype(subtypeSpec=constraint.ConstraintsUnion('
+                for range in typeDef['ranges']:
+                    r = r + '%s(%s,%s),' % (__subtypeSpec, __reprIntVal(range['min']), __reprIntVal(range['max']))
+                if classMode:
+                    r = r + ')\n'
+                    r = r + identFiller*identValue
+                else:
+                    r = r + '))'
+        # only one size/range contraint was given
+        if single_range:
             if classMode:
                 r = r + 'subtypeSpec = %s.subtypeSpec+%s(%s,%s)\n' % (parentType, __subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
                 r = r + identFiller*identValue
             else:
                 r = r + '.subtype(subtypeSpec=%s(%s, %s))' % (__subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
+
     if symDef.has_key('default'):
         defVal = __genDefVal(baseType, symDef)
         if classMode:
