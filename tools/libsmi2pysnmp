@@ -222,6 +222,9 @@ def __genTypeDef((symName, symDef), classMode=0):
         single_range = 0
         if typeDef.has_key('range'):
            single_range = 1
+        # ATTENTION: libsmi-0.4.5 does not support "ranges". The patch
+        # for it is available from http://www.glas.net/~ilya/download/tools/pysnmp/libsmi-0.4.5-perl_python_range_union.patch
+        # Thanks to Randy Couey!
         if typeDef.has_key('ranges'):
             # if more than one size/range is given, then we need to 
             # create a ContraintsUnion to hold all of them.
