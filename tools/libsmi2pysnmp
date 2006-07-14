@@ -135,7 +135,8 @@ __kludgyStringTypes = {
     'DisplayString': 1,
     'SnmpAdminString': 1,
     'JmUTF8StringTC': 1,
-    'JmJobStringTC': 1
+    'JmJobStringTC': 1,
+    'InternationalDisplayString': 1
     }
 
 __buggySmiTypes = {
