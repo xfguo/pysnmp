@@ -1500,7 +1500,9 @@ accessible through UDP domain transport.
 <A NAME="UdpTransportTarget"></A>
 <DL>
 <DT>class <STRONG>UdpTransportTarget</STRONG>(
-<STRONG>transportAddr</STRONG>
+<STRONG>transportAddr</STRONG>,
+<STRONG>timeout=1.5</STRONG>,
+<STRONG>retries=3</STRONG>
 )</DT>
 <DD>
 <P>
@@ -1511,6 +1513,11 @@ Mandatory <STRONG>transportAddr</STRONG> parameter indicates destination
 Agent address in form of tuple of <STRONG>FQDN</STRONG>, <STRONG>port</STRONG>
 where <STRONG>FQDN</STRONG> is a string and <STRONG>port</STRONG> is an 
 integer.
+</P>
+<P>
+Optional <STRONG>timeout</STRONG> and <STRONG>retries</STRONG> parameters
+may be used to modify default response timeout (1.5 seconds) and number 
+of succesive request retries (3 times).
 </P>
 </DD>
 </DL>
