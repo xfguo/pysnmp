@@ -220,7 +220,7 @@ def __genTypeDef((symName, symDef), classMode=0):
         else:
             __subtypeSpec = 'constraint.ValueRangeConstraint'
  
-        is_fixed_length = single_range = 0
+        single_range = 0
         if typeDef.has_key('range'):
            single_range = 1
         # ATTENTION: libsmi-0.4.5 does not support "ranges". The patch
@@ -237,36 +237,18 @@ def __genTypeDef((symName, symDef), classMode=0):
                     r = r + '.subtype(subtypeSpec=constraint.ConstraintsUnion('
                 for range in typeDef['ranges']:
                     r = r + '%s(%s,%s),' % (__subtypeSpec, __reprIntVal(range['min']), __reprIntVal(range['max']))
-                    if range['min'] == range['max']:
-                        is_fixed_length = 1
                 if classMode:
                     r = r + ')\n'
                     r = r + identFiller*identValue
-                    if is_fixed_length and \
-                           __kludgyStringTypes.has_key(parentType):
-                        r = r + 'isFixedLength = 1\n'
-                        r = r + identFiller*identValue
                 else:
                     r = r + '))'
-                    if is_fixed_length and \
-                           __kludgyStringTypes.has_key(parentType):
-                        r = r + '.setFixedLength()'
         # only one size/range contraint was given
         if single_range:
-            if typeDef['range']['min'] == typeDef['range']range['max']:
-                isFixedLength = 1
             if classMode:
                 r = r + 'subtypeSpec = %s.subtypeSpec+%s(%s,%s)\n' % (parentType, __subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
                 r = r + identFiller*identValue
-                if is_fixed_length and \
-                       __kludgyStringTypes.has_key(parentType):
-                    r = r + 'isFixedLength = 1\n'
-                    r = r + identFiller*identValue
             else:
                 r = r + '.subtype(subtypeSpec=%s(%s, %s))' % (__subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
-                if is_fixed_length and \
-                       __kludgyStringTypes.has_key(parentType):
-                    r = r + '.setFixedLength()'
 
     if symDef.has_key('default'):
         defVal = __genDefVal(baseType, symDef)
