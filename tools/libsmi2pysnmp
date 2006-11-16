@@ -11,8 +11,8 @@ version = '0.0.7-alpha'
 class Error(StandardError): pass
 
 if len(sys.argv) > 1:
-    sys.stderr.write('libsmi-to-pysnmp MIB converter. Run this tool like this:\n\
-smidump -f python <mib-text-file.txt> | %s > <mib-text-file.py>\n' % sys.argv[0])
+    sys.stderr.write('libsmi-to-pysnmp MIB converter, version %s.\n\
+smidump -f python <mib-text-file.txt> | %s > <mib-text-file.py>\n' % (version, sys.argv[0]))
     sys.exit(-1)
 
 inputText = ''
@@ -125,18 +125,28 @@ def __genDefVal(baseType, symDef):
         else:
             return '\"%s\"' % symDef['default']
     else:
-        # XXX complain
-        return
+        sys.stderr.write('WARNING: guessing DEFVAL type \'%s\' for %s\n' %
+                         (symDef['default'], baseType))
+        if symDef['default'][:2] == '0x':
+            defVal = ''
+            for i in range(2, len(symDef['default']), 2):
+                defVal = defVal + chr(
+                    atoi(symDef['default'][i:i+2], 16)
+                    )
+        else:
+            defVal = symDef['default']
+            try:
+                atol(defVal)
+            except ValueError:
+                pass
+            else:
+                return defVal
+        return '%s' % repr(defVal)
 
 # Ugly kludge against smidump bug which does not distinguish
 # size/range constraints
 __kludgyStringTypes = {
-    'OctetString': 1,
-    'DisplayString': 1,
-    'SnmpAdminString': 1,
-    'JmUTF8StringTC': 1,
-    'JmJobStringTC': 1,
-    'InternationalDisplayString': 1
+    'OctetString': 1
     }
 
 __buggySmiTypes = {
@@ -215,7 +225,7 @@ def __genTypeDef((symName, symDef), classMode=0):
             if typeDef.has_key('format'):
                 r = r + 'displayHint = \"%s\"\n' % typeDef['format']
                 r = r + identFiller*identValue
-        if __kludgyStringTypes.has_key(parentType):
+        if __kludgyStringTypes.has_key(baseType):
             __subtypeSpec = 'constraint.ValueSizeConstraint'
         else:
             __subtypeSpec = 'constraint.ValueRangeConstraint'
@@ -247,8 +257,15 @@ def __genTypeDef((symName, symDef), classMode=0):
             if classMode:
                 r = r + 'subtypeSpec = %s.subtypeSpec+%s(%s,%s)\n' % (parentType, __subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
                 r = r + identFiller*identValue
+                if __kludgyStringTypes.has_key(baseType) and \
+                       typeDef['range']['min'] == typeDef['range']['max']:
+                    r = r + 'isFixedLengthFlag = 1\n'
+                    r = r + identFiller*identValue
             else:
                 r = r + '.subtype(subtypeSpec=%s(%s, %s))' % (__subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
+                if __kludgyStringTypes.has_key(baseType) and \
+                       typeDef['range']['min'] == typeDef['range']['max']:
+                    r = r + '.setFixedLength()'
 
     if symDef.has_key('default'):
         defVal = __genDefVal(baseType, symDef)
