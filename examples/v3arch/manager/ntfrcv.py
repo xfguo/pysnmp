@@ -22,7 +22,8 @@ config.addV3User(
     snmpEngine, 'test-user',
     config.usmHMACMD5AuthProtocol, 'authkey1',
     config.usmDESPrivProtocol, 'privkey1'
-#    '80004fb81c3dafe69'   # ContextEngineID of Notification Originator
+#   '\x80\x00\x4f\xb8\x1c\x3d\xaf\xe6'   # ContextEngineID of
+                                         # Notification Originator
     )
     
 # Callback function for receiving notifications
