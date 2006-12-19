@@ -2614,14 +2614,14 @@ class FileWatcherInstance(MibScalarInstance):
     try:
       os.stat('/var/adm/messages')
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
   def readGet(self, *args):
     name, val = apply(MibScalarInstance.readGet, (self,) + args)
     try:
       return name, val.clone(os.stat('/var/adm/messages')[6])
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
 mibBuilder.exportSymbols(
   'FILESIZE-MIB', FileWatcherInstance((1,3,6,1,4,1,20408,1), Integer())
@@ -2727,7 +2727,7 @@ class MyFileInstance(MibScalarInstance):
     try:
       open('/tmp/myfile.new', 'w').write(value)
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
   def writeCommit(self, *args):
     apply(MibScalarInstance.writeCommit, (self,) + args)
@@ -2735,21 +2735,21 @@ class MyFileInstance(MibScalarInstance):
       os.rename('/tmp/myfile', '/tmp/myfile.old')
       os.rename('/tmp/myfile.new', /tmp/myfile')
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
   def writeCleanup(self, *args):
     apply(MibScalarInstance.writeCleanup, (self,) + args)
     try:
       os.unlink('/tmp/myfile.old')
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
   def writeUndo(self, *args):
     apply(MibScalarInstance.writeUndo, (self,) + args)
     try:
       os.rename('/tmp/myfile.old', '/tmp/myfile')
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
 mibBuilder.exportSymbols(
   'MYFILE-MIB', MyFileInstance((1,3,6,1,4,1,20408,1), OctetString())
@@ -2864,7 +2864,7 @@ class MyFileInstance(MibScalarInstance):
     try:
       open('%s.new' % self.__myFile, 'w')
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
   def createCommit(self, *args):
     apply(MibScalarInstance.createCommit, (self,) + args)
@@ -2872,21 +2872,21 @@ class MyFileInstance(MibScalarInstance):
       os.rename(self.__myFile, '%s.old' % self.__myFile)
       os.rename('%s.new' % self.__myFile, self.__myFile)
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
   def createCleanup(self, *args):
     apply(MibScalarInstance.createCleanup, (self,) + args)
     try:
       os.unlink('%s.old' % self.__myFile)
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
   def createUndo(self, *args):
     apply(MibScalarInstance.createUndo, (self,) + args)
     try:
       os.rename('%s.old' % self.__myFile, self.__myFile)
     except StandardError, why:
-      raise SmiError('%s: %s' % (self, why))
+      raise ResourceUnavailableError('%s: %s' % (self, why))
 
 # Register custom Managed Object Instance at Column
 myFileColumn, = mibBuilder.importSymbols('MYFILE-MIB', 'myFileColumn')
