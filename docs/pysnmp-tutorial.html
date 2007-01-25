@@ -749,9 +749,12 @@ The <STRONG>varBindTable</STRONG> parameter is a tuple of
 <STRONG>varBinds</STRONG> in <STRONG>varBindTable</STRONG> represent a 
 set of Managed Objects whose Object Names reside inside 
 <A HREF="#OID">OID</A> sub-tree of Managed Object name passed in request. 
-In other words, call of <STRONG>nextCmd</STRONG> method for a single
-Managed Object might return a sequence of Managed Objects so that Object
-Name passed in request would be a prefix for Object Names returned in response.
+In other words, with this oneliner API, an invocation of 
+<STRONG>nextCmd</STRONG> method for a single Managed Object might return
+a sequence of Managed Objects so that Object Name passed in request would
+be a prefix for Object Names returned in response (as a side note, the same
+method in Applications API would return <STRONG>varBinds</STRONG> as held
+in a single response, and regardless of the prefix property).
 Properties of the <STRONG>varBinds</STRONG> parameter is the same as in
 <STRONG>getCmd</STRONG> method.
 </P>
