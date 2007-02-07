@@ -259,13 +259,13 @@ def __genTypeDef((symName, symDef), classMode=0):
                 r = r + identFiller*identValue
                 if __kludgyStringTypes.has_key(baseType) and \
                        typeDef['range']['min'] == typeDef['range']['max']:
-                    r = r + 'isFixedLengthFlag = 1\n'
+                    r = r + 'fixedLength = %s\n' % typeDef['range']['min']
                     r = r + identFiller*identValue
             else:
                 r = r + '.subtype(subtypeSpec=%s(%s, %s))' % (__subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
                 if __kludgyStringTypes.has_key(baseType) and \
                        typeDef['range']['min'] == typeDef['range']['max']:
-                    r = r + '.setFixedLength()'
+                    r = r + '.setFixedLength(%s)' % typeDef['range']['min']
 
     if symDef.has_key('default'):
         defVal = __genDefVal(baseType, symDef)
