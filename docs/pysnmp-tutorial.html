@@ -2109,6 +2109,28 @@ on dependent MIB modules import.
 </DD>
 </DL>
 
+<A NAME="MibBuilder.unloadModules"></A>
+<DL>
+<DT><STRONG>unloadModules</STRONG>(
+<STRONG>*modNames</STRONG>
+)</DT>
+
+<DD>
+<P>
+Drop all references to Python objects previously created through
+calling <STRONG>loadModules</STRONG>() method against [here optional] 
+<STRONG>*modNames</STRONG>. This method would invoke
+<A HREF="#MibBuilder.unexportSymbols">unexportSymbols</A>()
+against MIB symbols previously registered under each of
+<STRONG>*modNames</STRONG>.
+</P>
+
+<P>
+Missing <STRONG>*modNames</STRONG> implies all currently loaded modules.
+</P>
+</DD>
+</DL>
+
 <A NAME="MibBuilder.importSymbols"></A>
 <DL>
 <DT><STRONG>importSymbols</STRONG>(
@@ -2153,6 +2175,27 @@ Managed Objects defined in MIB are always named. These are exported using
 don't have to have MIB names, unless Application wants to access
 Managed Objects Instances by MIB name, so these may be exported through
 <STRONG>*anonymousSyms</STRONG>.
+</P>
+</DD>
+</DL>
+
+<A NAME="MibBuilder.unexportSymbols"></A>
+<DL>
+<DT><STRONG>unexportSymbols</STRONG>(
+<STRONG>modName</STRONG>, 
+<STRONG>*symNames</STRONG>
+)</DT>
+
+<DD>
+<P>
+Drop all references to Python objects previously registered
+under <STRONG>*symNames</STRONG> within <STRONG>modName</STRONG>
+through <A HREF="#MibBuilder.exportSymbols">exportSymbols</A>() call.
+</P>
+
+<P>
+Missing <STRONG>*symNames</STRONG> implies all symbols currently
+registered within <STRONG>modName</STRONG> module.
 </P>
 </DD>
 </DL>
