@@ -621,8 +621,8 @@ The pair of <STRONG>errorStatus</STRONG> and <STRONG>errorIndex</STRONG>
 variables determines SNMP PDU-level error. If <STRONG>errorStatus</STRONG>
 evaluates to true, this indicates SNMP PDU error caused by Managed Object
 at position <STRONG>errorIndex</STRONG>-1 in <STRONG>varBinds</STRONG>. 
-Doing <STRONG>repr</STRONG>(<STRONG>errorStatus</STRONG>) would return 
-explanatory error message.
+Doing <STRONG>errorStatus.prettyPrint</STRONG>() would return an
+explanatory text error message.
 </P>
 
 <P>
