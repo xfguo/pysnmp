@@ -63,6 +63,13 @@ PySNMP tutorial
 <LI><A HREF="#ASN1">ASN.1 standard</A>
 </UL>
 </UL>
+</UL>
+</UL>
+</TABLE>
+</TD></TR>
+</TABLE>
+
+<P ALIGN="LEFT">
 
 <A NAME="NETWORK-MANAGEMENT-BASICS"></A>
 <H4>
@@ -613,7 +620,9 @@ error.
 The pair of <STRONG>errorStatus</STRONG> and <STRONG>errorIndex</STRONG> 
 variables determines SNMP PDU-level error. If <STRONG>errorStatus</STRONG>
 evaluates to true, this indicates SNMP PDU error caused by Managed Object
-at position <STRONG>errorIndex</STRONG>-1 in <STRONG>varBinds</STRONG>.
+at position <STRONG>errorIndex</STRONG>-1 in <STRONG>varBinds</STRONG>. 
+Doing <STRONG>repr</STRONG>(<STRONG>errorStatus</STRONG>) would return 
+explanatory error message.
 </P>
 
 <P>
