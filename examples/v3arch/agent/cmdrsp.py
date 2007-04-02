@@ -44,9 +44,12 @@ config.addV3User(
 
 # Alternatively, configure VACM from the scratch
 config.addContext(snmpEngine, '')
-config.addRwUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv', (1,3,6,1)) # v1
-config.addRwUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv', (1,3,6,1)) # v2c
-config.addRwUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6,1)) # v3
+config.addVacmUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv',
+                   (1,3,6), (1,3,6)) # v1
+config.addVacmUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv',
+                   (1,3,6), (1,3,6)) # v2c
+config.addVacmUser(snmpEngine, 3, 'test-user', 'authPriv',
+                   (1,3,6), (1,3,6)) # v3
 
 # SNMP context
 snmpContext = context.SnmpContext(snmpEngine)

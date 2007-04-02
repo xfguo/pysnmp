@@ -41,9 +41,12 @@ config.addSocketTransport(
 
 # Agent-side VACM setup
 config.addContext(snmpEngine, '')
-config.addTrapUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v1
-config.addTrapUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv', (1,3,6)) # v2c
-config.addTrapUser(snmpEngine, 3, 'test-user', 'authPriv', (1,3,6)) # v3
+config.addVacmUser(snmpEngine, 1, 'test-agent', 'noAuthNoPriv',
+                   (), (), (1,3,6)) # v1
+config.addVacmUser(snmpEngine, 2, 'test-agent', 'noAuthNoPriv',
+                   (), (), (1,3,6)) # v2c
+config.addVacmUser(snmpEngine, 3, 'test-user', 'authPriv',
+                   (), (), (1,3,6)) # v3
 
 # SNMP context
 snmpContext = context.SnmpContext(snmpEngine)
