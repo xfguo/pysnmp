@@ -10,9 +10,12 @@ errorIndication = ntforg.NotificationOriginator().sendNotification(
     # SNMP v3
     ntforg.UsmUserData('test-user', 'authkey1', 'privkey1'),
     ntforg.UdpTransportTarget(('localhost', 162)),
+    # Trap type
 #    'trap',
-    'inform',    
-    ('SNMPv2-MIB', 'coldStart'),
+    'inform',
+    # Trap OID
+    (('SNMPv2-MIB', 'coldStart'),),
+    # (oid, value) ...
     ((1,3,6,1,2,1,1,3,0), v2c.TimeTicks(44100))
     )
 

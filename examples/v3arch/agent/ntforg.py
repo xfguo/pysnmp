@@ -56,7 +56,12 @@ def cbFun(snmpEngine, errorIndication, cbCtx):
         print errorIndication
         
 errorIndication = ntforg.NotificationOriginator(snmpContext).sendNotification(
-    snmpEngine, 'myNotifyName', ('SNMPv2-MIB', 'coldStart'),
+    snmpEngine,
+    # Notification targets
+    'myNotifyName',
+    # Trap OID (SNMPv2-MIB::coldStart)
+    (1,3,6,1,6,3,1,1,5,1),
+    # ((oid, value), ... )
     (((1,3,6,1,2,1,1,5), v2c.OctetString('Example Notificator')),),
     cbFun
     )

@@ -933,8 +933,8 @@ process and acknowledge confirmed notification.
 <P>
 The <STRONG>notificationType</STRONG> parameter indicates the kind of
 event to notify Manager about in form of SMI NOTIFICATION-TYPE object
-name. For instance, ('SNMPv2-MIB', 'coldStart') is a value of coldStart
-notification type as defined in SNMPv2-MIB module.
+name. For instance, (('SNMPv2-MIB', 'coldStart'),) or (1,3,6,1,6,3,1,1,5,1)
+is a value of coldStart notification type as defined in SNMPv2-MIB module.
 </P>
 
 <P>
@@ -965,7 +965,7 @@ The following code sends SNMP TRAP over SNMPv3:
 ... cmdgen.UsmUserData('my-user', 'my-authkey', 'my-privkey'),
 ... cmdgen.UdpTransportTarget(('localhost', 162)),
 ... 'trap',
-... ('SNMPv2-MIB', 'coldStart'),
+... (('SNMPv2-MIB', 'coldStart'),),
 ... ((1,3,6,1,2,1,1,3,0), v2c.TimeTicks(44100))
 )
 >>> print errorIndication
