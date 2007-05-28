@@ -1,21 +1,11 @@
 # SET Command Generator with MIB resolution
 import string
 from pysnmp.entity.rfc3413.oneliner import cmdgen
+from pysnmp.entity.rfc3413 import mibvar
 
 cmdGen = cmdgen.CommandGenerator()
 
-# Lookup Managed Object name & value at MIB
-oid, suffix = cmdgen.mibvar.mibNameToOid(
-    cmdGen.mibViewController,
-    (('SNMPv2-MIB', 'sysDescr'), 0)
-    )
-val = cmdgen.mibvar.cloneFromMibValue(
-    cmdGen.mibViewController,
-    'SNMPv2-MIB', 'sysDescr', 'Some system desc'
-    )
-
-errorIndication, errorStatus, errorIndex, \
-                 varBinds = cmdGen.setCmd(
+errorIndication, errorStatus, errorIndex, varBinds = cmdGen.setCmd(
     # SNMP v1
 #    cmdgen.CommunityData('test-agent', 'public', 0),
     # SNMP v2
@@ -25,7 +15,7 @@ errorIndication, errorStatus, errorIndex, \
     # Transport
     cmdgen.UdpTransportTarget(('localhost', 161)),
     # Request variable(s)
-    (oid + suffix, val)
+    ((('SNMPv2-MIB', 'sysDescr'), 0), 'new name')
     )
 
 if errorIndication:
@@ -37,10 +27,10 @@ else:
             )
     else:
         for oid, val in varBinds:
-            (symName, modName), indices = cmdgen.mibvar.oidToMibName(
+            (symName, modName), indices = mibvar.oidToMibName(
                 cmdGen.mibViewController, oid
                 )
-            val = cmdgen.mibvar.cloneFromMibValue(
+            val = mibvar.cloneFromMibValue(
                 cmdGen.mibViewController, modName, symName, val
                 )
             print '%s::%s.%s = %s' % (

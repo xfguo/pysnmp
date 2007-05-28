@@ -1,6 +1,6 @@
 # Notification Originator (TRAP/INFORM)
 from pysnmp.entity.rfc3413.oneliner import ntforg
-from pysnmp.proto.api import v2c
+from pysnmp.proto import rfc1902
 
 errorIndication = ntforg.NotificationOriginator().sendNotification(
     # SNMP v1
@@ -15,8 +15,10 @@ errorIndication = ntforg.NotificationOriginator().sendNotification(
     'inform',
     # Trap OID
     (('SNMPv2-MIB', 'coldStart'),),
-    # (oid, value) ...
-    ((1,3,6,1,2,1,1,3,0), v2c.TimeTicks(44100))
+    # MIB symbol name, plain string value
+    ((('SNMPv2-MIB', 'sysName'), 0), 'new name'),
+    # Plain OID name, rfc1902 class instance value
+    ((1,3,6,1,2,1,1,5,0), rfc1902.OctetString('new name'))
     )
 
 if errorIndication:

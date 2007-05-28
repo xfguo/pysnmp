@@ -11,7 +11,10 @@ errorIndication, errorStatus, \
     # SNMP v3
     cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
     cmdgen.UdpTransportTarget(('localhost', 161)),
-    ((1,3,6,1,2,1,1,1,0), rfc1902.OctetString('Some system desc'))
+    # MIB symbol name, plain string value
+    ((('SNMPv2-MIB', 'sysName'), 0), 'new name'),
+    # Plain OID name, rfc1902 class instance value
+    ((1,3,6,1,2,1,1,5,0), rfc1902.OctetString('new name'))
     )
 
 if errorIndication:
