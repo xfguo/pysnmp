@@ -1,6 +1,7 @@
 # GETNEXT Commnd Generator with MIB resolution
 import string
 from pysnmp.entity.rfc3413.oneliner import cmdgen
+from pysnmp.entity.rfc3413 import mibvar
 
 cmdGen = cmdgen.CommandGenerator()
 
@@ -34,12 +35,12 @@ else:
     else:
         for varBindTableRow in varBindTable:
             for oid, val in varBindTableRow:
-                (symName, modName), indices = cmdgen.mibvar.oidToMibName(
+                (symName, modName), indices = mibvar.oidToMibName(
                     cmdGen.mibViewController, oid
                     )
-                val = cmdgen.mibvar.cloneFromMibValue(
-                              cmdGen.mibViewController, modName, symName, val
-                      )
+                val = mibvar.cloneFromMibValue(
+                    cmdGen.mibViewController, modName, symName, val
+                    )
                 print '%s::%s.%s = %s' % (
                     modName, symName,
                     string.join(map(lambda v: v.prettyPrint(), indices), '.'),

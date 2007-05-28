@@ -10,7 +10,10 @@ errorIndication, errorStatus, \
     # SNMP v3
 #    cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
     cmdgen.UdpTransportTarget(('localhost', 161)),
-    (1,3,6,1,2,1,1,1,0)
+    # Plain OID
+    (1,3,6,1,2,1,1,1,0),
+    # ((mib-name, mib-symbol), instance-id)
+    (('SNMPv2-MIB', 'sysObjectID'), 0)
     )
 
 if errorIndication:
