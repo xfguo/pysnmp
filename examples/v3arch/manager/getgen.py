@@ -13,6 +13,7 @@ config.addV3User(
     snmpEngine, 'test-user',
     config.usmHMACMD5AuthProtocol, 'authkey1',
     config.usmDESPrivProtocol, 'privkey1'
+#    config.usmAesCfb128Protocol, 'privkey1'
     )
 
 # Transport params
