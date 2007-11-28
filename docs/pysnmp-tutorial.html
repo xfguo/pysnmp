@@ -6,13 +6,12 @@
 <BODY BGCOLOR="#ffffff" TEXT="#000000"
       LINK="#0000bb"  VLINK="#551a8b" ALINK="#ff0000">
 <FONT SIZE=2 FACE="arial, helvetica">
-<TABLE><TR><TD>
-<TABLE ALIGN="CENTER" WIDTH="70%"><TR><TD>
+<TABLE ALIGN="CENTER" WIDTH="70%"><TR><TD ALIGN="LEFT">
 <H4>
 PySNMP tutorial
 </H4>
 
-<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, May 2006</I>
+<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, Nov 2007</I>
 
 <P><B>Table of contents</B></P>
 <UL>
@@ -65,9 +64,6 @@ PySNMP tutorial
 </UL>
 </UL>
 </UL>
-</TABLE>
-</TD></TR>
-</TABLE>
 
 <P ALIGN="LEFT">
 
@@ -172,8 +168,8 @@ Modern SNMP standards suggest splitting Agent functionality on two parts.
 Such Agents may run SNMP for local processes called <STRONG>Subagents</STRONG>, which
 interface with managed devices internals. Communication between <STRONG>Master 
 Agent</STRONG> and its Subagents is performed using a simplified version
-of original SNMP protocol, known as <STRONG>AgentX</STRONG>, which is designed to run
-only within a single system.
+of original SNMP protocol, known as <STRONG>AgentX</STRONG>, which is
+designed to run only within a single host.
 </P>
 
 <P>
@@ -331,11 +327,12 @@ protocol operations. SMI part of standard is inherited intact from SNMPv2.
 
 <P>
 SNMPv3 system is designed as a framework that consists of a core, known
-as <STRONG>Message and PDU Dispatcher</STRONG>, and several abstract subsystems:
-<STRONG>Message Processing Subsystem</STRONG> (<STRONG>MP</STRONG>), responsible
-for SNMP message handling, <STRONG>Transport Dispatcher</STRONG>, used for 
-carrying over messages, and <STRONG>Security Subsystem</STRONG>, which deals 
-with message authentication and encryption issues. The framework defines 
+as <STRONG>Message and PDU Dispatcher</STRONG>, and several abstract
+subsystems: <STRONG>Message Processing Subsystem</STRONG>
+(<STRONG>MP</STRONG>), responsible for SNMP message handling,
+<STRONG>Transport Dispatcher</STRONG>, used for carrying over messages,
+and <STRONG>Security Subsystem</STRONG>, which deals with message 
+authentication and encryption issues. The framework defines 
 subsystems interfaces to let feature-specific modules to be plugged into 
 SNMPv3 core thus forming particular feature-set of SNMP system. Typical use 
 of this modularity feature could be seen in multiprotocol systems -- legacy 
@@ -530,8 +527,8 @@ Message Processing subsystem.
 
 <P>
 Access Control subsystem uses LCD information to authorize remote access to
-Managed Objects. This is used when serving Agent Applications or Trap receiver in 
-Manager Applications. 
+Managed Objects. This is used when serving Agent Applications or Trap
+receiver in Manager Applications. 
 </P>
 
 <A NAME="ONELINER-APPS"></A>
@@ -1435,16 +1432,16 @@ passed in as a string.
 </P>
 
 <P>
-Optional <STRONG>authKey</STRONG> parameter is a secret key used within 
-USM for SNMP PDU authorization. It's string type. Setting it to a non-empty
+Optional <STRONG>authKey</STRONG> parameter is a secret key (string typed)
+used within USM for SNMP PDU authorization. Setting it to a non-empty
 value implies MD5-based PDU authentication to take effect. Default hashing 
 method may be changed by means of further <STRONG>authProtocol</STRONG> 
 parameter.
 </P>
 
 <P>
-Optional <STRONG>privKey</STRONG> parameter is a secret key used within 
-USM for SNMP PDU encryption. It's string type. Setting it to a non-empty
+Optional <STRONG>privKey</STRONG> parameter is a secret key (string typed)
+used within USM for SNMP PDU encryption. Setting it to a non-empty
 value implies MD5-based PDU authentication and DES-based encryption to 
 take effect. Default hashing and/or encryption methods may be changed by 
 means of further <STRONG>authProtocol</STRONG> and/or 
