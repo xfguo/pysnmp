@@ -6,14 +6,24 @@ from string import split, join, replace, find, atol, atoi
 from types import StringType, DictType
 import sys, time
 
-version = '0.0.7-alpha'
+version = '0.0.8-alpha'
+genTextLoader = 1
 
 class Error(StandardError): pass
 
 if len(sys.argv) > 1:
-    sys.stderr.write('libsmi-to-pysnmp MIB converter, version %s.\n\
-smidump -f python <mib-text-file.txt> | %s > <mib-text-file.py>\n' % (version, sys.argv[0]))
-    sys.exit(-1)
+    if sys.argv[1] == '--no-text':
+        genTextLoader = 0
+    else:
+        sys.stderr.write('SNMP MIB to pysnmp objects converter, version %s.\n\
+Usage:\n\
+    %s [--no-text]\n\
+Takes:\n\
+    smidump -f python <mib-text-file.txt>\n\
+program output on stdin, generates python code on stdout.\n\
+The smidump tool is available at http://www.ibr.cs.tu-bs.de/projects/libsmi/\n\
+The --no-text option disables code generation for MIB text comments.\n' % (version, sys.argv[0]))
+        sys.exit(-1)
 
 inputText = ''
 while 1:
@@ -359,6 +369,10 @@ if nodes:
                         for r in m["revisions"]:
                             out.write('\"%s\",' % r["date"])
                         out.write('))')
+                    if genTextLoader and m.has_key("organization"):
+                        out.write('\nif mibBuilder.loadTexts: %s.setOrganization("%s")' % (transOpers(symName), replace(m['organization'], '\n', '\\n')))
+                    if genTextLoader and m.has_key("contact"):
+                        out.write('\nif mibBuilder.loadTexts: %s.setContactInfo("%s")' % (transOpers(symName), replace(m['contact'], '\n', '\\n')))
             else:
                 out.write('MibIdentifier(%s)' % __oidToTuple(symDef['oid']))
         if symDef['nodetype'] == 'scalar':
@@ -411,7 +425,10 @@ if nodes:
                 out.write('.setMaxAccess(\"%s\")' % 'readcreate')
             else:
                 out.write('.setMaxAccess(\"%s\")' % symDef['access'])
-            
+
+        if genTextLoader and symDef.has_key("description"):
+            out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
+    
         out.write('%s\n' % addLabelForSymbol(symName))
 
     out.write('\n# Augmentions\n')
