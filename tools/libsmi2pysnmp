@@ -369,10 +369,18 @@ if nodes:
                         for r in m["revisions"]:
                             out.write('\"%s\",' % r["date"])
                         out.write('))')
-                    if genTextLoader and m.has_key("organization"):
+                out.write('%s' % addLabelForSymbol(symName))
+                if genTextLoader:
+                    if m.has_key('organization'):
                         out.write('\nif mibBuilder.loadTexts: %s.setOrganization("%s")' % (transOpers(symName), replace(m['organization'], '\n', '\\n')))
-                    if genTextLoader and m.has_key("contact"):
+                    if m.has_key('contact'):
                         out.write('\nif mibBuilder.loadTexts: %s.setContactInfo("%s")' % (transOpers(symName), replace(m['contact'], '\n', '\\n')))
+                    if m.has_key('description'):
+                        out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(m['description'], '\n', '\\n')))
+                out.write('\n')
+                continue
+            elif symDef.has_key("description"):
+                out.write('ObjectIdentity(%s)' % __oidToTuple(symDef['oid']))
             else:
                 out.write('MibIdentifier(%s)' % __oidToTuple(symDef['oid']))
         if symDef['nodetype'] == 'scalar':
@@ -433,11 +441,14 @@ if nodes:
             else:
                 out.write('.setMaxAccess(\"%s\")' % symDef['access'])
 
-        if genTextLoader and symDef.has_key("description"):
-            out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
-    
-        out.write('%s\n' % addLabelForSymbol(symName))
+        out.write('%s' % addLabelForSymbol(symName))
 
+        if genTextLoader:
+            if symDef.has_key("description"):        
+                out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
+
+        out.write('\n')
+        
     out.write('\n# Augmentions\n')
     for symName, symDef in mib['nodes'].items():
         if symDef['nodetype'] == 'row':
