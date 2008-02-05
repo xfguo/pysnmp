@@ -27,7 +27,7 @@ shift $((OPTIND-1))
     export SMIPATH=":$SMIPATH:$(echo $mibFile | sed -e 's/\(.*\)\/.*/\1/g')";
 }        
 
-egrep -q 'FROM *RFC' $mibFile 2> /dev/null && { oldMib='yes'; } || {
+egrep -q 'FROM *RFC' $mibFile 2> /dev/null && ! egrep -q 'FROM *SNMPv2-' $mibFile 2> /dev/null && { oldMib='yes'; } || {
     [ $? -eq 1 ] && { oldMib='no'; } || {
         echo >&2 "cant open $mibFile";
         exit 1;
@@ -36,20 +36,23 @@ egrep -q 'FROM *RFC' $mibFile 2> /dev/null && { oldMib='yes'; } || {
 
 [ $oldMib = 'yes' ] && { # pysnmp SMI is SMIv2
     tmpFile=/tmp/buildmibs.$$
-    $smidump -f smiv2 $mibFile > $tmpFile 2> /dev/null || {
+    $smidump -k -f smiv2 $mibFile > $tmpFile 2> /dev/null || {
         [ -f $tmpFile ] && rm -f $tmpFile;
-        echo >&2 "$smidump -f smiv2 $mibFile fails";
+        echo >&2 "$smidump -k -f smiv2 $mibFile fails";
+        echo >&2 "make sure you are using libsmi version > 0.4.5 (or svn)";
         exit ;
     }
-    $smidump -f python $tmpFile 2> /dev/null | $libsmi2pysnmp || {
+    $smidump -k -f python $tmpFile 2> /dev/null | $libsmi2pysnmp || {
         [ -f $tmpFile ] && rm -f $tmpFile;
-        echo >&2 "$smidump -f python $mibFile | $libsmi2pysnmp fails";
+        echo >&2 "$smidump -k -f python $mibFile | $libsmi2pysnmp fails";
+        echo >&2 "make sure you are using libsmi version > 0.4.5 (or svn)";
         exit
     }
     rm -f $tmpFile
 } || {
-    $smidump -f python $mibFile 2> /dev/null | $libsmi2pysnmp || {
-        echo >&2 "$smidump -f python $mibFile | $libsmi2pysnmp fails";
+    $smidump -k -f python $mibFile 2> /dev/null | $libsmi2pysnmp || {
+        echo >&2 "$smidump -k -f python $mibFile | $libsmi2pysnmp fails";
+        echo >&2 "make sure you are using libsmi version > 0.4.5 (or svn)";
         exit
     }
 }
