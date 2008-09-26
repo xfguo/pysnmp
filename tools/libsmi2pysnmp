@@ -6,7 +6,7 @@ from string import split, join, replace, find, atol, atoi
 from types import StringType, DictType
 import sys, time
 
-version = '0.0.8-alpha'
+version = '0.0.9-alpha'
 genTextLoader = 1
 
 class Error(StandardError): pass
@@ -517,7 +517,7 @@ out.write('\n# Exports\n\n')
 if moduleIdentityNode:
     out.write('# Module identity\n')
     out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)    
-    out.write(', PYSNMP_MODULE_ID=%s' % moduleIdentityNode)
+    out.write(', PYSNMP_MODULE_ID=%s' % transOpers(moduleIdentityNode))
     out.write(')\n\n')
     
 if typedefs:
@@ -540,9 +540,7 @@ if nodes:
         if idx % 127 == 0:
             out.write(')\n')
             out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-        out.write(', %s=%s' % (
-            transOpers(symTrans(symName)[0]), transOpers(symTrans(symName)[0])
-            ))
+        out.write(', %s=%s' % (transOpers(symTrans(symName)[0]),)*2)
         idx = idx + 1
     out.write(')\n\n')
     
@@ -554,7 +552,7 @@ if notifications:
         if idx % 127 == 0:
             out.write(')\n')
             out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-        out.write(', %s=%s' % (symName, symName))
+        out.write(', %s=%s' % (transOpers(symName),)*2)
         idx = idx + 1
     out.write(')\n\n')
 
@@ -566,7 +564,7 @@ if groups:
         if idx % 127 == 0:
             out.write(')\n')
             out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-        out.write(', %s=%s' % (symName, symName))
+        out.write(', %s=%s' % (transOpers(symName),)*2)
         idx = idx + 1        
     out.write(')\n')    
 
