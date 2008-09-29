@@ -540,7 +540,7 @@ if nodes:
         if idx % 127 == 0:
             out.write(')\n')
             out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-        out.write(', %s=%s' % (transOpers(symTrans(symName)[0]),)*2)
+        out.write(', %s=%s' % ((transOpers(symTrans(symName)[0]),)*2))
         idx = idx + 1
     out.write(')\n\n')
     
@@ -552,7 +552,7 @@ if notifications:
         if idx % 127 == 0:
             out.write(')\n')
             out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-        out.write(', %s=%s' % (transOpers(symName),)*2)
+        out.write(', %s=%s' % ((transOpers(symName),)*2))
         idx = idx + 1
     out.write(')\n\n')
 
@@ -564,7 +564,7 @@ if groups:
         if idx % 127 == 0:
             out.write(')\n')
             out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-        out.write(', %s=%s' % (transOpers(symName),)*2)
+        out.write(', %s=%s' % ((transOpers(symName),)*2))
         idx = idx + 1        
     out.write(')\n')    
 
