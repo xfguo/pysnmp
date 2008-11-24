@@ -489,6 +489,7 @@ if notifications:
             for objName, objDef in symDef['objects'].items():
                 out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
             out.write(')')
+            out.write('%s' % addLabelForSymbol(symName))
         out.write('\n')
 
 if mib.has_key('groups'):
@@ -505,11 +506,16 @@ if groups:
     for symName, symDef in groups:
         out.write('%s = ' % transOpers(symName))
         if symDef['nodetype'] == 'group':
-            out.write('ObjectGroup(%s)'  % __oidToTuple(symDef['oid']))
+            if mib.has_key('notifications') and mib['notifications'].has_key(symDef['members'].keys()[0]):
+                out.write('NotificationGroup(')
+            else:
+                out.write('ObjectGroup(')
+            out.write('%s)'  % __oidToTuple(symDef['oid']))
             out.write('.setObjects(')
             for objName, objDef in symDef['members'].items():
                 out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
             out.write(')')
+            out.write('%s' % addLabelForSymbol(symName))
         out.write('\n')
 
 out.write('\n# Exports\n\n')
