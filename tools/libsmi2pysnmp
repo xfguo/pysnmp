@@ -315,6 +315,8 @@ for imp in (
     ) + mib.get('imports', ()):
     if not imports.has_key(imp['module']):
         imports[imp['module']] = []
+    if not imp['module']:
+        sys.stderr.write('WARNING: empty MIB module name seen in smidump output at %s\n' % dstModName)
     imports[imp['module']].append(imp['name'])
 map(lambda x:x.sort(), imports.values())
 
