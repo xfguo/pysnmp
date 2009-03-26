@@ -277,7 +277,7 @@ def __genTypeDef((symName, symDef), classMode=0):
                        typeDef['range']['min'] == typeDef['range']['max']:
                     r = r + '.setFixedLength(%s)' % typeDef['range']['min']
 
-    if symDef.has_key('default'):
+    if symDef.has_key('default') and not symDef.has_key('basetype'):
         defVal = __genDefVal(baseType, symDef)
         if classMode:
             if defVal is not None:
