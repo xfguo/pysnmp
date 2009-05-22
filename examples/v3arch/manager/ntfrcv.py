@@ -32,11 +32,13 @@ config.addV3User(
     
 # Callback function for receiving notifications
 def cbFun(snmpEngine,
+          stateReference,
           contextEngineId, contextName,
           varBinds,
           cbCtx):
-    print 'Notification from SNMP Engine \"%s\", Context \"%s\"' % (
-        contextEngineId, contextName
+    transportDomain, transportAddress = snmpEngine.msgAndPduDsp.getTransportInfo(stateReference)
+    print 'Notification from %s, SNMP Engine \"%s\", Context \"%s\"' % (
+        transportAddress, contextEngineId, contextName
         )
     for name, val in varBinds:
         print '%s = %s' % (name.prettyPrint(), val.prettyPrint())
