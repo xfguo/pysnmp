@@ -36,7 +36,7 @@ egrep -q 'FROM *RFC' $mibFile 2> /dev/null && ! egrep -q 'FROM *SNMPv2-' $mibFil
 }
 
 [ $oldMib = 'yes' ] && { # pysnmp SMI is SMIv2
-    tmpFile=/tmp/buildmibs.$$
+    [ -x "$(which mktemp)" ] && tmpFile=$(mktemp -t buildmibs.XXXXXXX) || tmpFile=/tmp/buildmibs.$$
     $smidump -k -f smiv2 $mibFile > $tmpFile 2> /dev/null || {
         [ -f $tmpFile ] && rm -f $tmpFile;
         echo >&2 "$smidump -k -f smiv2 $mibFile fails";
