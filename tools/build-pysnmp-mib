@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Convert MIB text into PySNMP-compilant MIB/managed objects module.
 # See http://pysnmp.sf.net for more information.
