@@ -4,7 +4,8 @@
 # See http://pysnmp.sf.net for more information.
 #
 
-libsmi2pysnmp=libsmi2pysnmp  # part of pysnmp distro
+basedir=$(dirname "$0")
+libsmi2pysnmp=$basedir/libsmi2pysnmp  # part of pysnmp distro
 smidump=smidump  # part of libsmi distro
 
 while getopts o: o
