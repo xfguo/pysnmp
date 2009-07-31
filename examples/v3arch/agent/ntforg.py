@@ -51,11 +51,11 @@ config.addVacmUser(snmpEngine, 3, 'test-user', 'authPriv',
 # SNMP context
 snmpContext = context.SnmpContext(snmpEngine)
 
-def cbFun(snmpEngine, errorIndication, cbCtx):
+def cbFun(sendRequestHandle, errorIndication, cbCtx):
     if errorIndication:
         print errorIndication
         
-errorIndication = ntforg.NotificationOriginator(snmpContext).sendNotification(
+ntforg.NotificationOriginator(snmpContext).sendNotification(
     snmpEngine,
     # Notification targets
     'myNotifyName',
@@ -66,7 +66,4 @@ errorIndication = ntforg.NotificationOriginator(snmpContext).sendNotification(
     cbFun
     )
 
-if errorIndication:
-    print errorIndication
-else:
-    snmpEngine.transportDispatcher.runDispatcher()
+snmpEngine.transportDispatcher.runDispatcher()
