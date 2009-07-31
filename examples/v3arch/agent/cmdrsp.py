@@ -1,7 +1,7 @@
 # Command Responder
 from pysnmp.entity import engine, config
-from pysnmp.carrier.asynsock.dgram import udp
 from pysnmp.entity.rfc3413 import cmdrsp, context
+from pysnmp.carrier.asynsock.dgram import udp
 from pysnmp import debug
 
 # Optionally enable stdout debugging
@@ -15,7 +15,7 @@ snmpEngine = engine.SnmpEngine()
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 161))
+    udp.UdpTransport().openServerMode(('127.0.0.1', 161))
     )
 
 # Create and put on-line my managed object
