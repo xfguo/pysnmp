@@ -2,7 +2,7 @@
 from pysnmp.entity.rfc3413.oneliner import ntforg
 from pysnmp.proto import rfc1902
 
-errorIndication = ntforg.NotificationOriginator().sendNotification(
+ntforg.NotificationOriginator().sendNotification(
     # SNMP v1
 #    ntforg.CommunityData('test-manager', 'public', 0),
     # SNMP v2
@@ -20,6 +20,3 @@ errorIndication = ntforg.NotificationOriginator().sendNotification(
     # Plain OID name, rfc1902 class instance value
     ((1,3,6,1,2,1,1,5,0), rfc1902.OctetString('new name'))
     )
-
-if errorIndication:
-    print errorIndication
