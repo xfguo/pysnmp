@@ -26,7 +26,7 @@ config.addV3User(
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpTwistedTransport().openServerMode(('127.0.0.1', 1162))
+    udp.UdpTwistedTransport().openServerMode(('127.0.0.1', 162))
     )
 
 # Callback function for receiving notifications
