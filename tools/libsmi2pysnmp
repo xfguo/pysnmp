@@ -198,13 +198,23 @@ def __genTypeDef((symName, symDef), classMode=0):
             r = r + ', %s()' % parentType
         if baseType == 'Enumeration':
             if classMode:
-                r = r + 'subtypeSpec = %s.subtypeSpec+constraint.SingleValueConstraint(' % parentType
+                r = r + 'subtypeSpec = %s.subtypeSpec+' % parentType
             else:
-                r = r + '.subtype(subtypeSpec=constraint.SingleValueConstraint('
+                r = r + '.subtype(subtypeSpec='
+            # Python has certain limit on the number of func params
+            if len(typeDef) > 127:
+                r = r + 'constraint.ConstraintsUnion('
+            r = r + 'constraint.SingleValueConstraint('
+            cnt = 1
             for e, v in typeDef.items():
                 if type(v) == DictType and v.has_key('nodetype') \
                        and v['nodetype'] == 'namednumber':
                     r = r + '%s,' % v['number']
+                    if cnt % 127 == 0:
+                        r = r + '), constraint.SingleValueConstraint('
+                    cnt = cnt + 1
+            if len(typeDef) > 127:
+                r = r + ')'
             if classMode:
                 r = r + ')\n'
                 r = r + identFiller*identValue
@@ -216,10 +226,14 @@ def __genTypeDef((symName, symDef), classMode=0):
             r = r + '.subtype(namedValues=namedval.NamedValues('
         typedesc = typeDef.items()
         typedesc.sort(lambda x,y: cmp(x[1],y[1]))
+        cnt = 1
         for e, v in typedesc:
             if type(v) == DictType and v.has_key('nodetype') \
               and v['nodetype'] == 'namednumber':
                 r = r + '(\"%s\", %s), ' % (e, v['number'])
+                if cnt % 127 == 0:
+                    r = r + ') + namedval.NamedValues('
+                cnt = cnt + 1                
         if classMode:
             r = r + ')\n'
             r = r + identFiller*identValue            
