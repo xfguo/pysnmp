@@ -2,6 +2,7 @@
 from pysnmp.entity import engine, config
 from pysnmp.entity.rfc3413 import cmdrsp, context
 from pysnmp.carrier.asynsock.dgram import udp
+#from pysnmp.carrier.asynsock.dgram import udp6
 from pysnmp import debug
 
 # Optionally enable stdout debugging
@@ -11,12 +12,19 @@ from pysnmp import debug
 # to socket transport dispatcher
 snmpEngine = engine.SnmpEngine()
 
-# Setup transport endpoint
+# Setup UDP over IPv4 transport endpoint
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
     udp.UdpTransport().openServerMode(('127.0.0.1', 161))
     )
+
+# Setup UDP over IPv6 transport endpoint
+#config.addSocketTransport(
+#    snmpEngine,
+#    udp6.domainName,
+#    udp6.Udp6Transport().openServerMode(('::1', 161))
+#    )
 
 # Create and put on-line my managed object
 sysDescr, = snmpEngine.msgAndPduDsp.mibInstrumController.mibBuilder.importSymbols('SNMPv2-MIB', 'sysDescr')
