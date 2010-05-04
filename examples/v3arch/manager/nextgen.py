@@ -37,7 +37,9 @@ def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
     if errorIndication:
         print errorIndication
         return
-    if errorStatus:
+    # SNMPv1 response may contain noSuchName error *and* SNMPv2c exception,
+    # so we ignore noSuchName error here
+    if errorStatus and errorStatus != 2:
         print errorStatus.prettyPrint()
         return
     for varBindRow in varBindTable:
