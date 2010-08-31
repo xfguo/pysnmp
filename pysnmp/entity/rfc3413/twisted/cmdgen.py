@@ -1,6 +1,10 @@
 from twisted.internet import reactor, defer
 from pysnmp.entity.rfc3413 import cmdgen
 
+def _cbFun(sendRequestHandle, errorIndication,
+           errorStatus, errorIndex, varBinds, cbCtx):
+    cbCtx.callback((errorIndication, errorStatus, errorIndex, varBinds))
+
 class GetCommandGenerator(cmdgen.GetCommandGenerator):
     def sendReq(
         self,
@@ -16,39 +20,12 @@ class GetCommandGenerator(cmdgen.GetCommandGenerator):
             snmpEngine,
             addrName,
             varBinds,
-            None,
+            _cbFun,
             df,
             contextEngineId,
             contextName
             )
         return df
-
-    def _handleResponse(
-        self,
-        snmpEngine,
-        transportDomain,
-        transportAddress,
-        messageProcessingModel,
-        securityModel,
-        securityName,
-        securityLevel,
-        contextEngineId,
-        contextName,
-        pduVersion,
-        PDU,
-        timeout,
-        retryCount,
-        pMod,
-        rspPDU,
-        sendRequestHandle,
-        (cbFun, cbCtx)
-        ):        
-        cbCtx.callback(
-            (None,
-             pMod.apiPDU.getErrorStatus(rspPDU),
-             pMod.apiPDU.getErrorIndex(rspPDU),
-             pMod.apiPDU.getVarBinds(rspPDU))
-            )
 
 class SetCommandGenerator(cmdgen.SetCommandGenerator):
     def sendReq(
@@ -65,39 +42,12 @@ class SetCommandGenerator(cmdgen.SetCommandGenerator):
             snmpEngine,
             addrName,
             varBinds,
-            None,
+            _cbFun,
             df,
             contextEngineId,
             contextName
             )
         return df
-
-    def _handleResponse(
-        self,
-        snmpEngine,
-        transportDomain,
-        transportAddress,
-        messageProcessingModel,
-        securityModel,
-        securityName,
-        securityLevel,
-        contextEngineId,
-        contextName,
-        pduVersion,
-        PDU,
-        timeout,
-        retryCount,
-        pMod,
-        rspPDU,
-        sendRequestHandle,
-        (cbFun, cbCtx)
-        ):        
-        cbCtx.callback(
-            (None,
-             pMod.apiPDU.getErrorStatus(rspPDU),
-             pMod.apiPDU.getErrorIndex(rspPDU),
-             pMod.apiPDU.getVarBinds(rspPDU))
-            )
 
 class NextCommandGenerator(cmdgen.NextCommandGenerator):
     def sendReq(
@@ -114,39 +64,12 @@ class NextCommandGenerator(cmdgen.NextCommandGenerator):
             snmpEngine,
             addrName,
             varBinds,
-            None,
+            _cbFun,
             df,
             contextEngineId,
             contextName
             )
         return df
-
-    def _handleResponse(
-        self,
-        snmpEngine,
-        transportDomain,
-        transportAddress,
-        messageProcessingModel,
-        securityModel,
-        securityName,
-        securityLevel,
-        contextEngineId,
-        contextName,
-        pduVersion,
-        PDU,
-        timeout,
-        retryCount,
-        pMod,
-        rspPDU,
-        sendRequestHandle,
-        (cbFun, cbCtx)
-        ):        
-        cbCtx.callback(
-            (None,
-             pMod.apiPDU.getErrorStatus(rspPDU),
-             pMod.apiPDU.getErrorIndex(rspPDU),
-             pMod.apiPDU.getVarBindTable(PDU, rspPDU))
-            )
 
 class BulkCommandGenerator(cmdgen.BulkCommandGenerator):
     def sendReq(
@@ -167,36 +90,10 @@ class BulkCommandGenerator(cmdgen.BulkCommandGenerator):
             nonRepeaters,
             maxRepetitions,
             varBinds,
-            None,
+            _cbFun,
             df,
             contextEngineId=None,
             contextName=''
             )
         return df
 
-    def _handleResponse(
-        self,
-        snmpEngine,
-        transportDomain,
-        transportAddress,
-        messageProcessingModel,
-        securityModel,
-        securityName,
-        securityLevel,
-        contextEngineId,
-        contextName,
-        pduVersion,
-        PDU,
-        timeout,
-        retryCount,
-        pMod,
-        rspPDU,
-        sendRequestHandle,
-        (cbFun, cbCtx)
-        ):        
-        cbCtx.callback(
-            (None,
-             pMod.apiBulkPDU.getErrorStatus(rspPDU),
-             pMod.apiBulkPDU.getErrorIndex(rspPDU),
-             pMod.apiBulkPDU.getVarBindTable(PDU, rspPDU))
-            )
