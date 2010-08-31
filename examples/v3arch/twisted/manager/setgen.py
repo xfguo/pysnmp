@@ -41,8 +41,12 @@ config.addSocketTransport(
 # Twisted API follows
 
 def receiveResponse((errorIndication, errorStatus, errorIndex, varBinds)):
-    if errorIndication or errorStatus:
-        print 'Error: ', errorIndication, errorStatus.prettyPrint(), errorIndex
+    if errorIndication:
+        print 'Error: ', errorIndication
+        reactor.stop()
+        return
+    if errorStatus:
+        print 'Error: ', errorStatus.prettyPrint(), errorIndex
         reactor.stop()
         return
     for oid, val in varBinds:
