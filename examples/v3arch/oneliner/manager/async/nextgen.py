@@ -34,7 +34,7 @@ def cbFun(
     varBindTableRow = varBindTable[-1]
     for idx in range(len(varBindTableRow)):
         name, val = varBindTableRow[idx]
-        if val is not None and varBindHead[idx].isPrefixOf(name):
+        if val is not None and varBindHead[idx] <= name:
             # still in table
             break
     else:
