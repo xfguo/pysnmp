@@ -775,7 +775,7 @@ over SNMPv3:
 <TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
 <PRE>
 >>> from pysnmp.entity.rfc3413.oneliner import cmdgen
->>> errorIndication, errorStatus, errorIndex, varBinds = cmdgen.CommandGenerator().nextCmd(
+>>> errorIndication, errorStatus, errorIndex, varBindTable = cmdgen.CommandGenerator().nextCmd(
 ... cmdgen.UsmUserData('my-user', 'my-authkey', 'my-privkey'),
 ... cmdgen.UdpTransportTarget(('localhost', 161)),
 ... (1,3,6,1,2,1,1)
@@ -854,7 +854,7 @@ over SNMPv3:
 <TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
 <PRE>
 >>> from pysnmp.entity.rfc3413.oneliner import cmdgen
->>> errorIndication, errorStatus, errorIndex, varBinds = cmdgen.CommandGenerator().bulkCmd(
+>>> errorIndication, errorStatus, errorIndex, varBindTable = cmdgen.CommandGenerator().bulkCmd(
 ... cmdgen.UsmUserData('my-user', 'my-authkey', 'my-privkey'),
 ... cmdgen.UdpTransportTarget(('localhost', 161)),
 ... 0, 25, # nonRepeaters, maxRepetitions
