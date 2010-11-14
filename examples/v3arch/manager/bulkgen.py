@@ -36,21 +36,16 @@ def cbFun(sendRequesthandle, errorIndication, errorStatus, errorIndex,
           varBindTable, cbCtx):
     if errorIndication:
         print errorIndication
-        return
+        return  # stop on error
     if errorStatus:
-        print errorStatus.prettyPrint()
-        return
+        print '%s at %s\n' % (
+            errorStatus.prettyPrint(),
+            errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
+            )        
+        return  # stop on error
     for varBindRow in varBindTable:
         for oid, val in varBindRow:
-            if val is None:
-                print oid.prettyPrint()
-            else:
-                print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
-    for oid, val in varBindTable[-1]:
-        if val is not None:
-            break
-    else:
-        return # stop on end-of-table
+            print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
     return 1 # continue walking
 
 cmdgen.BulkCommandGenerator().sendReq(

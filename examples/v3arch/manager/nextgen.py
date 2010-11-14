@@ -40,19 +40,14 @@ def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
     # SNMPv1 response may contain noSuchName error *and* SNMPv2c exception,
     # so we ignore noSuchName error here
     if errorStatus and errorStatus != 2:
-        print errorStatus.prettyPrint()
-        return
+        print '%s at %s\n' % (
+            errorStatus.prettyPrint(),
+            errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
+            )
+        return  # stop on error
     for varBindRow in varBindTable:
         for oid, val in varBindRow:
-            if val is None:
-                print oid.prettyPrint()
-            else:            
-                print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
-    for oid, val in varBindTable[-1]:
-        if val is not None:
-            break
-    else:
-        return # stop on end-of-table
+            print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
     return 1 # continue walking
 
 cmdgen.NextCommandGenerator().sendReq(
