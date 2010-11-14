@@ -19,7 +19,7 @@ else:
     if errorStatus:
         print '%s at %s\n' % (
             errorStatus.prettyPrint(),
-            varBindTable[-1][int(errorIndex)-1]
+            errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
             )
     else:
         for varBindTableRow in varBindTable:

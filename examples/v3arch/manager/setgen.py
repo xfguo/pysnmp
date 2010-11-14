@@ -51,10 +51,13 @@ snmpEngine.transportDispatcher.runDispatcher()
 if cbCtx['errorIndication']:
     print cbCtx['errorIndication']
 elif cbCtx['errorStatus']:
-    print '%s at %s' % (
-        cbCtx['errorStatus'].prettyPrint(),
-        cbCtx['varBinds'][int(cbCtx['errorIndex'])-1]
+    if cbCtx['errorIndex']:
+        print '%s at %s' % (
+            cbCtx['errorStatus'].prettyPrint(),
+            cbCtx['varBinds'][int(cbCtx['errorIndex'])-1]
         )
+    else:
+        print cbCtx['errorStatus'].prettyPrint()
 else:
     for o, v in cbCtx['varBinds']:
         print '%s = %s' % (o.prettyPrint(), v.prettyPrint())
