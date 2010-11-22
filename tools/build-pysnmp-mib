@@ -25,7 +25,7 @@ shift $((OPTIND-1))
 
 [ -z $1 ] && { mibFile="-"; } || { 
     mibFile=$1;
-    export SMIPATH=":$SMIPATH:$(echo $mibFile | sed -e 's/\(.*\)\/.*/\1/g')";
+    export SMIPATH="$SMIPATH:$(echo $mibFile | sed -e 's,[^/]*$,.,')";
 }        
 
 egrep -q 'FROM *RFC' $mibFile 2> /dev/null && ! egrep -q 'FROM *SNMPv2-' $mibFile 2> /dev/null && { oldMib='yes'; } || {
