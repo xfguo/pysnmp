@@ -456,6 +456,8 @@ if nodes:
                 out.write('.setMaxAccess(\"%s\")' % 'readcreate')
             else:
                 out.write('.setMaxAccess(\"%s\")' % symDef['access'])
+        if symDef['nodetype'] == 'capabilities':
+            out.write('AgentCapabilities(%s)' % __oidToTuple(symDef['oid']))
 
         out.write('%s' % addLabelForSymbol(symName))
 
