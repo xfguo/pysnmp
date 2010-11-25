@@ -6,7 +6,7 @@ from string import split, join, replace, find, atol, atoi
 from types import StringType, DictType
 import sys, time
 
-version = '0.0.9-alpha'
+version = '0.0.10-beta'
 genTextLoader = 1
 
 class Error(StandardError): pass
@@ -374,8 +374,8 @@ if nodes:
     out.write('\n# Objects\n\n')            
     row_create = {}
     for symName, symDef in nodes:
-        out.write('%s = ' % transOpers(symName))
         if symDef['nodetype'] == 'node':
+            out.write('%s = ' % transOpers(symName))
             if symName == moduleIdentityNode:
                 out.write('ModuleIdentity(%s)' % __oidToTuple(symDef['oid']))
                 if mib.has_key(dstModName):
@@ -399,15 +399,18 @@ if nodes:
                 out.write('ObjectIdentity(%s)' % __oidToTuple(symDef['oid']))
             else:
                 out.write('MibIdentifier(%s)' % __oidToTuple(symDef['oid']))
-        if symDef['nodetype'] == 'scalar':
+        elif symDef['nodetype'] == 'scalar':
+            out.write('%s = ' % transOpers(symName))            
             out.write('MibScalar(%s' % __oidToTuple(symDef['oid']))
             out.write('%s)' % __genTypeDef((symName, symDef)))
             out.write('.setMaxAccess(\"%s\")' % symDef['access'])
             if symDef.has_key('units'):
                 out.write('.setUnits(\"%s\")' % symDef['units'])
-        if symDef['nodetype'] == 'table':
+        elif symDef['nodetype'] == 'table':
+            out.write('%s = ' % transOpers(symName))            
             out.write('MibTable(%s)' % __oidToTuple(symDef['oid']))
-        if symDef['nodetype'] == 'row':
+        elif symDef['nodetype'] == 'row':
+            out.write('%s = ' % transOpers(symName))            
             # determine if row creation is permitted, and store
             # status for later inspection by column nodes.
             if symDef.has_key('create'):
@@ -445,7 +448,8 @@ if nodes:
                         impliedFlag, modName, idx
                         ))
                 out.write(')')
-        if symDef['nodetype'] == 'column':
+        elif symDef['nodetype'] == 'column':
+            out.write('%s = ' % transOpers(symName))            
             out.write('MibTableColumn(%s' % __oidToTuple(symDef['oid']))
             out.write('%s)' % __genTypeDef((symName, symDef)))
             # smidump does not tag columns as read-create.
@@ -456,9 +460,13 @@ if nodes:
                 out.write('.setMaxAccess(\"%s\")' % 'readcreate')
             else:
                 out.write('.setMaxAccess(\"%s\")' % symDef['access'])
-        if symDef['nodetype'] == 'capabilities':
+        elif symDef['nodetype'] == 'capabilities':
+            out.write('%s = ' % transOpers(symName))            
             out.write('AgentCapabilities(%s)' % __oidToTuple(symDef['oid']))
-
+        else:
+            sys.stderr.write('Warning: skipping unknown node type %s, oid %s\n' % (symDef['nodetype'], symName))
+            continue
+            
         out.write('%s' % addLabelForSymbol(symName))
 
         if genTextLoader:
@@ -491,7 +499,7 @@ if nodes:
 if mib.has_key('notifications'):
     notifications = mib['notifications'].items()
     __oid2num = lambda o: map(lambda x: atol(x), split(o, '.'))
-    nodes.sort(lambda x,y,f=__oid2num: cmp(
+    notifications.sort(lambda x,y,f=__oid2num: cmp(
         f(x[1].get('oid')), f(y[1].get('oid'))
         ))
 else:
@@ -513,7 +521,7 @@ if notifications:
 if mib.has_key('groups'):
     groups = mib['groups'].items()
     __oid2num = lambda o: map(lambda x: atol(x), split(o, '.'))
-    nodes.sort(lambda x,y,f=__oid2num: cmp(
+    groups.sort(lambda x,y,f=__oid2num: cmp(
         f(x[1].get('oid')), f(y[1].get('oid'))
         ))
 else:
