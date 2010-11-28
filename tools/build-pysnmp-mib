@@ -10,7 +10,7 @@ smidump=smidump  # part of libsmi distro
 
 while getopts o: o
   do case "$o" in
-  o) exec 5>"$OPTARG" 1>&5 || { echo >&2 "Redirection failed"; exit 1; } ;;
+  o) outFile=$OPTARG ;;
   [?]) echo >&2 "\
 Convert MIB text file into PySNMP-compliant module, see http://pysnmp.sf.net.
 Usage: $0 [-o pysnmp-mib-file ] [ mib-text-file ]\
@@ -18,6 +18,10 @@ Usage: $0 [-o pysnmp-mib-file ] [ mib-text-file ]\
   exit 1;;
   esac
 done
+
+[ -n "$outFile" ] && {
+  exec 5>"$outFile" 1>&5 || { echo >&2 "Redirection failed"; exit 1; }
+}
 
 shift $((OPTIND-1))
 
@@ -45,6 +49,7 @@ egrep -q 'FROM *RFC' $mibFile 2> /dev/null && ! egrep -q 'FROM *SNMPv2-' $mibFil
     }
     $smidump -k -f python $tmpFile 2> /dev/null | $libsmi2pysnmp || {
         [ -f $tmpFile ] && rm -f $tmpFile;
+        [ -n "$outFile" ] && rm -f $outFile;
         echo >&2 "$smidump -k -f python $mibFile | $libsmi2pysnmp fails";
         echo >&2 "make sure you are using libsmi version > 0.4.5 (or svn)";
         exit
@@ -52,6 +57,7 @@ egrep -q 'FROM *RFC' $mibFile 2> /dev/null && ! egrep -q 'FROM *SNMPv2-' $mibFil
     rm -f $tmpFile
 } || {
     $smidump -k -f python $mibFile 2> /dev/null | $libsmi2pysnmp || {
+        [ -n "$outFile" ] && rm -f $outFile;
         echo >&2 "$smidump -k -f python $mibFile | $libsmi2pysnmp fails";
         echo >&2 "make sure you are using libsmi version > 0.4.5 (or svn)";
         exit
