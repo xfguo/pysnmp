@@ -516,6 +516,9 @@ if notifications:
                 out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
             out.write(')')
             out.write('%s' % addLabelForSymbol(symName))
+            if genTextLoader:
+                if symDef.has_key("description"):        
+                    out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
         out.write('\n')
 
 if mib.has_key('groups'):
@@ -532,16 +535,48 @@ if groups:
     for symName, symDef in groups:
         out.write('%s = ' % transOpers(symName))
         if symDef['nodetype'] == 'group':
-            if mib.has_key('notifications') and mib['notifications'].has_key(symDef['members'].keys()[0]):
-                out.write('NotificationGroup(')
-            else:
+            if find(symName, 'otification') < 0: # hackerish
                 out.write('ObjectGroup(')
+            else:
+                out.write('NotificationGroup(')
             out.write('%s)'  % __oidToTuple(symDef['oid']))
             out.write('.setObjects(')
             for objName, objDef in symDef['members'].items():
                 out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
             out.write(')')
             out.write('%s' % addLabelForSymbol(symName))
+            if genTextLoader:
+                if symDef.has_key("description"):        
+                    out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
+        out.write('\n')
+
+if mib.has_key('compliances'):
+    compliances = mib['compliances'].items()
+    __oid2num = lambda o: map(lambda x: atol(x), split(o, '.'))
+    compliances.sort(lambda x,y,f=__oid2num: cmp(
+        f(x[1].get('oid')), f(y[1].get('oid'))
+        ))
+else:
+    compliances = ()
+
+if compliances:
+    out.write('\n# Compliances\n\n')
+    for symName, symDef in compliances:
+        out.write('%s = ' % transOpers(symName))
+        if symDef['nodetype'] == 'compliance':
+            out.write('ModuleCompliance(')
+            out.write('%s)'  % __oidToTuple(symDef['oid']))
+            if symDef.has_key('requires'):
+                out.write('.setObjects(')
+                for objName, objDef in symDef['requires'].items():
+                    # XXX nodetype not stored
+                    out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
+                out.write(')')
+            # XXX refinements not stored
+            out.write('%s' % addLabelForSymbol(symName))
+            if genTextLoader:
+                if symDef.has_key("description"):        
+                    out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
         out.write('\n')
 
 out.write('\n# Exports\n\n')
@@ -598,7 +633,19 @@ if groups:
             out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
         out.write(', %s=%s' % ((transOpers(symName),)*2))
         idx = idx + 1        
-    out.write(')\n')    
+    out.write(')\n\n')    
+
+if compliances:
+    out.write('# Compliances\n')
+    out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
+    idx = 1L
+    for symName, symObj in compliances:
+        if idx % 127 == 0:
+            out.write(')\n')
+            out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
+        out.write(', %s=%s' % ((transOpers(symName),)*2))
+        idx = idx + 1        
+    out.write(')\n')
 
 # XXX
 # implement API version checking
