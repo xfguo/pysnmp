@@ -1,4 +1,4 @@
-from twisted.internet import reactor, defer
+from twisted.internet import defer
 from pysnmp.entity.rfc3413 import cmdgen
 
 def _cbFun(sendRequestHandle, errorIndication,
