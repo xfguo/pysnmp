@@ -4,6 +4,7 @@ from pysnmp.entity import engine, config
 from pysnmp.carrier.twisted import dispatch
 from pysnmp.carrier.twisted.dgram import udp
 from pysnmp.entity.rfc3413.twisted import cmdgen
+from pyasn1.type import univ
 
 snmpEngine = engine.SnmpEngine()
 
@@ -46,25 +47,27 @@ def receiveResponse(
         print 'Error: ', errorIndication
         reactor.stop()
         return
-    if errorStatus:
-        print 'Error: ', errorStatus.prettyPrint(), errorIndex
+    if errorStatus and errorStatus != 2:
+        print '%s at %s\n' % (
+            errorStatus.prettyPrint(),
+            errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
+            )
         reactor.stop()
         return
     for varBindRow in varBindTable:
         for oid, val in varBindRow:
-            if val is None:
-                print oid.prettyPrint()
-            else:
-                print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
-    for oid, val in varBindTable[-1]:
-        if val is not None:
-            df = nextCmdGen.sendReq(
-                snmpEngine, 'myRouter', varBindTable[-1]
-                )
-            df.addCallback(receiveResponse, nextCmdGen, snmpEngine)
-            return
+            print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
+
+    for o, v in varBindTable[-1]:
+        if not isinstance(v, univ.Null):
+            break
     else:
-        reactor.stop()
+        reactor.stop()  # no more objects available
+        
+    df = nextCmdGen.sendReq(
+        snmpEngine, 'myRouter', varBindTable[-1]
+        )
+    df.addCallback(receiveResponse, nextCmdGen, snmpEngine)
 
 nextCmdGen = cmdgen.NextCommandGenerator()
 
