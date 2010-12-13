@@ -40,9 +40,7 @@ config.addSocketTransport(
 
 # Twisted API follows
 
-def receiveResponse(
-    (errorIndication, errorStatus, errorIndex, varBindTable, df)
-    ):
+def receiveResponse((errorIndication, errorStatus, errorIndex, varBindTable)):
     if errorIndication:
         print 'Error: ', errorIndication
         reactor.stop()
@@ -64,9 +62,10 @@ def receiveResponse(
     else:
         reactor.stop()  # no more objects available
         return
-        
-    df.addCallback(receiveResponse)  # continue walking
-    return 1
+
+    df = defer.Deferred()
+    df.addCallback(receiveResponse)
+    return df  # this is to indicate that we wish to continue walking
 
 nextCmdGen = cmdgen.NextCommandGenerator()
 

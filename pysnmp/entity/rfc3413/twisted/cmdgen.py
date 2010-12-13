@@ -49,15 +49,17 @@ class SetCommandGenerator(cmdgen.SetCommandGenerator):
             )
         return df
 
-def _cbFunWithDeferred(
-    sendRequestHandle, errorIndication, errorStatus, errorIndex, varBinds, cbCtx
-    ):
-    df = defer.Deferred()
-    cbCtx['df'].callback(
-        (errorIndication, errorStatus, errorIndex, varBinds, df)
+def _cbFunWithDeferred(sendRequestHandle, errorIndication,
+                       errorStatus, errorIndex, varBinds, cbCtx):
+    df = cbCtx['df']
+    df.callback(
+        (errorIndication, errorStatus, errorIndex, varBinds)
         )
-    cbCtx['df'] = df
-    return len(df.callbacks)
+    # Callback function may return another deferred to indicate
+    # it wishes to continue MIB walk.
+    if isinstance(df.result, defer.Deferred):
+        cbCtx['df'] = df.result
+        return 1  # continue walking
 
 class NextCommandGenerator(cmdgen.NextCommandGenerator):
     def sendReq(

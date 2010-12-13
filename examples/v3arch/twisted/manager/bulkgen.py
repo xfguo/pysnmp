@@ -40,9 +40,7 @@ config.addSocketTransport(
 
 # Twisted API follows
 
-def receiveResponse(
-    (errorIndication, errorStatus, errorIndex, varBindTable, df),
-    ):
+def receiveResponse((errorIndication, errorStatus, errorIndex, varBindTable)):
     if errorIndication:
         print 'Error: ', errorIndication
         reactor.stop()
@@ -65,13 +63,14 @@ def receiveResponse(
         reactor.stop()  # no more objects available
         return
 
-    df.addCallback(receiveResponse)  # continue walking
-    return 1
+    df = defer.Deferred()
+    df.addCallback(receiveResponse)
+    return df  # this is to indicate that we wish to continue walking
 
 bulkCmdGen = cmdgen.BulkCommandGenerator()
 
 df = bulkCmdGen.sendReq(
-    snmpEngine, 'myRouter', 0, 25, (((1,3,6,1,2), None),)
+    snmpEngine, 'myRouter', 0, 25, (((1,3,6,1,2), None), ((1,3,6,1,4), None))
     )
 
 df.addCallback(receiveResponse)
