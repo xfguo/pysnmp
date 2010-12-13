@@ -41,8 +41,8 @@ config.addSocketTransport(
 # Twisted API follows
 
 def receiveResponse(
-    (errorIndication, errorStatus, errorIndex, varBindTable),
-    nextCmdGen, snmpEngine):
+    (errorIndication, errorStatus, errorIndex, varBindTable, df)
+    ):
     if errorIndication:
         print 'Error: ', errorIndication
         reactor.stop()
@@ -63,11 +63,10 @@ def receiveResponse(
             break
     else:
         reactor.stop()  # no more objects available
+        return
         
-    df = nextCmdGen.sendReq(
-        snmpEngine, 'myRouter', varBindTable[-1]
-        )
-    df.addCallback(receiveResponse, nextCmdGen, snmpEngine)
+    df.addCallback(receiveResponse)  # continue walking
+    return 1
 
 nextCmdGen = cmdgen.NextCommandGenerator()
 
@@ -75,6 +74,6 @@ df = nextCmdGen.sendReq(
     snmpEngine, 'myRouter', (((1,3,6,1,2,1,1), None),)
     )
 
-df.addCallback(receiveResponse, nextCmdGen, snmpEngine)
+df.addCallback(receiveResponse)
 
 reactor.run()

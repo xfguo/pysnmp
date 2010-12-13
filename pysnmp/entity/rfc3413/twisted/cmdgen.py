@@ -49,6 +49,16 @@ class SetCommandGenerator(cmdgen.SetCommandGenerator):
             )
         return df
 
+def _cbFunWithDeferred(
+    sendRequestHandle, errorIndication, errorStatus, errorIndex, varBinds, cbCtx
+    ):
+    df = defer.Deferred()
+    cbCtx['df'].callback(
+        (errorIndication, errorStatus, errorIndex, varBinds, df)
+        )
+    cbCtx['df'] = df
+    return len(df.callbacks)
+
 class NextCommandGenerator(cmdgen.NextCommandGenerator):
     def sendReq(
         self,
@@ -64,8 +74,8 @@ class NextCommandGenerator(cmdgen.NextCommandGenerator):
             snmpEngine,
             addrName,
             varBinds,
-            _cbFun,
-            df,
+            _cbFunWithDeferred,
+            { 'df': df },  # anonymous dictionary used for cbCtx
             contextEngineId,
             contextName
             )
@@ -90,8 +100,8 @@ class BulkCommandGenerator(cmdgen.BulkCommandGenerator):
             nonRepeaters,
             maxRepetitions,
             varBinds,
-            _cbFun,
-            df,
+            _cbFunWithDeferred,            
+            { 'df': df },  # anonymous dictionary used for cbCtx
             contextEngineId=None,
             contextName=''
             )
