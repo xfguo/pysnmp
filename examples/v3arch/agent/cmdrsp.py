@@ -41,7 +41,11 @@ config.addV1System(snmpEngine, 'test-agent', 'public')
 config.addV3User(
     snmpEngine, 'test-user',
     config.usmHMACMD5AuthProtocol, 'authkey1',
+#    config.usmHMACSHAAuthProtocol, 'authkey1',
     config.usmDESPrivProtocol, 'privkey1'
+#    config.usm3DESEDEPrivProtocol, 'privkey1'
+#    config.usmAesCfb192Protocol, 'privkey1'
+#    config.usmAesCfb256Protocol, 'privkey1'
 #    config.usmAesCfb128Protocol, 'privkey1'
     )
 
