@@ -50,10 +50,10 @@ def cbFun(
 
     return 1 # continue table retrieval
 
-cmdGen  = cmdgen.CommandGenerator()
+cmdGen  = cmdgen.AsynCommandGenerator()
 
 for authData, transportTarget, varNames in targets:
-    cmdGen.asyncNextCmd(
+    cmdGen.nextCmd(
         authData, transportTarget, varNames,
         # User-space callback function and its context
         (cbFun, (varNames, authData, transportTarget))
