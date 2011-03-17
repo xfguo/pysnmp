@@ -36,8 +36,9 @@ def cbFun(snmpEngine,
           varBinds,
           cbCtx):
     transportDomain, transportAddress = snmpEngine.msgAndPduDsp.getTransportInfo(stateReference)
-    print 'Notification from %s, SNMP Engine \"%s\", Context \"%s\"' % (
-        transportAddress, contextEngineId.prettyPrint(), contextName
+    print 'Notification from %s, SNMP Engine %s, Context %s' % (
+        transportAddress, contextEngineId.prettyPrint(),
+        contextName.prettyPrint()
         )
     for name, val in varBinds:
         print '%s = %s' % (name.prettyPrint(), val.prettyPrint())

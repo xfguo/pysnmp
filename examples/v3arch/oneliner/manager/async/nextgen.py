@@ -26,10 +26,13 @@ def cbFun(
     ):
     print '%s via %s' % (authData, transportTarget)
     if errorIndication:
-        print 'SNMP engine error', errorIndication
+        print errorIndication
         return 1
     if errorStatus:
-        print 'SNMP error %s at %s' % (errorStatus, errorIndex)
+        print '%s at %s\n' % (
+            errorStatus.prettyPrint(),
+            errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
+            )
         return 1
     varBindTableRow = varBindTable[-1]
     for idx in range(len(varBindTableRow)):
