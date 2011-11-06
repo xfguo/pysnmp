@@ -649,7 +649,8 @@ None
 >>> print(errorStatus)
 0
 >>> print(varBinds)
-[(ObjectName(1.3.6.1.2.1.1.1.0), OctetString('Linux saturn 2.6.37.6-smp #2 SMP Sat Apr 9 23:39:07 CDT 2011 i686')), 
+[(ObjectName(1.3.6.1.2.1.1.1.0), OctetString('Linux saturn 2.6.37.6-smp 
+    #2 SMP Sat Apr 9 23:39:07 CDT 2011 i686')), 
 (ObjectName(1.3.6.1.2.1.1.2.0), ObjectIdentifier(1.3.6.1.4.1.8072.3.2.10))]
 </PRE>
 </TD></TR></TABLE>
@@ -804,7 +805,8 @@ None
 >>> for varBindTableRow in varBindTable:
 ...     print(varBindTableRow)
 ...
-[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux saturn 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux saturn 2.6.21 
+    #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
 [(ObjectName('1.3.6.1.2.1.1.2.0'), ObjectIdentifier('1.3.6.1.4.1.8072.3.2.10'))]
 [ skipped ]
 [(ObjectName('1.3.6.1.2.1.1.9.1.4.9'), TimeTicks('17'))]
@@ -884,7 +886,8 @@ None
 >>> for varBindTableRow in varBindTable:
 ...     print(varBindTableRow)
 ...
-[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux saturn 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux saturn 2.6.21 
+     #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
 [(ObjectName('1.3.6.1.2.1.1.2.0'), ObjectIdentifier('1.3.6.1.4.1.8072.3.2.10'))]
 [ skipped ]
 [(ObjectName('1.3.6.1.2.1.1.9.1.4.9'), TimeTicks('17'))]
@@ -1260,7 +1263,8 @@ SNMPv3:
 sendRequestHandle = 1
 errorIndication = None
 errorStatus = 0
-varBinds = [(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux saturn 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+varBinds = [(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux saturn 
+     2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
 cbCtx = None
 >>>
 </PRE>
@@ -2046,7 +2050,8 @@ PySNMP SMI data model. First example is on a scalar:
 
 <TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
 <PRE>
-myManagedObject = MibScalar((1, 3, 6, 1, 4, 1, 20408, 2, 1), OctetString()).setMaxAccess("readonly")
+myManagedObject = MibScalar((1, 3, 6, 1, 4, 1, 20408, 2, 1),
+                            OctetString()).setMaxAccess("readonly")
 </PRE>
 </TD></TR></TABLE>
 
@@ -2060,7 +2065,8 @@ on the basis of their names relation.
 
 <TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
 <PRE>
-myManagedObjectInstance = MibScalarInstance(myManagedObject.getName() + (0,), myManagedObject.getSyntax().clone('my string'))
+myManagedObjectInstance = MibScalarInstance(myManagedObject.getName() + (0,), 
+    myManagedObject.getSyntax().clone('my string'))
 </PRE>
 </TD></TR></TABLE>
 
@@ -2084,7 +2090,8 @@ column.
 
 <TABLE BGCOLOR="lightgray" BORDER=0 WIDTH=100%><TR><TD>
 <PRE>
-myTableValueInstance = MibScalarInstance(myTableValue.getName() + (1,), myTableValue.getSyntax().clone('my value'))
+myTableValueInstance = MibScalarInstance(myTableValue.getName() + (1,), 
+    myTableValue.getSyntax().clone('my value'))
 </PRE>
 </TD></TR></TABLE>
 
