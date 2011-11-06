@@ -17,13 +17,14 @@ errorIndication, errorStatus, \
     )
 
 if errorIndication:
-    print errorIndication
+    print(errorIndication)
 else:
     if errorStatus:
-        print '%s at %s\n' % (
+        print('%s at %s' % (
             errorStatus.prettyPrint(),
             errorIndex and varBinds[int(errorIndex)-1] or '?'
             )
+        )
     else:
         for name, val in varBinds:
-            print '%s = %s' % (name.prettyPrint(), val.prettyPrint())
+            print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))

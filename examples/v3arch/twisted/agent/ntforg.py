@@ -66,9 +66,10 @@ snmpContext = context.SnmpContext(snmpEngine)
 
 # Twisted API follows
 
-def receiveResponse((sendRequestHandle, errorIndication)):
+def receiveResponse(cbCtx):
+    (sendRequestHandle, errorIndication) = cbCtx
     if errorIndication:
-        print 'Error: ', errorIndication
+        print('Error: %s' % errorIndication)
     reactor.stop()
     
 ntfOrg = ntforg.NotificationOriginator(snmpContext)

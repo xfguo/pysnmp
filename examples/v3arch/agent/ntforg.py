@@ -53,7 +53,7 @@ snmpContext = context.SnmpContext(snmpEngine)
 
 def cbFun(sendRequestHandle, errorIndication, cbCtx):
     if errorIndication:
-        print errorIndication
+        print(errorIndication)
         
 ntforg.NotificationOriginator(snmpContext).sendNotification(
     snmpEngine,

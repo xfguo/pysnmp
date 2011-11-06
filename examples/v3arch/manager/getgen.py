@@ -49,9 +49,9 @@ cmdgen.GetCommandGenerator().sendReq(
 
 snmpEngine.transportDispatcher.runDispatcher()
 if cbCtx['errorIndication']:
-    print cbCtx['errorIndication']
+    print(cbCtx['errorIndication'])
 elif cbCtx['errorStatus']:
-    print cbCtx['errorStatus'].prettyPrint()
+    print(cbCtx['errorStatus'].prettyPrint())
 else:
     for oid, val in cbCtx['varBinds']:
-        print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
+        print('%s = %s' % (oid.prettyPrint(), val.prettyPrint()))

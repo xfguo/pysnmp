@@ -1,5 +1,6 @@
 from twisted.internet import defer
 from pysnmp.entity.rfc3413 import cmdgen
+from pyasn1.compat.octets import null
 
 def _cbFun(sendRequestHandle, errorIndication,
            errorStatus, errorIndex, varBinds, cbCtx):
@@ -12,7 +13,7 @@ class GetCommandGenerator(cmdgen.GetCommandGenerator):
         addrName,
         varBinds,
         contextEngineId=None,
-        contextName=''
+        contextName=null
         ):
         df = defer.Deferred()
         cmdgen.GetCommandGenerator.sendReq(
@@ -34,7 +35,7 @@ class SetCommandGenerator(cmdgen.SetCommandGenerator):
         addrName,
         varBinds,
         contextEngineId=None,
-        contextName=''
+        contextName=null
         ):
         df = defer.Deferred()
         cmdgen.SetCommandGenerator.sendReq(
@@ -68,7 +69,7 @@ class NextCommandGenerator(cmdgen.NextCommandGenerator):
         addrName,
         varBinds,
         contextEngineId=None,
-        contextName=''
+        contextName=null
         ):
         df = defer.Deferred()
         cmdgen.NextCommandGenerator.sendReq(
@@ -92,7 +93,7 @@ class BulkCommandGenerator(cmdgen.BulkCommandGenerator):
         maxRepetitions,
         varBinds,
         contextEngineId=None,
-        contextName=''
+        contextName=null
         ):
         df = defer.Deferred()
         cmdgen.BulkCommandGenerator.sendReq(
@@ -105,7 +106,7 @@ class BulkCommandGenerator(cmdgen.BulkCommandGenerator):
             _cbFunWithDeferred,            
             { 'df': df },  # anonymous dictionary used for cbCtx
             contextEngineId=None,
-            contextName=''
+            contextName=null
             )
         return df
 

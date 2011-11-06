@@ -78,7 +78,8 @@ class GetCommandProxy(cmdrsp.GetCommandResponder):
     cmdGen = cmdgen.GetCommandGenerator()
     
     def handleMgmtOperation(self, snmpEngine, stateReference, contextName,
-                            PDU, (acFun, acCtx)):
+                            PDU, acInfo):
+        (acFun, acCtx) = acInfo
         varBinds = v2c.apiPDU.getVarBinds(PDU)
         try:
             # The trick here is to use contextName as SNMP Manager target name
@@ -86,12 +87,12 @@ class GetCommandProxy(cmdrsp.GetCommandResponder):
                 snmpEngine, contextName, varBinds,
                 self.handleResponse, (stateReference, varBinds)
                 )
-        except Exception, why:
+        except Exception:
             self.sendRsp(snmpEngine, stateReference,  5, 0,  varBinds)
 
     def handleResponse(self, sendRequestHandle, errorIndication,
-                       errorStatus, errorIndex, varBinds,
-                       (stateReference, reqVarBinds)):
+                       errorStatus, errorIndex, varBinds, cbCtx):
+        (stateReference, reqVarBinds) = cbCtx
         if errorIndication:
             errorStatus = 5
             varBinds = reqVarBinds

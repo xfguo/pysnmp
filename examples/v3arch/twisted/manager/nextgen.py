@@ -40,21 +40,23 @@ config.addSocketTransport(
 
 # Twisted API follows
 
-def receiveResponse((errorIndication, errorStatus, errorIndex, varBindTable)):
+def receiveResponse(cbCtx):
+    (errorIndication, errorStatus, errorIndex, varBindTable) = cbCtx
     if errorIndication:
-        print 'Error: ', errorIndication
+        print('Error: %s' % errorIndication)
         reactor.stop()
         return
     if errorStatus and errorStatus != 2:
-        print '%s at %s\n' % (
+        print('%s at %s' % (
             errorStatus.prettyPrint(),
             errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
             )
+        )
         reactor.stop()
         return
     for varBindRow in varBindTable:
         for oid, val in varBindRow:
-            print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
+            print('%s = %s' % (oid.prettyPrint(), val.prettyPrint()))
 
     for o, v in varBindTable[-1]:
         if not isinstance(v, univ.Null):

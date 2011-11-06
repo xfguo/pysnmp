@@ -39,20 +39,21 @@ config.addSocketTransport(
 
 # Twisted API follows
 
-def receiveResponse((errorIndication, errorStatus, errorIndex, varBinds)):
+def receiveResponse(cbCtx):
+    (errorIndication, errorStatus, errorIndex, varBinds) = cbCtx
     if errorIndication:
-        print 'Error: ', errorIndication
+        print('Error: %s' % errorIndication)
         reactor.stop()
         return
     if errorStatus:
-        print 'Error: ', errorStatus.prettyPrint(), errorIndex
+        print('Error: %s at %s' % (errorStatus.prettyPrint(), errorIndex))
         reactor.stop()
         return
     for oid, val in varBinds:
         if val is None:
-            print oid.prettyPrint()
+            print(oid.prettyPrint())
         else:
-            print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
+            print('%s = %s' % (oid.prettyPrint(), val.prettyPrint()))
     reactor.stop()
 
 getCmdGen = cmdgen.GetCommandGenerator()

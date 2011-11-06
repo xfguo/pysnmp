@@ -20,19 +20,19 @@ targets = (
     # ...
     )
 
-def cbFun(
-    sendRequestHandle, errorIndication, errorStatus, errorIndex,
-    varBindTable, (varBindHead, authData, transportTarget)
-    ):
-    print '%s via %s' % (authData, transportTarget)
+def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
+          varBindTable, cbCtx):
+    (varBindHead, authData, transportTarget) = cbCtx
+    print('%s via %s' % (authData, transportTarget))
     if errorIndication:
-        print errorIndication
+        print(errorIndication)
         return 1
     if errorStatus:
-        print '%s at %s\n' % (
+        print('%s at %s' % (
             errorStatus.prettyPrint(),
             errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
             )
+        )
         return 1
     varBindTableRow = varBindTable[-1]
     for idx in range(len(varBindTableRow)):
@@ -41,15 +41,15 @@ def cbFun(
             # still in table
             break
     else:
-        print 'went out of table at %s' % (name, )
+        print('went out of table at %s' % (name, ))
         return
     
     for varBindRow in varBindTable:
         for oid, val in varBindRow:
             if val is None:
-                print oid.prettyPrint()
+                print(oid.prettyPrint())
             else:
-                print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
+                print('%s = %s' % (oid.prettyPrint(), val.prettyPrint()))
 
     return 1 # continue table retrieval
 

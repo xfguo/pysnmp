@@ -1,5 +1,4 @@
 # SET Command Generator with MIB resolution
-import string
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.entity.rfc3413 import mibvar
 
@@ -19,12 +18,13 @@ errorIndication, errorStatus, errorIndex, varBinds = cmdGen.setCmd(
     )
 
 if errorIndication:
-    print errorIndication
+    print(errorIndication)
 else:
     if errorStatus:
-        print '%s at %s\n' % (
+        print('%s at %s' % (
             errorStatus.prettyPrint(), varBinds[int(errorIndex)-1]
             )
+        )
     else:
         for oid, val in varBinds:
             (symName, modName), indices = mibvar.oidToMibName(
@@ -33,8 +33,9 @@ else:
             val = mibvar.cloneFromMibValue(
                 cmdGen.mibViewController, modName, symName, val
                 )
-            print '%s::%s.%s = %s' % (
+            print('%s::%s.%s = %s' % (
                 modName, symName,
-                string.join(map(lambda v: v.prettyPrint(), indices), '.'),
+                '.'.join([ v.prettyPrint() for v in indices]),
                 val.prettyPrint()
                 )
+            )

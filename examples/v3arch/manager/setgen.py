@@ -49,15 +49,16 @@ cmdgen.SetCommandGenerator().sendReq(
 
 snmpEngine.transportDispatcher.runDispatcher()
 if cbCtx['errorIndication']:
-    print cbCtx['errorIndication']
+    print(cbCtx['errorIndication'])
 elif cbCtx['errorStatus']:
     if cbCtx['errorIndex']:
-        print '%s at %s' % (
+        print('%s at %s' % (
             cbCtx['errorStatus'].prettyPrint(),
             cbCtx['varBinds'][int(cbCtx['errorIndex'])-1]
+            )
         )
     else:
-        print cbCtx['errorStatus'].prettyPrint()
+        print(cbCtx['errorStatus'].prettyPrint())
 else:
     for o, v in cbCtx['varBinds']:
-        print '%s = %s' % (o.prettyPrint(), v.prettyPrint())
+        print('%s = %s' % (o.prettyPrint(), v.prettyPrint()))

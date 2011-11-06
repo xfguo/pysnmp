@@ -6,12 +6,12 @@
 <BODY BGCOLOR="#ffffff" TEXT="#000000"
       LINK="#0000bb"  VLINK="#551a8b" ALINK="#ff0000">
 <FONT SIZE=2 FACE="arial, helvetica">
-<TABLE ALIGN="CENTER" WIDTH="70%"><TR><TD><TABLE ALIGN="LEFT"><TR><TD>
+<TABLE ALIGN="CENTER" WIDTH="60%"><TR><TD><TABLE ALIGN="LEFT"><TR><TD>
 <H4>
 PySNMP tutorial
 </H4>
 
-<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, Nov 2007</I>
+<I>by <A HREF=mailto:ilya@glas.net>Ilya Etingof</A>, 2007-2011</I>
 
 <P><B>Table of contents</B></P>
 <UL>
@@ -27,12 +27,12 @@ PySNMP tutorial
 <LI><A HREF="#SYNCH-ONELINER-APPS">2.1.1 Synchronous Applications</A>
 <UL>
 <LI><A HREF="#CommandGenerator">2.1.1.1 Command Generator</A>
-<LI><A HREF="#NotificationOriginator">2.1.1.2 Notification Originator</A
+<LI><A HREF="#NotificationOriginator">2.1.1.2 Notification Originator</A>
 </UL>
 <LI><A HREF="#ASYNCH-ONELINER-APPS">2.1.2 Asynchronous Applications</A>
 <UL>
 <LI><A HREF="#AsynCommandGenerator">2.1.2.1 Asynchronous Command Generator</A>
-<LI><A HREF="#AsynNotificationOriginator">2.1.2.2 Asynchronous Notification Originator</A
+<LI><A HREF="#AsynNotificationOriginator">2.1.2.2 Asynchronous Notification Originator</A>
 </UL>
 <LI><A HREF="#SECURITY-CONFIGURATION">2.1.3 Security configuration</A>
 <UL>
@@ -88,7 +88,7 @@ configuration facilities.
 
 <P>
 For any information to be exchanged between entities, some agreement on
-information format and transmission procedure should be settled beforehand.
+information format and transmission procedure needs to be settled beforehand.
 This is what is conventionally called a <STRONG>Protocol</STRONG>.
 </P>
 
@@ -108,8 +108,8 @@ in a reasonably short period of time, an important feature of a network
 management software would be <STRONG>Performance</STRONG>.
 
 <P>
-Some of network devices may run on strictly limited resources what require
-another property of network management facility: 
+Some of network devices may run on severely limited resources what invokes
+another property of a proper network management facility: 
 <STRONG>Low resource consumption</STRONG>.
 </P>
 
@@ -132,7 +132,7 @@ be at least authentic and sometimes hidden from possible observers.
 </P>
 
 <P>
-All these problems were approached many times during about three decades
+All these problems were approached many times through about three decades
 of networking history. Some solutions collapsed over time for one reason or
 another, while others, such as Simple Network Management Protocol (SNMP),
 evolve into an industry standard.
@@ -363,7 +363,7 @@ applications are Manager, Agent and Proxy (
 
 <P>
 PySNMP stands for a pure-Python SNMP implementation. This software deals with
-darkest corners of SNMP specifications all in Python programming language.
+the darkest corners of SNMP specifications all in Python programming language.
 </P>
 
 <P>
@@ -486,7 +486,7 @@ of all kinds.
 
 <P>
 Transport subsystem is used for sending SNMP messages to and accepting them
-from network. The I/O subsystem consists of a an abstract Dispatcher and one 
+from network. The I/O subsystem consists of an abstract Dispatcher and one 
 or more abstract Transport classes. Concrete Dispatcher implementation 
 is I/O method-specific, consider BSD sockets for example. Concrete Transport
 classes are transport domain-specific. SNMP frequently uses UDP Transport 
@@ -578,7 +578,7 @@ Methods of the <STRONG>CommandGenerator</STRONG> class instances implement
 specific request types.
 </P>
 
-<A NAME="CommandGenerator.setCmd"></A>
+<A NAME="CommandGenerator.getCmd"></A>
 <DL>
 <DT><STRONG>getCmd</STRONG>(
 <STRONG>authData</STRONG>,
@@ -596,8 +596,8 @@ The <STRONG>authData</STRONG> is a
 SNMP <A HREF="#UsmUserData">Security Parameters object</A>,
 <STRONG>transportTarget</STRONG> is a SNMP 
 <A HREF="#UdpTransportTarget">Transport Configuration object</A>
-and <STRONG>*varNames</STRONG> are Managed Objects names 
-(ASN.1 <A HREF="#OID-IMPL">OID</A>s).
+and <STRONG>*varNames</STRONG> is a sequence of
+<A HREF="#MANAGED-OBJECT-NAME-VALUE">Managed Objects names</A>.
 </P>
 
 <P>
@@ -615,18 +615,18 @@ error.
 
 <P>
 The pair of <STRONG>errorStatus</STRONG> and <STRONG>errorIndex</STRONG> 
-variables determines SNMP PDU-level error. If <STRONG>errorStatus</STRONG>
-evaluates to true, this indicates SNMP PDU error caused by Managed Object
-at position <STRONG>errorIndex</STRONG>-1 in <STRONG>varBinds</STRONG>. 
+variables determines SNMP PDU-level error. These are instances of pyasn1
+<A HREF="http://pyasn1.sourceforge.net/#1.1.3">Integer class</A>.
+If <STRONG>errorStatus</STRONG> evaluates to true, this indicates SNMP PDU
+error caused by Managed Object at position <STRONG>errorIndex</STRONG>-1 
+in <STRONG>varBinds</STRONG>. 
 Doing <STRONG>errorStatus.prettyPrint</STRONG>() would return an
 explanatory text error message.
 </P>
 
 <P>
-The <STRONG>varBinds</STRONG> is a tuple of Managed Objects. Managed Objects 
-found in response are position-bound to Managed Object names passed in request. 
-Each Managed Object is a tuple of <STRONG>Object Name</STRONG> and 
-<STRONG>Object Value</STRONG>.
+The <STRONG>varBinds</STRONG> is a tuple of <A HREF="#MANAGED-OBJECT-NAME-VALUE">Managed Objects</A>. Those found in response are bound by position to
+Managed Object names passed in request.
 </P>
 </DD>
 </DL>
@@ -641,14 +641,16 @@ The following code performs SNMP GET operation over SNMPv1:
 >>> errorIndication, errorStatus, errorIndex, varBinds = cmdgen.CommandGenerator().getCmd(
 ... cmdgen.CommunityData('my-agent', 'public', 0),
 ... cmdgen.UdpTransportTarget(('localhost', 161)),
-... (1,3,6,1,2,1,1,1,0)
+... '1.3.6.1.2.1.1.1.0',
+... '1.3.6.1.2.1.1.2.0'
 ... )
->>> print errorIndication
+>>> print(errorIndication)
 None
->>> print errorStatus
+>>> print(errorStatus)
 0
->>> print varBinds
-[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux my.domain.com 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+>>> print(varBinds)
+[(ObjectName(1.3.6.1.2.1.1.1.0), OctetString('Linux saturn 2.6.37.6-smp #2 SMP Sat Apr 9 23:39:07 CDT 2011 i686')), 
+(ObjectName(1.3.6.1.2.1.1.2.0), ObjectIdentifier(1.3.6.1.4.1.8072.3.2.10))]
 </PRE>
 </TD></TR></TABLE>
 
@@ -667,13 +669,15 @@ Perform SNMP SET request and return a response or error indication.
 
 <P>
 The <STRONG>authData</STRONG> and <STRONG>transportTarget</STRONG> parameters
-have he same semantics as in <STRONG>getCmd</STRONG> method.
+have he same semantics as in <A HREF="#CommandGenerator.getCmd">getCmd</A>
+method.
 </P>
 
 <P>
-The <STRONG>*varBinds</STRONG> input parameter is a tuple of Managed
-Objects to be applied at Agent. The syntax of <STRONG>*varBinds</STRONG>
-is the same as in <STRONG>getCmd</STRONG>.
+The <STRONG>*varBinds</STRONG> input parameter is a sequence of
+Managed Objects to be applied at Agent. The syntax of
+<STRONG>*varBinds</STRONG> is the same as in
+<A HREF="#CommandGenerator.getCmd">getCmd</A> method.
 </P>
 
 <P>
@@ -687,7 +691,7 @@ The <STRONG>setCmd</STRONG> method returns a tuple of
 <P>
 The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG> and
 <STRONG>errorIndex</STRONG> parameters have the same meaning as in
-<STRONG>getCmd</STRONG> method.
+<A HREF="#CommandGenerator.getCmd">getCmd</A> method.
 </P>
 
 </DD>
@@ -706,11 +710,11 @@ The following code performs SNMP SET operation over SNMPv2c:
 ... cmdgen.UdpTransportTarget(('localhost', 161)),
 ... ((1,3,6,1,2,1,1,1,0), rfc1902.OctetString('my system description'))
 ... )
->>> print errorIndication
+>>> print(errorIndication)
 None
->>> print errorStatus
+>>> print(errorStatus)
 17
->>> print errorStatus.prettyPrint()
+>>> print(errorStatus.prettyPrint())
 notWritable(17)
 </PRE>
 </TD></TR></TABLE>
@@ -732,7 +736,7 @@ Names are next to those used in request.
 
 <P>
 Input parameters to the <STRONG>nextCmd</STRONG> method are the same as to 
-<STRONG>getCmd</STRONG>.
+<A HREF="#CommandGenerator.getCmd">getCmd</A>.
 </P>
 
 <P>
@@ -746,7 +750,7 @@ The <STRONG>nextCmd</STRONG> method returns a tuple of
 <P>
 The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG> and
 <STRONG>errorIndex</STRONG> parameters have the same meaning as in
-<STRONG>getCmd</STRONG> method.
+<A HREF="#CommandGenerator.getCmd">getCmd</A> method.
 </P>
 
 <P>
@@ -761,8 +765,21 @@ a sequence of Managed Objects so that Object Name passed in request would
 be a prefix for Object Names returned in response (as a side note, the same
 method in Applications API would return <STRONG>varBinds</STRONG> as held
 in a single response, and regardless of the prefix property).
+</P>
+
+<P>
+It's also possible to modify the above behaviour so that the 
+<STRONG>varBindTable</STRONG> returned would contain *all*
+Managed Objects from those passed in request up till the end of
+the list of available Managed Objects at the Agent. This option
+is enabled by setting the <STRONG>lexicographicMode</STRONG>
+attribute of the <STRONG>CommandGenerator</STRONG> class instance
+to True.
+</P>
+
+<P>
 Properties of the <STRONG>varBinds</STRONG> parameter is the same as in
-<STRONG>getCmd</STRONG> method.
+<A HREF="#CommandGenerator.getCmd">getCmd</A> method.
 </P>
 </DD>
 </DL>
@@ -780,14 +797,14 @@ over SNMPv3:
 ... cmdgen.UdpTransportTarget(('localhost', 161)),
 ... (1,3,6,1,2,1,1)
 ... )
->>> print errorIndication
+>>> print(errorIndication)
 None
->>> print errorStatus
+>>> print(errorStatus)
 0
 >>> for varBindTableRow in varBindTable:
-...     print varBindTableRow
+...     print(varBindTableRow)
 ...
-[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux my.domain.com 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux saturn 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
 [(ObjectName('1.3.6.1.2.1.1.2.0'), ObjectIdentifier('1.3.6.1.4.1.8072.3.2.10'))]
 [ skipped ]
 [(ObjectName('1.3.6.1.2.1.1.9.1.4.9'), TimeTicks('17'))]
@@ -841,7 +858,7 @@ The <STRONG>bulkCmd</STRONG> method returns a tuple of
 <P>
 The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG>,
 <STRONG>errorIndex</STRONG> and <STRONG>varBindTable</STRONG> parameters have
-the same meaning as in <STRONG>getCmd</STRONG> method.
+the same meaning as in <A HREF="#CommandGenerator.getCmd">getCmd</A> method.
 </P>
 </DD>
 </DL>
@@ -860,14 +877,14 @@ over SNMPv3:
 ... 0, 25, # nonRepeaters, maxRepetitions
 ... (1,3,6,1,2,1,1)
 ... )
->>> print errorIndication
+>>> print(errorIndication)
 None
->>> print errorStatus
+>>> print(errorStatus)
 0
 >>> for varBindTableRow in varBindTable:
-...     print varBindTableRow
+...     print(varBindTableRow)
 ...
-[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux my.domain.com 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+[(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux saturn 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
 [(ObjectName('1.3.6.1.2.1.1.2.0'), ObjectIdentifier('1.3.6.1.4.1.8072.3.2.10'))]
 [ skipped ]
 [(ObjectName('1.3.6.1.2.1.1.9.1.4.9'), TimeTicks('17'))]
@@ -912,7 +929,8 @@ and possibly return an error indication.
 
 <P>
 The <STRONG>authData</STRONG> and <STRONG>transportTarget</STRONG> parameters
-have the same semantics as in <STRONG>CommandGenerator.getCmd</STRONG> method.
+have the same semantics as in <A HREF="#CommandGenerator.getCmd">getCmd</A>
+method.
 </P>
 
 <P>
@@ -938,13 +956,13 @@ is a value of coldStart notification type as defined in SNMPv2-MIB module.
 The <STRONG>*varBinds</STRONG> input parameter is a tuple of Managed
 Objects to be passed over to Manager along with Notification. The syntax 
 of <STRONG>*varBinds</STRONG> is the same as in 
-<STRONG>CommandGenerator.getCmd</STRONG>.
+<A HREF="#CommandGenerator.getCmd">getCmd</A>
 </P>
 
 <P>
 The <STRONG>sendNotification</STRONG> method returns an
 <STRONG>errorIndication</STRONG> parameter which has the same meaning as
-in <STRONG>CommandGenerator.getCmd</STRONG>.
+in <A HREF="#CommandGenerator.getCmd">getCmd</A> method.
 </P>
 
 </DD>
@@ -965,9 +983,9 @@ The following code sends SNMP TRAP over SNMPv3:
 ... (('SNMPv2-MIB', 'coldStart'),),
 ... ((1,3,6,1,2,1,1,3,0), v2c.TimeTicks(44100))
 )
->>> print errorIndication
+>>> print(errorIndication)
 None
->>> print errorStatus
+>>> print(errorStatus)
 0
 </PRE>
 </TD></TR></TABLE>
@@ -1054,7 +1072,7 @@ through response methods.
 <P>
 The <STRONG>errorIndication</STRONG>, <STRONG>errorStatus</STRONG>,
 <STRONG>errorIndex</STRONG> and <STRONG>varBinds</STRONG> parameters
-have the same meaning as in <A HREF="#getCmd">CommandGenerator.getCmd</A>
+have the same meaning as in <A HREF="#CommandGenerator.getCmd">getCmd</A>
 method.
 </P>
 
@@ -1068,7 +1086,7 @@ it must return a true value. Otherwise, it returns false.
 <P>
 The <STRONG>authData</STRONG>, <STRONG>transportTarget</STRONG> and
 <STRONG>varNames</STRONG> parameters have the same meaning as in
-<A HREF="#CommandGenerator.getCmd">CommandGenerator.getCmd</A>
+<A HREF="#CommandGenerator.getCmd">getCmd</A>
 method.
 </P>
 
@@ -1098,7 +1116,7 @@ Prepare SNMP SET request to be dispatched. Return the
 <P>
 The <STRONG>authData</STRONG> and <STRONG>transportTarget</STRONG>
 parameters have the same meaning as in 
-<A HREF="#CommandGenerator.setCmd">CommandGenerator.setCmd</A> method.
+<A HREF="#CommandGenerator.getCmd">CommandGenerator.getCmd</A> method.
 </P>
 
 <P>
@@ -1223,11 +1241,11 @@ SNMPv3:
 >>> from pysnmp.entity.rfc3413.oneliner import cmdgen
 >>>
 >>> def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex, varBinds, cbCtx):
-...     print 'sendRequestHandle =', sendRequestHandle
-...     print 'errorIndication =', errorIndication
-...     print 'errorStatus =', errorStatus
-...     print 'varBinds =', varBinds
-...     print 'cbCtx =', cbCtx
+...     print('sendRequestHandle = %d' % sendRequestHandle)
+...     print('errorIndication = %s' % errorIndication)
+...     print('errorStatus = %s' % errorStatus)
+...     print('varBinds = %s' % (varBinds,))
+...     print('cbCtx = %s' % cbCtx)
 ...
 >>> asynCommandGenerator = cmdgen.AsynCommandGenerator()
 >>> # This is a non-blocking call
@@ -1236,13 +1254,13 @@ SNMPv3:
 ... cmdgen.UdpTransportTarget(('localhost', 161)), 
 ... ((1,3,6,1,2,1,1,1,0),), 
 ... (cbFun, None))
->>> print sendRequestHandle
+>>> print(sendRequestHandle)
 1
 >>> asynCommandGenerator.snmpEngine.transportDispatcher.runDispatcher()
 sendRequestHandle = 1
 errorIndication = None
 errorStatus = 0
-varBinds = [(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux my.domain.com 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
+varBinds = [(ObjectName('1.3.6.1.2.1.1.1.0'), OctetString("'Linux saturn 2.6.21 #2 Mon Mar 19 17:07:18 MSD 2006 i686'"))]
 cbCtx = None
 >>>
 </PRE>
@@ -1370,9 +1388,9 @@ SNMPv3:
 >>> from pysnmp.proto.api import v2c
 >>>
 >>> def cbFun(sendRequestHandle, errorIndication, cbCtx):
-...     print 'sendRequestHandle =', sendRequestHandle
-...     print 'errorIndication =', errorIndication
-...     print 'cbCtx =', cbCtx
+...     print('sendRequestHandle = %d' % sendRequestHandle)
+...     print('errorIndication = %s' % errorIndication)
+...     print('cbCtx = %s' % (cbCtx,))
 ...
 >>> asynNotificationOriginator = ntforg.AsynNotificationOriginator()
 >>> # This is a non-blocking call
@@ -1383,7 +1401,7 @@ SNMPv3:
 ... ('SNMPv2-MIB', 'coldStart'),
 ... ((1,3,6,1,2,1,1,1,0), v2c.TimeTicks(44100)),
 ... (cbFun, None))
->>> print sendRequestHandle
+>>> print(sendRequestHandle)
 1
 >>> asynNotificationOriginator.snmpEngine.transportDispatcher.runDispatcher()
 sendRequestHandle = 1
@@ -1450,20 +1468,33 @@ means of further <STRONG>authProtocol</STRONG> and/or
 
 <P>
 Optional <STRONG>authProtocol</STRONG> parameter may be used to specify 
-non-default hash function algorithm. Possible values include
-<STRONG>usmHMACMD5AuthProtocol</STRONG>,
-<STRONG>usmHMACSHAAuthProtocol</STRONG> and
-<STRONG>usmNoAuthProtocol</STRONG>. These symbols are defined in 
-<STRONG>pysnmp.entity.rfc3413.oneliner.cmdgen</STRONG> module.
+non-default hash function algorithm. Possible values include:
 </P>
+<UL>
+<LI><STRONG>usmHMACMD5AuthProtocol</STRONG> -- MD5-based authentication protocol
+<LI><STRONG>usmHMACSHAAuthProtocol</STRONG> -- SHA-based authentication protocol
+<LI><STRONG>usmNoAuthProtocol</STRONG> -- no authentication to use
+</UL>
 
 <P>
 Optional <STRONG>privProtocol</STRONG> parameter may be used to specify 
-non-default ciphering algorithm. Possible values include
-<STRONG>usmDESPrivProtocol</STRONG>,
-<STRONG>usmAesCfb128Protocol</STRONG>, and
-<STRONG>usmNoPrivProtocol</STRONG>.
+non-default ciphering algorithm. Possible values include:
 </P>
+<P>
+<UL>
+<LI><STRONG>usmDESPrivProtocol</STRONG> -- DES-based encryption protocol
+<LI><STRONG>usmAesCfb128Protocol</STRONG> -- AES128-based encryption protocol (<A HREF="http://www.ietf.org/rfc/rfc3826.txt">RFC3826</A>)
+<LI><STRONG>usm3DESEDEPrivProtocol</STRONG> -- triple DES-based encryption protocol (<A HREF="http://www.snmp.com/protocol/eso.shtml">Extended Security Options</A>)
+<LI><STRONG>usmAesCfb192Protocol</STRONG> -- AES192-based encryption protocol (<A HREF="http://www.snmp.com/protocol/eso.shtml">Extended Security Options</A>)
+<LI><STRONG>usmAesCfb256Protocol</STRONG> -- AES256-based encryption protocol (<A HREF="http://www.snmp.com/protocol/eso.shtml">Extended Security Options</A>)
+<LI><STRONG>usmNoPrivProtocol</STRONG> -- no encryption to use
+</UL>
+
+<P>
+All these symbols are defined in 
+<STRONG>pysnmp.entity.rfc3413.oneliner.cmdgen</STRONG> module.
+</P>
+
 </DD>
 </DL>
 
@@ -1539,62 +1570,34 @@ of succesive request retries (5 times).
 
 <A NAME="OIDVAL-IMPL">
 <P>
-In PySNMP programming context, <A HREF="#MANAGED-OBJECTS">
-Managed Object</A> term (also called <STRONG>Variable-Binding</STRONG> in
-protocol specifications) refers to a tuple of Managed Object (or 
-Managed Object Instance) Name and Managed Object Instance Value.
+At the protocol level, each <A HREF="#MANAGED-OBJECTS">Managed Object</A>
+instance is represented by a pair of Name and Value collectively called
+a <STRONG>Variable-Binding</STRONG>.
 </P>
 
 <P>
-Managed Objects Names and Values are <A HREF="#ASN1">ASN.1</A> types.
-Both Names and Values are derived from 
-<A HREF="http://pyasn1.sf.net">PyASN1</A> classes. These are defined in
-<STRONG>pysnmp.proto.rfc1902</STRONG> module.
+In PySNMP programming context, at the high-level API, each Managed Object is
+represented by a tuple of two class instances -- one represents Managed 
+Object Instance Name, and another -- its value.
 </P>
 
 <A NAME="OID-IMPL">
 <P>
-Managed Object Name is a tuple or tuple-like
-<A HREF="#OID">Object Identifier</A> class instance.
+Managed Object Name is an instance of <STRONG>ObjectName</STRONG> class,
+which is derived from PyASN1
+<A HREF="http://pyasn1.sourceforge.net/#1.1.8">ObjectIdentifier</A>.
+In most cases, PySNMP APIs will automatically create an instance of
+ObjectIdentifier class from its initialization value. Therefore it's
+allowed to use a plain tuple of integers as a Managed Object Name.
 </P>
-
-<DL>
-<DT>class <STRONG>ObjectIdentifier</STRONG>(
-<STRONG>objectIdentifier</STRONG>
-)</DT>
-<DD>
-<P>
-Create an <A HREF="#OID">ASN.1 Object Identifier</A> object. The
-<STRONG>objectIdentifier</STRONG> parameter represents Object Identifier
-value. It should be either a tuple or tuple-like object or a string
-representing Object Identifier in dotted notation (like "1.3.6.1").
-</P>
-
-<P>
-Instances of this class mimic basic properties of Python tuple. Sub-OIDs 
-of an OID translate into tuple components.
-</P>
-
-<P>
-For more information on <STRONG>ObjectIdentifier</STRONG> class properties,
-refer to <A HREF="http://pyasn1.sf.net">PyASN1</A> documentation.
-</P>
-</DD>
-</DL>
 
 <A NAME="VAL-IMPL">
-<P>
-It's PySNMP the design decision to always use <A HREF="#SMI">SMIv2</A>
-definitions for Managed Objects regardless of SNMP protocol version being 
-used.
-</P>
-
 <P>
 Managed Object Instance Value is an instance of some
 <A HREF="http://pyasn1.sf.net">PyASN1</A> class or its
 SNMP-specific derivative. The latter case reflects SNMP-specific
 <A HREF="#ASN1">ASN.1</A> sub-type. The list of Managed Object 
-Instance Value classes follows.
+Instance Value classes follow.
 </P>
 
 <A NAME="INTEGER-IMPL"></A>
@@ -1606,7 +1609,8 @@ Instance Value classes follows.
 <P>
 Create a SMIv2 <STRONG>Integer</STRONG> object. The <STRONG>value</STRONG>
 parameter should be an integer value. Instances of this class mimic basic 
-properties of a Python integer.
+properties of a Python integer. SMIv2 Integer class is derived from
+PyASN1 <A HREF="http://pyasn1.sourceforge.net/#1.1.3">Integer</A>.
 </P>
 </DD>
 </DL>
@@ -1624,6 +1628,22 @@ Create a SMIv2 <STRONG>Integer32</STRONG> object. This object is similar to
 </DD>
 </DL>
 
+<A NAME="OBJECTIDENTIFIER-IMPL"></A>
+<DL>
+<DT>class <STRONG>OctetIdentifier</STRONG>(
+<STRONG>value</STRONG>
+)</DT>
+<DD>
+<P>
+Create a SMIv2 <STRONG>OctetIdentifier</STRONG> object. 
+The <STRONG>value</STRONG>
+parameter could be a tuple of integer sub-IDs or a human-friendly
+string form like ".1.3.6.1.3.1". SMIv2 OctetString class is derived from
+PyASN1 <A HREF="http://pyasn1.sourceforge.net/#1.1.8">OctetIdentifier</A>.
+</P>
+</DD>
+</DL>
+
 <A NAME="OCTETSTRING-IMPL"></A>
 <DL>
 <DT>class <STRONG>OctetString</STRONG>(
@@ -1633,7 +1653,8 @@ Create a SMIv2 <STRONG>Integer32</STRONG> object. This object is similar to
 <P>
 Create a SMIv2 <STRONG>OctetString</STRONG> object. The <STRONG>value</STRONG>
 parameter should be a string value. Instances of this class mimic basic
-properties of a Python string.
+properties of a Python string. SMIv2 OctetString class is derived from
+PyASN1 <A HREF="http://pyasn1.sourceforge.net/#1.1.7">OctetString</A>.
 </P>
 </DD>
 </DL>
@@ -1647,7 +1668,8 @@ properties of a Python string.
 <P>
 Create a SMIv2 <STRONG>IpAddress</STRONG> object. The <STRONG>value</STRONG>
 parameter should be an IP address expressed in quad-dotted notation (e.g. 
-"127.0.0.1").
+"127.0.0.1"). SMIv2 IpAddress class is derived from          
+PyASN1 <A HREF="http://pyasn1.sourceforge.net/#1.1.7">OctetString</A>.
 </P>
 </DD>
 </DL>
@@ -1744,10 +1766,19 @@ class instance.
 <P>
 Create a SMIv2 <STRONG>Bits</STRONG> object. The <STRONG>value</STRONG>
 parameter should be sequence of names of bits raised to one. Unmentioned
-bits default to zero.
+bits default to zero. The Bits class is derived from
+PyASN1 <A HREF="http://pyasn1.sourceforge.net/#1.1.7">OctetString</A>.
+
 </P>
 </DD>
 </DL>
+
+<P>
+It's PySNMP design decision to always use <A HREF="#SMI">SMIv2</A>
+definitions for Managed Objects at the high-level API regardless of SNMP
+protocol version being used. For instance, an SNMPv3 Manager will always report
+SMIv2 types even when talking to SNMPv1 Agent (which is SMIv1-compliant).
+</P>
 
 <P>
 For more information on SNMP Managed Value objects properties,
@@ -2221,9 +2252,9 @@ loaded up and Managed Object definition looked up by symbolic name:
 >>>
 >>> # get Managed Object definition by symbol name
 ... mibNode, = mibBuilder.importSymbols('SNMPv2-MIB', 'sysDescr')
->>> print mibNode.getName()
+>>> print(mibNode.getName())
 (1, 3, 6, 1, 2, 1, 1, 1)
->>> print repr(mibNode.getSyntax())
+>>> print(repr(mibNode.getSyntax()))
 DisplayString('')
 >>>
 </PRE>
@@ -2334,11 +2365,11 @@ raised.
 >>> mibViewController = view.MibViewController(mibBuilder)
 >>> 
 >>> oid, label, suffix = mibViewController.getNodeName((1,3,6,1,2,'mib-2',1,'sysDescr'))
->>> print oid
+>>> print(oid)
 (1, 3, 6, 1, 2, 1, 1, 1)
->>> print label
+>>> print(label)
 ('iso', 'org', 'dod', 'internet', 'mgmt', 'mib-2', 'system', 'sysDescr')
->>> print suffix
+>>> print(suffix)
 ()
 </PRE>
 </TD></TR></TABLE>
@@ -2408,11 +2439,11 @@ as used in <A HREF="#MibBuilder">MibBuilder</A> interface. The
 >>> mibViewController = view.MibViewController(mibBuilder)
 >>> 
 >>> modName, symName, suffix = mibViewController.getNodeLocation((1,3,6,1,2,1,1,1,123))
->>> print modName
+>>> print(modName)
 SNMPv2-MIB
->>> print symName
+>>> print(symName)
 sysDescr
->>> print suffix
+>>> print(suffix)
 (123,)
 </PRE>
 </TD></TR></TABLE>
@@ -3105,7 +3136,7 @@ octet-streams manipulations.
 
 <I>
 <P>
-Warning! This document is a draft. 
+Disclaimer: this document is a work-in-progress. 
 It is neither complete nor accurate. 
 Take it with a grain of salt!
 </P>

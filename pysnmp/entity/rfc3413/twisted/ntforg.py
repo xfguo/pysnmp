@@ -1,5 +1,6 @@
 from twisted.internet import reactor, defer
 from pysnmp.entity.rfc3413 import ntforg
+from pyasn1.compat.octets import null
 
 class NotificationOriginator(ntforg.NotificationOriginator):
     def sendNotification(
@@ -8,7 +9,7 @@ class NotificationOriginator(ntforg.NotificationOriginator):
         notificationTarget,
         notificationName,
         additionalVarBinds=None,
-        contextName=''
+        contextName=null
         ):
         df = defer.Deferred()
         ntforg.NotificationOriginator.sendNotification(
@@ -19,7 +20,7 @@ class NotificationOriginator(ntforg.NotificationOriginator):
             additionalVarBinds,
             None,
             df,
-            contextName=''
+            contextName=null
             )
         return df
 

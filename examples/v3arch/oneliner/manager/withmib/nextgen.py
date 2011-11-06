@@ -1,5 +1,4 @@
 # GETNEXT Commnd Generator with MIB resolution
-import string
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.entity.rfc3413 import mibvar
 
@@ -25,13 +24,14 @@ errorIndication, errorStatus, errorIndex, \
     )
 
 if errorIndication:
-    print errorIndication
+    print(errorIndication)
 else:
     if errorStatus:
-        print '%s at %s\n' % (
+        print('%s at %s' % (
             errorStatus.prettyPrint(),
             varBindTable[-1][int(errorIndex)-1]
             )
+        )
     else:
         for varBindTableRow in varBindTable:
             for oid, val in varBindTableRow:
@@ -41,8 +41,9 @@ else:
                 val = mibvar.cloneFromMibValue(
                     cmdGen.mibViewController, modName, symName, val
                     )
-                print '%s::%s.%s = %s' % (
+                print('%s::%s.%s = %s' % (
                     modName, symName,
-                    string.join(map(lambda v: v.prettyPrint(), indices), '.'),
+                    '.'.join([ v.prettyPrint() for v in indices]),
                     val.prettyPrint()
                     )
+                )

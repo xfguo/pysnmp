@@ -35,19 +35,20 @@ config.addSocketTransport(
 def cbFun(sendRequestHandle, errorIndication, errorStatus, errorIndex,
           varBindTable, cbCtx):
     if errorIndication:
-        print errorIndication
+        print(errorIndication)
         return
     # SNMPv1 response may contain noSuchName error *and* SNMPv2c exception,
     # so we ignore noSuchName error here
     if errorStatus and errorStatus != 2:
-        print '%s at %s\n' % (
+        print('%s at %s' % (
             errorStatus.prettyPrint(),
             errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
             )
+        )
         return  # stop on error
     for varBindRow in varBindTable:
         for oid, val in varBindRow:
-            print '%s = %s' % (oid.prettyPrint(), val.prettyPrint())
+            print('%s = %s' % (oid.prettyPrint(), val.prettyPrint()))
     return 1 # continue walking
 
 cmdgen.NextCommandGenerator().sendReq(

@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 # Walk libsmi-generated tree of MIB symbols and build pysnmp.smi
 # compliant module
-from exceptions import StandardError
-from string import split, join, replace, find, atol, atoi
-from types import StringType, DictType
 import sys, time
 
-version = '0.0.10-beta'
+version = '0.1.1'
 genTextLoader = 1
 
-class Error(StandardError): pass
+class Error(Exception): pass
 
 if len(sys.argv) > 1:
     if sys.argv[1] == '--no-text':
@@ -42,10 +39,8 @@ g = {}
 
 try:
     eval(codeObj, g)
-except StandardError, why:
-    raise Error(
-        'MIB module load error: %s' % why
-        )
+except Exception:
+    raise Error('MIB module load error: %s' % (sys.exc_info[1],))
 
 mib = g['MIB']
 
@@ -68,90 +63,70 @@ __symsTable = {
     }
 
 def symTrans(symbol):
-    if __symsTable.has_key(symbol):
+    if symbol in __symsTable:
         return __symsTable[symbol]
     return symbol,
 
 def transOpers(symbol):
-    return replace(symbol, '-', '_')
+    return symbol.replace('-', '_')
 
 def addLabelForSymbol(symbol):
-    if find(symbol, '-') != -1:
+    if symbol.find('-') != -1:
         return '.setLabel(\"%s\")' % symbol
     return ''
 
-__oidToTuple = lambda x: str(tuple(map(lambda y: int(y), split(x, '.'))))
+__oidToTuple = lambda x: str(tuple([ int(y) for y in x.split('.') ]))
 
 def __reprIntVal(value):
     try:
-        intVal = atoi(value)
+        return int(value)
     except ValueError:
-        try:
-            intVal = atol(value)
-        except ValueError:
-            return repr(value)
-    if -2147483647 < intVal < 2147483647:
-        return repr(intVal)
-    else:
-        return repr(long(intVal))
+        return repr(value)
     
 def __genDefVal(baseType, symDef):
     if baseType == 'OctetString':
         if symDef['default'][:2] == '0x':
-            defVal = ''
-            for i in range(2, len(symDef['default']), 2):
-                defVal = defVal + chr(
-                    atoi(symDef['default'][i:i+2], 16)
-                    )
+            return '%s' % repr(symDef['default'][2:]), True
         else:
-            defVal = symDef['default']
-        return '%s' % repr(defVal)
+            return '%s' % repr(symDef['default']), False
     elif baseType == 'Integer':
-        return '%s' % __reprIntVal(symDef['default'])
-    elif baseType == 'Integer32':
-        return '%s' % __reprIntVal(symDef['default'])
+        return '%s' % __reprIntVal(symDef['default']), False
+    elif baseType in ('Integer32', 'Unsigned32'):
+        return '%s' % __reprIntVal(symDef['default']), False
     elif baseType == 'ObjectIdentifier':
-        return '%s' % __oidToTuple(symDef['default'])
+        return '%s' % __oidToTuple(symDef['default']), False
     elif baseType == 'IpAddress':
         defVal = ''
         for i in range(2, len(symDef['default']), 2):
             if defVal: defVal = defVal + '.'
             defVal = defVal + str(
-                atoi(symDef['default'][i:i+2], 16)
+                int(symDef['default'][i:i+2], 16)
                 )
-        return '\"%s\"' % defVal
+        return '\"%s\"' % defVal, False
     elif baseType == 'Bits':
         defVal = '('
-        for bit in split(replace(
-            replace(replace(symDef['default'], ',', ''), '(', ''), ')', ''
-            )):
+        for bit in symDef['default'].replace(',', '').replace('(', '').replace(')', '').split():
             defVal = defVal + '\"%s\",' % bit
         defVal = defVal + ')'
-        return defVal
+        return defVal, False
     elif baseType == 'Enumeration':
-        if symDef['syntax']['type'].has_key(symDef['default']):
+        if symDef['default'] in symDef['syntax']['type']:
             return '%s' % \
-                   symDef['syntax']['type'][symDef['default']]['number']
+                   symDef['syntax']['type'][symDef['default']]['number'], False
         else:
-            return '\"%s\"' % symDef['default']
+            return '\"%s\"' % symDef['default'], False
     else:
         sys.stderr.write('WARNING: guessing DEFVAL type \'%s\' for %s\n' %
                          (symDef['default'], baseType))
         if symDef['default'][:2] == '0x':
-            defVal = ''
-            for i in range(2, len(symDef['default']), 2):
-                defVal = defVal + chr(
-                    atoi(symDef['default'][i:i+2], 16)
-                    )
+            return '%s' % repr(symDef['default'][2:]), True
         else:
             defVal = symDef['default']
             try:
-                atol(defVal)
+                int(defVal)
             except ValueError:
                 pass
-            else:
-                return defVal
-        return '%s' % repr(defVal)
+            return '%s' % repr(defVal), False
 
 # Ugly kludge against smidump bug which does not distinguish
 # size/range constraints
@@ -163,29 +138,29 @@ __buggySmiTypes = {
     'NetworkAddress': 'IpAddress' # this is up to smidump, but it does not care
     }
 
-def __genTypeDef((symName, symDef), classMode=0):
+def __genTypeDef(symName, symDef, classMode=0):
     r = ''
     if classMode:
         typeDef = symDef
         identFiller = '    ';  identValue = 0
     else:
         typeDef = symDef['syntax']['type']
-    if typeDef.has_key('name'):
+    if 'name' in typeDef:
         baseType = typeDef['name']
-    if typeDef.has_key('basetype'):
+    if 'basetype' in typeDef:
         baseType = typeDef['basetype']
-    if typeDef.has_key('parent module'):
+    if 'parent module' in typeDef:
         parentType = typeDef['parent module']['type']
     else:
         parentType = baseType
     # Ugly hack to overcome smidump bug in smiv1->smiv2 convertion
-    if __buggySmiTypes.has_key(baseType):
+    if baseType in __buggySmiTypes:
         baseType = __buggySmiTypes[baseType]
-    if __buggySmiTypes.has_key(parentType):
+    if parentType in __buggySmiTypes:
         parentType = __buggySmiTypes[parentType]
     if classMode:
         r = r + 'class %s(' % symName
-        if typeDef.has_key('format'):
+        if 'format' in typeDef:
             r = r + '%s, ' % symTrans('TEXTUAL-CONVENTION')[0]
         identValue = identValue + 1
     if baseType in ('Enumeration', 'Bits'):
@@ -193,7 +168,8 @@ def __genTypeDef((symName, symDef), classMode=0):
             parentType = 'Integer'
         if classMode:
             r = r + '%s):\n' % parentType
-            r = r + identFiller*identValue            
+            r = r + identFiller*identValue
+            _r = r
         else:
             r = r + ', %s()' % parentType
         if baseType == 'Enumeration':
@@ -207,8 +183,8 @@ def __genTypeDef((symName, symDef), classMode=0):
             r = r + 'constraint.SingleValueConstraint('
             cnt = 1
             for e, v in typeDef.items():
-                if type(v) == DictType and v.has_key('nodetype') \
-                       and v['nodetype'] == 'namednumber':
+                if isinstance(v, dict) and 'nodetype' in v and \
+                       v['nodetype'] == 'namednumber':
                     r = r + '%s,' % v['number']
                     if cnt % 127 == 0:
                         r = r + '), constraint.SingleValueConstraint('
@@ -224,12 +200,12 @@ def __genTypeDef((symName, symDef), classMode=0):
             r = r + 'namedValues = namedval.NamedValues('
         else:
             r = r + '.subtype(namedValues=namedval.NamedValues('
-        typedesc = typeDef.items()
-        typedesc.sort(lambda x,y: cmp(x[1],y[1]))
+        typedesc = list(typeDef.items())
+        typedesc.sort(key=lambda x: str(x[1]))
         cnt = 1
         for e, v in typedesc:
-            if type(v) == DictType and v.has_key('nodetype') \
-              and v['nodetype'] == 'namednumber':
+            if isinstance(v, dict) and 'nodetype' in v and \
+                   v['nodetype'] == 'namednumber':
                 r = r + '(\"%s\", %s), ' % (e, v['number'])
                 if cnt % 127 == 0:
                     r = r + ') + namedval.NamedValues('
@@ -243,24 +219,25 @@ def __genTypeDef((symName, symDef), classMode=0):
         if classMode:
             r = r + '%s):\n' % parentType
             r = r + identFiller*identValue
+            _r = r
         else:
             r = r + ', %s()' % parentType
         if classMode:
-            if typeDef.has_key('format'):
+            if 'format' in typeDef:
                 r = r + 'displayHint = \"%s\"\n' % typeDef['format']
                 r = r + identFiller*identValue
-        if __kludgyStringTypes.has_key(baseType):
+        if baseType in __kludgyStringTypes:
             __subtypeSpec = 'constraint.ValueSizeConstraint'
         else:
             __subtypeSpec = 'constraint.ValueRangeConstraint'
  
         single_range = 0
-        if typeDef.has_key('range'):
+        if 'range' in typeDef:
            single_range = 1
         # ATTENTION: libsmi-0.4.5 does not support "ranges". Use libsmi
         # SVN version or an older patch from Randy Couey:
         # http://www.glas.net/~ilya/download/tools/pysnmp/libsmi-0.4.5-perl_python_range_union.patch
-        if typeDef.has_key('ranges'):
+        if 'ranges' in typeDef:
             # if more than one size/range is given, then we need to 
             # create a ContraintsUnion to hold all of them.
             if len(typeDef['ranges']) > 1:
@@ -281,27 +258,33 @@ def __genTypeDef((symName, symDef), classMode=0):
             if classMode:
                 r = r + 'subtypeSpec = %s.subtypeSpec+%s(%s,%s)\n' % (parentType, __subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
                 r = r + identFiller*identValue
-                if __kludgyStringTypes.has_key(baseType) and \
+                if baseType in __kludgyStringTypes and \
                        typeDef['range']['min'] == typeDef['range']['max']:
                     r = r + 'fixedLength = %s\n' % typeDef['range']['min']
                     r = r + identFiller*identValue
             else:
                 r = r + '.subtype(subtypeSpec=%s(%s, %s))' % (__subtypeSpec, __reprIntVal(typeDef['range']['min']), __reprIntVal(typeDef['range']['max']))
-                if __kludgyStringTypes.has_key(baseType) and \
+                if baseType in __kludgyStringTypes and \
                        typeDef['range']['min'] == typeDef['range']['max']:
                     r = r + '.setFixedLength(%s)' % typeDef['range']['min']
 
-    if symDef.has_key('default') and not symDef.has_key('basetype'):
-        defVal = __genDefVal(baseType, symDef)
-        if classMode:
-            if defVal is not None:
-                r = r + 'defaultValue = %s\n' % defVal
-        else:
-            if defVal is not None:
-                r = r + '.clone(%s)' % defVal
+    if 'default' in symDef and 'basetype' not in symDef:
+        defVal, inHex = __genDefVal(baseType, symDef)
+        if defVal is not None:        
+            if classMode:
+                if inHex:
+                    r = r + 'defaultHexValue = %s\n' % defVal
+                else:
+                    r = r + 'defaultValue = %s\n' % defVal
+            else:
+                if inHex:
+                    r = r + '.clone(hexValue=%s)' % defVal
+                else:
+                    r = r + '.clone(%s)' % defVal
     if classMode:
-        r = r + 'pass\n\n'
-        
+        if r == _r:
+            r = r + 'pass\n'
+        r = r + '\n'
     return r
 
 out.write(
@@ -327,14 +310,15 @@ for imp in (
     { 'module': 'SNMPv2-SMI', 'name': 'TimeTicks' }, # bug in some IETF MIB
     { 'module': 'SNMPv2-SMI', 'name': 'MibIdentifier' }, # OBJECT IDENTIFIER
     ) + mib.get('imports', ()):
-    if not imports.has_key(imp['module']):
+    if imp['module'] not in imports:
         imports[imp['module']] = []
     if not imp['module']:
         sys.stderr.write('WARNING: empty MIB module name seen in smidump output at %s\n' % dstModName)
     imports[imp['module']].append(imp['name'])
-map(lambda x:x.sort(), imports.values())
 
-modNames = imports.keys(); modNames.sort()
+[ x.sort() for x in imports.values() ]
+
+modNames = list(imports.keys()); modNames.sort()
 for modName in modNames:
     out.write('( ')
     for symName in imports[modName]:
@@ -346,27 +330,24 @@ for modName in modNames:
             out.write(', \"%s\"' % s)
     out.write(')\n')
 
-if mib.has_key('typedefs'):
-    typedefs = mib['typedefs'].items(); typedefs.sort()
+if 'typedefs' in mib:
+    typedefs = list(mib['typedefs'].items()); typedefs.sort()
 else:
     typedefs = ()
 
 if typedefs:
     out.write('\n# Types\n\n')
     for symName, symDef in typedefs:
-        out.write('%s' % __genTypeDef((symName, symDef), 1))
+        out.write('%s' % __genTypeDef(symName, symDef, 1))
 
-if mib.has_key(dstModName) and mib[dstModName].has_key('identity node'):
+if dstModName in mib and 'identity node' in mib[dstModName]:
     moduleIdentityNode = mib[dstModName]['identity node']
 else:
     moduleIdentityNode = ''
 
-if mib.has_key('nodes'):
-    nodes = mib['nodes'].items()
-    __oid2num = lambda o: map(lambda x: atol(x), split(o, '.'))
-    nodes.sort(lambda x,y,f=__oid2num: cmp(
-        f(x[1].get('oid')), f(y[1].get('oid'))
-        ))
+if 'nodes' in mib:
+    nodes = list(mib['nodes'].items())
+    nodes.sort(key=lambda x: [ int(y) for y in x[1].get('oid').split('.') ])
 else:
     nodes = ()
     
@@ -378,33 +359,33 @@ if nodes:
             out.write('%s = ' % transOpers(symName))
             if symName == moduleIdentityNode:
                 out.write('ModuleIdentity(%s)' % __oidToTuple(symDef['oid']))
-                if mib.has_key(dstModName):
+                if dstModName in mib:
                     m = mib[dstModName]
-                    if m.has_key("revisions"):
+                    if 'revisions' in m:
                         out.write('.setRevisions((')
                         for r in m["revisions"]:
                             out.write('\"%s\",' % r["date"])
                         out.write('))')
                 out.write('%s' % addLabelForSymbol(symName))
                 if genTextLoader:
-                    if m.has_key('organization'):
-                        out.write('\nif mibBuilder.loadTexts: %s.setOrganization("%s")' % (transOpers(symName), replace(m['organization'], '\n', '\\n')))
-                    if m.has_key('contact'):
-                        out.write('\nif mibBuilder.loadTexts: %s.setContactInfo("%s")' % (transOpers(symName), replace(m['contact'], '\n', '\\n')))
-                    if m.has_key('description'):
-                        out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(m['description'], '\n', '\\n')))
+                    if 'organization' in m:
+                        out.write('\nif mibBuilder.loadTexts: %s.setOrganization("%s")' % (transOpers(symName), m['organization'].replace('\n', '\\n')))
+                    if 'contact' in m:
+                        out.write('\nif mibBuilder.loadTexts: %s.setContactInfo("%s")' % (transOpers(symName), m['contact'].replace('\n', '\\n')))
+                    if 'description' in m:
+                        out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), m['description'].replace('\n', '\\n')))
                 out.write('\n')
                 continue
-            elif symDef.has_key("description"):
+            elif 'description' in symDef:
                 out.write('ObjectIdentity(%s)' % __oidToTuple(symDef['oid']))
             else:
                 out.write('MibIdentifier(%s)' % __oidToTuple(symDef['oid']))
         elif symDef['nodetype'] == 'scalar':
             out.write('%s = ' % transOpers(symName))            
             out.write('MibScalar(%s' % __oidToTuple(symDef['oid']))
-            out.write('%s)' % __genTypeDef((symName, symDef)))
+            out.write('%s)' % __genTypeDef(symName, symDef))
             out.write('.setMaxAccess(\"%s\")' % symDef['access'])
-            if symDef.has_key('units'):
+            if 'units' in symDef:
                 out.write('.setUnits(\"%s\")' % symDef['units'])
         elif symDef['nodetype'] == 'table':
             out.write('%s = ' % transOpers(symName))            
@@ -413,12 +394,12 @@ if nodes:
             out.write('%s = ' % transOpers(symName))            
             # determine if row creation is permitted, and store
             # status for later inspection by column nodes.
-            if symDef.has_key('create'):
+            if 'create' in symDef:
                 row_create[symDef['oid']] = symDef['create']
             else:
                 row_create[symDef['oid']] = 'false'
             out.write('MibTableRow(%s)' % __oidToTuple(symDef['oid']))
-            if symDef['linkage'] and type(symDef['linkage'][0]) == StringType:
+            if symDef['linkage'] and isinstance(symDef['linkage'][0], str):
                 out.write('.setIndexNames(')
                 cnt = 0
                 for idx in symDef['linkage']:
@@ -438,8 +419,8 @@ if nodes:
                     else:
                         modName = dstModName
                     if idx == symDef['linkage'][-1] and \
-                       symDef.has_key("implied") and \
-                       symDef["implied"] == "true":
+                       'implied' in symDef and \
+                       symDef['implied'] == 'true':
                         impliedFlag = 1
                     else:
                         impliedFlag = 0
@@ -451,11 +432,11 @@ if nodes:
         elif symDef['nodetype'] == 'column':
             out.write('%s = ' % transOpers(symName))            
             out.write('MibTableColumn(%s' % __oidToTuple(symDef['oid']))
-            out.write('%s)' % __genTypeDef((symName, symDef)))
+            out.write('%s)' % __genTypeDef(symName, symDef))
             # smidump does not tag columns as read-create.
             # we must check the parent row object to determine if column is
             # createable
-            parent = join(split(symDef['oid'], '.')[:-1], '.')
+            parent = '.'.join(symDef['oid'].split('.')[:-1])
             if row_create[parent] == 'true' and symDef['access']=='readwrite':
                 out.write('.setMaxAccess(\"%s\")' % 'readcreate')
             else:
@@ -470,15 +451,15 @@ if nodes:
         out.write('%s' % addLabelForSymbol(symName))
 
         if genTextLoader:
-            if symDef.has_key("description"):        
-                out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
+            if 'description' in symDef:
+                out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), symDef['description'].replace('\n', '\\n')))
 
         out.write('\n')
         
     out.write('\n# Augmentions\n')
     for symName, symDef in mib['nodes'].items():
         if symDef['nodetype'] == 'row':
-            if symDef['linkage'] and type(symDef['linkage'][0]) == DictType:
+            if symDef['linkage'] and isinstance(symDef['linkage'][0], dict):
                 for idx in symDef['linkage']:
                     for m, indices in idx.items():
                         if m != dstModName:
@@ -491,17 +472,15 @@ if nodes:
                             '%s.registerAugmentions((\"%s\", \"%s\"))\n' % (
                             indices['relatedNode'], dstModName, symName
                             ))
-                        out.write(
-                            'apply(%s.setIndexNames, %s.getIndexNames())\n' % (
+                        out.write('%s.setIndexNames(*%s.getIndexNames())\n' % (
                             symName, transOpers(indices['relatedNode'])
                             ))
 
-if mib.has_key('notifications'):
-    notifications = mib['notifications'].items()
-    __oid2num = lambda o: map(lambda x: atol(x), split(o, '.'))
-    notifications.sort(lambda x,y,f=__oid2num: cmp(
-        f(x[1].get('oid')), f(y[1].get('oid'))
-        ))
+if 'notifications' in mib:
+    notifications = list(mib['notifications'].items())
+    notifications.sort(
+        key=lambda x: [ int(y) for y in x[1].get('oid').split('.') ]
+        )
 else:
     notifications = ()
 
@@ -517,16 +496,13 @@ if notifications:
             out.write(')')
             out.write('%s' % addLabelForSymbol(symName))
             if genTextLoader:
-                if symDef.has_key("description"):        
-                    out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
+                if 'description' in symDef:
+                    out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), symDef['description'].replace('\n', '\\n')))
         out.write('\n')
 
-if mib.has_key('groups'):
-    groups = mib['groups'].items()
-    __oid2num = lambda o: map(lambda x: atol(x), split(o, '.'))
-    groups.sort(lambda x,y,f=__oid2num: cmp(
-        f(x[1].get('oid')), f(y[1].get('oid'))
-        ))
+if 'groups' in mib:
+    groups = list(mib['groups'].items())
+    groups.sort(key=lambda x: [ int(y) for y in x[1].get('oid').split('.') ])
 else:
     groups = ()
 
@@ -535,7 +511,7 @@ if groups:
     for symName, symDef in groups:
         out.write('%s = ' % transOpers(symName))
         if symDef['nodetype'] == 'group':
-            if find(symName, 'otification') < 0: # hackerish
+            if symName.find('otification') < 0: # hackerish
                 out.write('ObjectGroup(')
             else:
                 out.write('NotificationGroup(')
@@ -546,16 +522,15 @@ if groups:
             out.write(')')
             out.write('%s' % addLabelForSymbol(symName))
             if genTextLoader:
-                if symDef.has_key("description"):        
-                    out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
+                if 'description' in symDef:
+                    out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), symDef['description'].replace('\n', '\\n')))
         out.write('\n')
 
-if mib.has_key('compliances'):
-    compliances = mib['compliances'].items()
-    __oid2num = lambda o: map(lambda x: atol(x), split(o, '.'))
-    compliances.sort(lambda x,y,f=__oid2num: cmp(
-        f(x[1].get('oid')), f(y[1].get('oid'))
-        ))
+if 'compliances' in mib:
+    compliances = list(mib['compliances'].items())
+    compliances.sort(
+        key=lambda x: [ int(y) for y in x[1].get('oid').split('.') ]
+        )
 else:
     compliances = ()
 
@@ -566,7 +541,7 @@ if compliances:
         if symDef['nodetype'] == 'compliance':
             out.write('ModuleCompliance(')
             out.write('%s)'  % __oidToTuple(symDef['oid']))
-            if symDef.has_key('requires'):
+            if 'requires' in symDef:
                 out.write('.setObjects(')
                 for objName, objDef in symDef['requires'].items():
                     # XXX nodetype not stored
@@ -575,8 +550,8 @@ if compliances:
             # XXX refinements not stored
             out.write('%s' % addLabelForSymbol(symName))
             if genTextLoader:
-                if symDef.has_key("description"):        
-                    out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), replace(symDef['description'], '\n', '\\n')))
+                if 'description' in symDef:
+                    out.write('\nif mibBuilder.loadTexts: %s.setDescription("%s")' % (transOpers(symName), symDef['description'].replace('\n', '\\n')))
         out.write('\n')
 
 out.write('\n# Exports\n\n')
@@ -590,7 +565,7 @@ if moduleIdentityNode:
 if typedefs:
     out.write('# Types\n')
     out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-    idx = 1L
+    idx = 1
     for symName, symObj in typedefs:
         if idx % 127 == 0:
             out.write(')\n')
@@ -602,7 +577,7 @@ if typedefs:
 if nodes:
     out.write('# Objects\n')
     out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)        
-    idx = 1L
+    idx = 1
     for symName, symObj in nodes:
         if idx % 127 == 0:
             out.write(')\n')
@@ -614,7 +589,7 @@ if nodes:
 if notifications:
     out.write('# Notifications\n')
     out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-    idx = 1L
+    idx = 1
     for symName, symObj in notifications:
         if idx % 127 == 0:
             out.write(')\n')
@@ -626,7 +601,7 @@ if notifications:
 if groups:
     out.write('# Groups\n')
     out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-    idx = 1L
+    idx = 1
     for symName, symObj in groups:
         if idx % 127 == 0:
             out.write(')\n')
@@ -638,7 +613,7 @@ if groups:
 if compliances:
     out.write('# Compliances\n')
     out.write('mibBuilder.exportSymbols(\"%s\"' % dstModName)
-    idx = 1L
+    idx = 1
     for symName, symObj in compliances:
         if idx % 127 == 0:
             out.write(')\n')
