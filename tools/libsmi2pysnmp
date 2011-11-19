@@ -297,6 +297,17 @@ out.write("# Python version %s\n\n" % str(sys.version_info))
 
 out.write('# Imports\n\n')
 
+# smidump sometimes does not fully convert into SMIv2
+__replacementModules = {
+    ('RFC1213-MIB', 'mib-2'): ('SNMPv2-SMI', 'mib-2'),
+    ('RFC1213-MIB', 'transmission'): ('SNMPv2-SMI', 'transmission'),    
+    ('RFC1213-MIB', 'ifIndex'): ('IF-MIB', 'ifIndex'),
+    ('RFC1213-MIB', 'ifAdminStatus'): ('IF-MIB', 'ifAdminStatus'),
+    ('RFC1213-MIB', 'ifOperStatus'): ('IF-MIB', 'ifOperStatus'),
+    ('RFC1213-MIB', 'PhysAddress'): ('SNMPv2-TC', 'PhysAddress'),
+    ('RFC1213-MIB', 'ipAdEntAddr'): ('IP-MIB', 'ipAdEntAddr')
+    }
+
 imports = {}
 for imp in (
     { 'module': 'ASN1', 'name': 'Integer' },
@@ -313,6 +324,10 @@ for imp in (
     { 'module': 'SNMPv2-SMI', 'name': 'TimeTicks' }, # bug in some IETF MIB
     { 'module': 'SNMPv2-SMI', 'name': 'MibIdentifier' }, # OBJECT IDENTIFIER
     ) + mib.get('imports', ()):
+    if (imp['module'], imp['name']) in __replacementModules:
+        imp['module'], imp['name'] = __replacementModules[
+            (imp['module'], imp['name'])
+            ]
     if imp['module'] not in imports:
         imports[imp['module']] = []
     if not imp['module']:
@@ -495,6 +510,10 @@ if notifications:
             out.write('NotificationType(%s)'  % __oidToTuple(symDef['oid']))
             out.write('.setObjects(')
             for objName, objDef in symDef['objects'].items():
+                if (objDef['module'], objName) in __replacementModules:
+                    objDef['module'], objName = __replacementModules[
+                        (objDef['module'], objName)
+                        ]
                 out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
             out.write(')')
             out.write('%s' % addLabelForSymbol(symName))
@@ -521,6 +540,10 @@ if groups:
             out.write('%s)'  % __oidToTuple(symDef['oid']))
             out.write('.setObjects(')
             for objName, objDef in symDef['members'].items():
+                if (objDef['module'], objName) in __replacementModules:
+                    objDef['module'], objName = __replacementModules[
+                        (objDef['module'], objName)
+                        ]                
                 out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
             out.write(')')
             out.write('%s' % addLabelForSymbol(symName))
@@ -547,6 +570,10 @@ if compliances:
             if 'requires' in symDef:
                 out.write('.setObjects(')
                 for objName, objDef in symDef['requires'].items():
+                    if (objDef['module'], objName) in __replacementModules:
+                        objDef['module'], objName = __replacementModules[
+                            (objDef['module'], objName)
+                            ]
                     # XXX nodetype not stored
                     out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
                 out.write(')')
