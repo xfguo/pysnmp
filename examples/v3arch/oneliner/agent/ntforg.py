@@ -4,9 +4,9 @@ from pysnmp.proto import rfc1902
 
 ntforg.NotificationOriginator().sendNotification(
     # SNMP v1
-#    ntforg.CommunityData('test-manager', 'public', 0),
+#    ntforg.CommunityData('public', mpModel=0),
     # SNMP v2
-#   ntforg.CommunityData('test-manager', 'public'),
+#   ntforg.CommunityData('public'),
     # SNMP v3
     ntforg.UsmUserData('test-user', 'authkey1', 'privkey1'),
     ntforg.UdpTransportTarget(('localhost', 162)),

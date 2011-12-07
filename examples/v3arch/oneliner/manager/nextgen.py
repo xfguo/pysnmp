@@ -4,9 +4,9 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 errorIndication, errorStatus, errorIndex, \
                  varBindTable = cmdgen.CommandGenerator().nextCmd(
     # SNMP v1
-#    cmdgen.CommunityData('test-agent', 'public', 0),
+#    cmdgen.CommunityData('public', mpModel=0),
     # SNMP v2
-    cmdgen.CommunityData('test-agent', 'public'),
+    cmdgen.CommunityData('public'),
     # SNMP v3
 #    cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
     cmdgen.UdpTransportTarget(('localhost', 161)),

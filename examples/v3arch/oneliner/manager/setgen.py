@@ -5,9 +5,9 @@ from pysnmp.proto import rfc1902
 errorIndication, errorStatus, \
                  errorIndex, varBinds = cmdgen.CommandGenerator().setCmd(
     # SNMP v1
-#    cmdgen.CommunityData('test-agent', 'public', 0),
+#    cmdgen.CommunityData('public', mpModel=0),
     # SNMP v2
-#    cmdgen.CommunityData('test-agent', 'public'),
+#    cmdgen.CommunityData('public'),
     # SNMP v3
     cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
     cmdgen.UdpTransportTarget(('localhost', 161)),
