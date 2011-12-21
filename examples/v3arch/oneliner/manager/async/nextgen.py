@@ -4,8 +4,8 @@ from pysnmp.proto import rfc1902
 
 # ( ( authData, transportTarget, varNames ), ... )
 targets = (
-    # 1-st target (SNMPv1)
-    ( cmdgen.CommunityData('public', mpModel=0),
+    # 1-st target (SNMPv2c -- can't handle v1&v2c with equal communities)
+    ( cmdgen.CommunityData('public'),  # , mpModel=0),
       cmdgen.UdpTransportTarget(('localhost', 161)),
       (rfc1902.ObjectName((1,3,6,1,2,1)), rfc1902.ObjectName((1,3,6,1,3,1)))),
     # 2-nd target (SNMPv2c)
