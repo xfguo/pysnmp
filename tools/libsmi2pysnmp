@@ -508,14 +508,14 @@ if notifications:
         out.write('%s = ' % transOpers(symName))
         if symDef['nodetype'] == 'notification':
             out.write('NotificationType(%s)'  % __oidToTuple(symDef['oid']))
-            out.write('.setObjects(')
+            out.write('.setObjects(*(')
             for objName, objDef in symDef['objects'].items():
                 if (objDef['module'], objName) in __replacementModules:
                     objDef['module'], objName = __replacementModules[
                         (objDef['module'], objName)
                         ]
                 out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
-            out.write(')')
+            out.write(') )')
             out.write('%s' % addLabelForSymbol(symName))
             if genTextLoader:
                 if 'description' in symDef:
@@ -538,14 +538,14 @@ if groups:
             else:
                 out.write('NotificationGroup(')
             out.write('%s)'  % __oidToTuple(symDef['oid']))
-            out.write('.setObjects(')
+            out.write('.setObjects(*(')
             for objName, objDef in symDef['members'].items():
                 if (objDef['module'], objName) in __replacementModules:
                     objDef['module'], objName = __replacementModules[
                         (objDef['module'], objName)
                         ]                
                 out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
-            out.write(')')
+            out.write(') )')
             out.write('%s' % addLabelForSymbol(symName))
             if genTextLoader:
                 if 'description' in symDef:
@@ -568,7 +568,7 @@ if compliances:
             out.write('ModuleCompliance(')
             out.write('%s)'  % __oidToTuple(symDef['oid']))
             if 'requires' in symDef:
-                out.write('.setObjects(')
+                out.write('.setObjects(*(')
                 for objName, objDef in symDef['requires'].items():
                     if (objDef['module'], objName) in __replacementModules:
                         objDef['module'], objName = __replacementModules[
@@ -576,7 +576,7 @@ if compliances:
                             ]
                     # XXX nodetype not stored
                     out.write('(\"%s\", \"%s\"), ' % (objDef['module'], objName))
-                out.write(')')
+                out.write(') )')
             # XXX refinements not stored
             out.write('%s' % addLabelForSymbol(symName))
             if genTextLoader:
