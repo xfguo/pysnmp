@@ -357,14 +357,19 @@ if 'typedefs' in mib:
     while len(typedefs_left):
         delayed = []
         for t in typedefs_left:
-            if t[1]['parent module']['name'] == 'SNMPv2-TC' or \
-                    t[1]['parent module']['type'] in typedefs_seen:
+            if t[1]['parent module']['name'] in { \
+                # implicitly imported MIBs
+                'SNMPv2-TC',
+                'SNMPv2-SMI'
+                } or t[1]['parent module']['type'] in typedefs_seen:
                 typedefs_seen.add(t[0])
                 typedefs.append(t)
                 continue
             delayed.append(t)
         if len(delayed) == len(typedefs_left):
-            sys.stderr.write('WARNING: %d unresolvable types found\n' % len(delayed))
+            for t in typedefs_left:
+                sys.stderr.write('WARNING: unresolved type %s(%s::%s)\n' % (t[0], t[1]['parent module']['name'], t[1]['parent module']['type']))
+            sys.stderr.write('WARNING: %d unresolvable types used\n' % len(delayed))
             typedefs.extend(typedefs_left)
             break
         typedefs_left = delayed        
