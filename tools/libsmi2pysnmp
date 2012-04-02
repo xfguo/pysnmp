@@ -3,7 +3,7 @@
 # compliant module
 import sys, time
 
-version = '0.1.2'
+version = '0.1.3'
 genTextLoader = 1
 
 class Error(Exception): pass
@@ -349,7 +349,25 @@ for modName in modNames:
     out.write(')\n')
 
 if 'typedefs' in mib:
-    typedefs = list(mib['typedefs'].items()); typedefs.sort()
+    typedefs = [ item for item in mib['typedefs'].items() if 'parent module' not in item[1] ]
+    typedefs.sort()
+    typedefs_left = [ item for item in mib['typedefs'].items() if 'parent module' in item[1] ]
+    typedefs_left.sort()
+    typedefs_seen = set([ item[0] for item in typedefs ])
+    while len(typedefs_left):
+        delayed = []
+        for t in typedefs_left:
+            if t[1]['parent module']['name'] == 'SNMPv2-TC' or \
+                    t[1]['parent module']['type'] in typedefs_seen:
+                typedefs_seen.add(t[0])
+                typedefs.append(t)
+                continue
+            delayed.append(t)
+        if len(delayed) == len(typedefs_left):
+            sys.stderr.write('WARNING: %d unresolvable types found\n' % len(delayed))
+            typedefs.extend(typedefs_left)
+            break
+        typedefs_left = delayed        
 else:
     typedefs = ()
 
