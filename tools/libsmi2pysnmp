@@ -357,11 +357,11 @@ if 'typedefs' in mib:
     while len(typedefs_left):
         delayed = []
         for t in typedefs_left:
-            if t[1]['parent module']['name'] in { \
+            if t[1]['parent module']['name'] in ( \
                 # implicitly imported MIBs
                 'SNMPv2-TC',
                 'SNMPv2-SMI'
-                } or t[1]['parent module']['type'] in typedefs_seen:
+                ) or t[1]['parent module']['type'] in typedefs_seen:
                 typedefs_seen.add(t[0])
                 typedefs.append(t)
                 continue
