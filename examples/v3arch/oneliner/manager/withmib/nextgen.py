@@ -27,7 +27,7 @@ errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
 #    cmdgen.Udp6TransportTarget(('::1', 161)),
     # Local (UNIX) domain socket
 #    cmdgen.UnixTransportTarget('/tmp/snmp-agent'),
-    # MIB symbol(s) to start walking with:
+    # MIB symbol(s) to start walking with (in tuple, string or MIB symbol form):
     # ((mib-name, mib-symbol), instance-id)
 #    (('TCP-MIB', ''),),
     (('SNMPv2-MIB', ''),),

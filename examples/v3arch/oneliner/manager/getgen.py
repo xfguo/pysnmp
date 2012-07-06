@@ -26,7 +26,7 @@ errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
 #    cmdgen.Udp6TransportTarget(('::1', 161)),
     # Local (UNIX) domain socket
 #    cmdgen.UnixTransportTarget('/tmp/snmp-agent'),
-    # Objects to query:
+    # Objects to query (OID-value pairs):
     # OID in tuple form
     (1,3,6,1,2,1,1,1,0),
     # OID in string form

@@ -30,9 +30,9 @@ errorIndication = ntfOrg.sendNotification(
     # Trap type (TRAP | INFORM)
     'trap',
 #    'inform',
-    # Trap OID
+    # Trap OID (in either tuple, string or MIB symbol form)
     (('SNMPv2-MIB', 'coldStart'),),
-    # Objects to include into TRAP message:
+    # Objects to include into TRAP message (OID-value pairs):
     # MIB symbol: ((mib-name, mib-symbol), instance-id), new-value
     ((('SNMPv2-MIB', 'sysName'), 0), 'new name'),
     # OID in string form, rfc1902 class instance value

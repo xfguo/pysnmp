@@ -27,9 +27,8 @@ errorIndication, errorStatus, errorIndex, varBinds = cmdGen.setCmd(
 #    cmdgen.Udp6TransportTarget(('::1', 161)),
     # Local (UNIX) domain socket
 #    cmdgen.UnixTransportTarget('/tmp/snmp-agent'),
-    # Object(s) to set/modify and their new values:
-    # MIB symbol:
-    # ((mib-name, mib-symbol), instance-id), new-value
+    # Object(s) to set/modify and their new values (OID-value pairs):
+    # MIB symbol: ((mib-name, mib-symbol), instance-id), new-value
     ((('SNMPv2-MIB', 'sysDescr'), 0), 'new name')
     )
 
