@@ -9,7 +9,10 @@ ntforg.NotificationOriginator().sendNotification(
 #   ntforg.CommunityData('public'),
     # SNMP v3
     ntforg.UsmUserData('test-user', 'authkey1', 'privkey1'),
+    # Transport options
     ntforg.UdpTransportTarget(('localhost', 162)),
+#    ntforg.Udp6TransportTarget(('::1', 162)),
+#    ntforg.UnixTransportTarget('/tmp/snmp-manager'),
     # Trap type
 #    'trap',
     'inform',
