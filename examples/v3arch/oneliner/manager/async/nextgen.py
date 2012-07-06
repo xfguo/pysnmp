@@ -7,15 +7,19 @@ targets = (
     # 1-st target (SNMPv2c -- can't handle v1&v2c with equal communities)
     ( cmdgen.CommunityData('public'),  # , mpModel=0),
       cmdgen.UdpTransportTarget(('localhost', 161)),
-      (rfc1902.ObjectName((1,3,6,1,2,1)), rfc1902.ObjectName((1,3,6,1,3,1)))),
-    # 2-nd target (SNMPv2c)
+      ('1.3.6.1.2.1', '1.3.6.1.3.1') ),
+    # 2-nd target (SNMPv2c over IPv4/UDP)
     ( cmdgen.CommunityData('public'),
       cmdgen.UdpTransportTarget(('localhost', 161)),
-      (rfc1902.ObjectName((1,3,6,1,4,1)),) ),
-    # 3-nd target (SNMPv3)
+      ('1.3.6.1.4.1', ) ),
+    # 3-nd target (SNMPv3 over IPv4/UDP)
     ( cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
       cmdgen.UdpTransportTarget(('localhost', 161)),
-      (rfc1902.ObjectName((1,3,6,1,5,1)),) )
+      ('1.3.6.1.5.1', ) )
+    # 4-th target (SNMPv3 over IPv6/UDP)
+#    ( cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
+#      cmdgen.Udp6TransportTarget(('::1', 161)),
+#      ('1.3.6.1.6.1', ) )
     # N-th target
     # ...
     )
