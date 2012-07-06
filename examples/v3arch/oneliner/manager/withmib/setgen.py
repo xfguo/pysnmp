@@ -11,8 +11,10 @@ errorIndication, errorStatus, errorIndex, varBinds = cmdGen.setCmd(
 #    cmdgen.CommunityData('public'),
     # SNMP v3
     cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
-    # Transport
+    # Transport options
     cmdgen.UdpTransportTarget(('localhost', 161)),
+#    cmdgen.Udp6TransportTarget(('::1', 161)),
+#    cmdgen.UnixTransportTarget('/tmp/snmp-agent'),
     # Request variable(s)
     ((('SNMPv2-MIB', 'sysDescr'), 0), 'new name')
     )

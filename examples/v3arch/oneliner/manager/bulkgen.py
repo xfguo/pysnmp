@@ -9,7 +9,10 @@ errorIndication, errorStatus, errorIndex, \
 #    cmdgen.CommunityData('public'),
     # SNMP v3
     cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
+    # Transport options
     cmdgen.UdpTransportTarget(('localhost', 161)),
+#    cmdgen.Udp6TransportTarget(('::1', 161)),
+#    cmdgen.UnixTransportTarget('/tmp/snmp-agent'),
     0, 25,
     (1,3,6,1,2,1,1)
     )

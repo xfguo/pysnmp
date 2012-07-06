@@ -10,7 +10,10 @@ errorIndication, errorStatus, \
 #    cmdgen.CommunityData('public'),
     # SNMP v3
     cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
+    # Transport options
     cmdgen.UdpTransportTarget(('localhost', 161)),
+#    cmdgen.Udp6TransportTarget(('::1', 161)),
+#    cmdgen.UnixTransportTarget('/tmp/snmp-agent'),
     # MIB symbol name, plain string value
     ((('SNMPv2-MIB', 'sysName'), 0), 'new name'),
     # Plain OID name, rfc1902 class instance value
