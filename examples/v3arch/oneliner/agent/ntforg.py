@@ -1,43 +1,128 @@
-# Notification Originator (TRAP/INFORM)
+# Various uses of the Notification Originator (TRAP/INFORM)
 from pysnmp.entity.rfc3413.oneliner import ntforg
 from pysnmp.proto import rfc1902
 
 ntfOrg = ntforg.NotificationOriginator()
 
+# Using
+#     SNMPv2c
+#     over IPv4/UDP
+#     send TRAP notification
+#     with TRAP ID 'coldStart' specified as a MIB symbol
+#     include managed object information specified as a MIB symbol
 errorIndication = ntfOrg.sendNotification(
-    # SNMP v1
-#    ntforg.CommunityData('public', mpModel=0),
-    # SNMP v2c
-#   ntforg.CommunityData('public'),
-    # SNMP v3:
-    # auth MD5, privacy DES
-    ntforg.UsmUserData('test-user', 'authkey1', 'privkey1'),
-    # auth MD5, privacy NONE
-#    ntforg.UsmUserData('test-user', 'authkey1'),
-    # auth NONE, privacy NONE
-#    ntforg.UsmUserData('test-user'),
-    # auth SHA, privacy AES128
-#    ntforg.UsmUserData('test-user', 'authkey1', 'privkey1',
-#                       authProtocol=ntforg.usmHMACSHAAuthProtocol,
-#                       privProtocol=ntforg.usmAesCfb128Protocol ),
-    # Transport options:
-    # IPv4/UDP
+    ntforg.CommunityData('public'),
     ntforg.UdpTransportTarget(('localhost', 162)),
-    # IPv6/UDP
-#    ntforg.Udp6TransportTarget(('::1', 162)),
-    # Local (UNIX) domain socket
-#    ntforg.UnixTransportTarget('/tmp/snmp-agent'),
-    # Trap type (TRAP | INFORM)
     'trap',
-#    'inform',
-    # Trap OID (in either tuple, string or MIB symbol form)
     (('SNMPv2-MIB', 'coldStart'),),
-    # Objects to include into TRAP message (OID-value pairs):
     # MIB symbol: ((mib-name, mib-symbol), instance-id), new-value
-    ((('SNMPv2-MIB', 'sysName'), 0), 'new name'),
-    # OID in string form, rfc1902 class instance value
-    ('1.3.6.1.2.1.1.5.0', rfc1902.OctetString('new name'))
+    ((('SNMPv2-MIB', 'sysName'), 0), 'new name')
     )
 
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
+
+
+# Using
+#     SNMPv1
+#     over IPv4/UDP
+#     send TRAP notification
+#     with Generic Trap #6 (enterpriseSpecific) and Specific Trap 432
+#     with Uptime value 12345
+#     with Agent Address '127.0.0.1'
+#     with Enterprise OID 1.3.6.1.4.1.20408.4.1.1.2
+#     include managed object information '1.3.6.1.2.1.1.1.0' = 'my system'
+errorIndication = ntfOrg.sendNotification(
+    ntforg.CommunityData('public', mpModel=0),
+    ntforg.UdpTransportTarget(('localhost', 162)),
+    'trap',
+    '1.3.6.1.4.1.20408.4.1.1.2.0.432',
+    ('1.3.6.1.2.1.1.3.0', 12345),
+    ('1.3.6.1.6.3.18.1.3.0', '127.0.0.1'),
+    ('1.3.6.1.6.3.1.1.4.3.0', '1.3.6.1.4.1.20408.4.1.1.2'),
+    ('1.3.6.1.2.1.1.1.0', rfc1902.OctetString('my system'))
+    )
+
+if errorIndication:
+    print('Notification not sent: %s' % errorIndication)
+
+
+# Using
+#     SNMPv1
+#     over IPv4/UDP
+#     send TRAP notification
+#     with Generic Trap #1 (warmStart) and Specific Trap 0
+#     with default Uptime
+#     with default Agent Address
+#     with Enterprise OID 1.3.6.1.4.1.20408.4.1.1.2
+#     include managed object information '1.3.6.1.2.1.1.1.0' = 'my system'
+errorIndication = ntfOrg.sendNotification(
+    ntforg.CommunityData('public', mpModel=0),
+    ntforg.UdpTransportTarget(('localhost', 162)),
+    'trap',
+    '1.3.6.1.6.3.1.1.5.2',
+    ('1.3.6.1.6.3.1.1.4.3.0', '1.3.6.1.4.1.20408.4.1.1.2'),
+    ('1.3.6.1.2.1.1.1.0', rfc1902.OctetString('my system'))
+    )
+
+if errorIndication:
+    print('Notification not sent: %s' % errorIndication)
+
+
+# Using
+#     SNMPv3 with MD5 auth and DES privacy protocols
+#     over IPv4/UDP
+#     send INFORM notification
+#     with TRAP ID 'warmStart' specified as a string OID
+#     include managed object information 1.3.6.1.2.1.1.5.0 = 'system name'
+errorIndication = ntfOrg.sendNotification(
+    ntforg.UsmUserData('test-user', 'authkey1', 'privkey1'),
+    ntforg.UdpTransportTarget(('localhost', 162)),
+    'inform',
+    '1.3.6.1.6.3.1.1.5.2',
+    ('1.3.6.1.2.1.1.5.0', rfc1902.OctetString('system name'))
+    )
+
+if errorIndication:
+    print('Notification not sent: %s' % errorIndication)
+
+
+# Using
+#     SNMPv3 with SHA auth and AES128 privacy protocols
+#     over IPv6/UDP
+#     send TRAP notification
+#     with TRAP ID 'authenticationFailure' specified as a MIB symbol
+#     include managed object information 1.3.6.1.2.1.1.1.0 = 'my system'
+#     include managed object information 1.3.6.1.2.1.1.3.0 = 567
+errorIndication = ntfOrg.sendNotification(
+    ntforg.UsmUserData('test-user', 'authkey1', 'privkey1',
+                       authProtocol=ntforg.usmHMACSHAAuthProtocol,
+                       privProtocol=ntforg.usmAesCfb128Protocol),
+    ntforg.Udp6TransportTarget(('::1', 162)),
+    'trap',
+    (('SNMPv2-MIB', 'authenticationFailure'),),
+    ('1.3.6.1.2.1.1.1.0', rfc1902.OctetString('my system')),
+    ('1.3.6.1.2.1.1.3.0', rfc1902.TimeTicks(567))
+    )
+
+if errorIndication:
+    print('Notification not sent: %s' % errorIndication)
+
+
+# Using
+#     SNMPv3 with no auth and privacy protocols
+#     over Local Domain Socket /tmp/snmp-manager
+#     send TRAP notification
+#     with TRAP ID 'authenticationFailure' specified as a MIB symbol
+#     include managed object information 1.3.6.1.2.1.1.2.0 = 1.3.6.1.2.1.1.1
+errorIndication = ntfOrg.sendNotification(
+    ntforg.UsmUserData('test-user'),
+    ntforg.UnixTransportTarget('/tmp/snmp-manager'),
+    'trap',
+    (('SNMPv2-MIB', 'authenticationFailure'),),
+    ('1.3.6.1.2.1.1.2.0', rfc1902.ObjectName('1.3.6.1.2.1.1.1'))
+    )
+
+if errorIndication:
+    print('Notification not sent: %s' % errorIndication)
+
