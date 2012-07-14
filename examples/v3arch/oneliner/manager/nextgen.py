@@ -1,34 +1,22 @@
-# GETNEXT Command Generator
+# Various GETNEXT Command Generator uses
 from pysnmp.entity.rfc3413.oneliner import cmdgen
+from pysnmp import debug
+
+#debug.setLogger(debug.Debug('secmod'))
 
 cmdGen = cmdgen.CommandGenerator()
 
+# Send a series of SNMP GETNEXT requests
+#     with SNMPv2c, community 'public'
+#     over IPv4/UDP
+#     to an Agent at localhost:161
+#     for two OIDs in string form
+#     stop when response OIDs leave the scopes of initial OIDs
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-    # SNMP v1
-#    cmdgen.CommunityData('public', mpModel=0),
-    # SNMP v2c
-#    cmdgen.CommunityData('public'),
-    # SNMP v3:
-    # auth MD5, privacy DES
-    cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
-    # auth MD5, privacy NONE
-#    cmdgen.UsmUserData('test-user', 'authkey1'),
-    # auth NONE, privacy NONE
-#    cmdgen.UsmUserData('test-user'),
-    # auth SHA, privacy AES128
-#    cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1',
-#                       authProtocol=cmdgen.usmHMACSHAAuthProtocol,
-#                       privProtocol=cmdgen.usmAesCfb128Protocol ),
-    # Transport options:
-    # IPv4/UDP
-    cmdgen.UdpTransportTarget(('localhost', 161)),
-    # IPv6/UDP
-#    cmdgen.Udp6TransportTarget(('::1', 161)),
-    # Local (UNIX) domain socket
-#    cmdgen.UnixTransportTarget('/tmp/snmp-agent'),
-    # OIDs to start walking with
-    '1.3.6.1.2.1.1',
-    '1.3.6.1.2.1.2.2.1'
+        cmdgen.CommunityData('public'),
+        cmdgen.UdpTransportTarget(('localhost', 161)),
+        '1.3.6.1.2.1.2.2.1.2',
+        '1.3.6.1.2.1.2.2.1.3',
     )
 
 if errorIndication:
@@ -44,3 +32,133 @@ else:
         for varBindTableRow in varBindTable:
             for name, val in varBindTableRow:
                 print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
+
+
+# Send a series of SNMP GETNEXT requests
+#     with SNMPv1, community 'public'
+#     over IPv4/UDP
+#     to an Agent at localhost:161
+#     for some columns of the IF-MIB::ifEntry table
+#     stop when response OIDs leave the scopes of initial OIDs
+# make sure IF-MIB.py is in search path
+errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
+        cmdgen.CommunityData('public', mpModel=0),
+        cmdgen.UdpTransportTarget(('localhost', 161)),
+        (('IF-MIB', 'ifDescr'),),
+        (('IF-MIB', 'ifType'),),
+        (('IF-MIB', 'ifMtu'),),
+        (('IF-MIB', 'ifSpeed'),),
+        (('IF-MIB', 'ifPhysAddress'),)
+    )
+
+if errorIndication:
+    print(errorIndication)
+else:
+    if errorStatus:
+        print('%s at %s' % (
+            errorStatus.prettyPrint(),
+            errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
+            )
+        )
+    else:
+        for varBindTableRow in varBindTable:
+            for name, val in varBindTableRow:
+                print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
+
+
+# Send a series of SNMP GETNEXT requests
+#     with SNMPv3 with user 'test-user', MD5 auth and DES privacy protocols
+#     over IPv6/UDP
+#     to an Agent at [::1]:161
+#     for all columns of the IF-MIB::ifEntry table
+#     stop when response OIDs leave the scopes of the table
+#     perform response OIDs and values resolution at MIB
+# make sure IF-MIB.py is in search path
+errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
+        cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
+        cmdgen.Udp6TransportTarget(('::1', 161)),
+        (('IF-MIB', 'ifEntry'),),
+        lookupNames=True, lookupValues=True
+    )
+
+if errorIndication:
+    print(errorIndication)
+else:
+    if errorStatus:
+        print('%s at %s' % (
+            errorStatus.prettyPrint(),
+            errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
+            )
+        )
+    else:
+        for varBindTableRow in varBindTable:
+            for name, val in varBindTableRow:
+                (modName, symName), indices = name
+                indices = '.'.join([x.prettyPrint() for x in indices ])
+                print('%s::%s.%s = %s' % (modName, symName, indices, val.prettyPrint()))
+
+
+# Send a series of SNMP GETNEXT requests
+#     with SNMPv3 with user 'test-user', MD5 authentication, no privacy
+#     over IPv4/UDP
+#     to an Agent at localhost:161
+#     for all OIDs in IF-MIB
+#     stop when response OIDs leave the scopes of the table
+#     perform response values resolution at MIB
+# make sure IF-MIB.py is in search path
+
+errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
+        cmdgen.UsmUserData('test-user', 'authkey1'),
+        cmdgen.UdpTransportTarget(('localhost', 161)),
+        (('IF-MIB', ''),),
+        lookupValues=True
+    )
+
+if errorIndication:
+    print(errorIndication)
+else:
+    if errorStatus:
+        print('%s at %s' % (
+            errorStatus.prettyPrint(),
+            errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
+            )
+        )
+    else:
+        for varBindTableRow in varBindTable:
+            for name, val in varBindTableRow:
+                print('%s = %s' % (name, val.prettyPrint()))
+
+
+# Send a series of SNMP GETNEXT requests
+#     with SNMPv3, user 'test-user', SHA auth, AES256 privacy
+#     over Local Domain Sockets
+#     to an Agent at localhost:161
+#     for all OIDs past IF-MIB
+#     run till end-of-mib condition is reported by Agent OR maxRows == 20
+#     ignoring non-increasing OIDs whenever reported by Agent
+# make sure IF-MIB.py is search path
+
+errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
+        cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1',
+                           authProtocol=cmdgen.usmHMACSHAAuthProtocol,
+                           privProtocol=cmdgen.usmAesCfb256Protocol),
+        cmdgen.UdpTransportTarget(('localhost', 161)),
+        (('IF-MIB', ''),),
+        lexicographicMode=True, maxRows=20,
+        ignoreNonIncreasingOid=True
+    )
+
+if errorIndication:
+    print(errorIndication)
+else:
+    if errorStatus:
+        print('%s at %s' % (
+            errorStatus.prettyPrint(),
+            errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
+            )
+        )
+    else:
+        for varBindTableRow in varBindTable:
+            for name, val in varBindTableRow:
+                print('%s = %s' % (name, val.prettyPrint()))
+
