@@ -22,7 +22,6 @@ errorIndication = ntfOrg.sendNotification(
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
 
-
 # Using
 #     SNMPv1
 #     over IPv4/UDP
@@ -46,7 +45,6 @@ errorIndication = ntfOrg.sendNotification(
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
 
-
 # Using
 #     SNMPv1
 #     over IPv4/UDP
@@ -68,15 +66,14 @@ errorIndication = ntfOrg.sendNotification(
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
 
-
 # Using
-#     SNMPv3 with MD5 auth and DES privacy protocols
+#     SNMPv3 user 'usr-md5-des', auth: MD5, priv 3DES
 #     over IPv4/UDP
 #     send INFORM notification
 #     with TRAP ID 'warmStart' specified as a string OID
 #     include managed object information 1.3.6.1.2.1.1.5.0 = 'system name'
 errorIndication = ntfOrg.sendNotification(
-    ntforg.UsmUserData('test-user', 'authkey1', 'privkey1'),
+    ntforg.UsmUserData('usr-md5-des', 'authkey1', 'privkey1'),
     ntforg.UdpTransportTarget(('localhost', 162)),
     'inform',
     '1.3.6.1.6.3.1.1.5.2',
@@ -86,16 +83,15 @@ errorIndication = ntfOrg.sendNotification(
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
 
-
 # Using
-#     SNMPv3 with SHA auth and AES128 privacy protocols
+#     SNMPv3 user 'usr-sha-aes', auth: SHA, priv: AES128
 #     over IPv6/UDP
 #     send TRAP notification
 #     with TRAP ID 'authenticationFailure' specified as a MIB symbol
 #     include managed object information 1.3.6.1.2.1.1.1.0 = 'my system'
 #     include managed object information 1.3.6.1.2.1.1.3.0 = 567
 errorIndication = ntfOrg.sendNotification(
-    ntforg.UsmUserData('test-user', 'authkey1', 'privkey1',
+    ntforg.UsmUserData('usr-sha-aes', 'authkey1', 'privkey1',
                        authProtocol=ntforg.usmHMACSHAAuthProtocol,
                        privProtocol=ntforg.usmAesCfb128Protocol),
     ntforg.Udp6TransportTarget(('::1', 162)),
@@ -110,7 +106,7 @@ if errorIndication:
 
 
 # Using
-#     SNMPv3 with no auth and privacy protocols
+#     SNMPv3 user 'usr-none-none', no auth, no priv
 #     over Local Domain Socket /tmp/snmp-manager
 #     send TRAP notification
 #     with TRAP ID 'authenticationFailure' specified as a MIB symbol

@@ -1,8 +1,5 @@
 # Various uses of GET Command Generator uses
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-from pysnmp import debug
-
-#debug.setLogger(debug.Debug('secmod'))
 
 cmdGen = cmdgen.CommandGenerator()
 
@@ -32,9 +29,6 @@ else:
         for name, val in varBinds:
             print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
 
-#from pysnmp import debug
-
-#debug.setLogger(debug.Debug('all'))
 
 # Send SNMP GET request
 #     with SNMPv1, community 'public'
@@ -47,8 +41,6 @@ errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         ('iso', 'org', 'dod', 'internet', 'mgmt', 'mib-2', 'system', 'sysDescr', 0),
         (('SNMPv2-MIB', 'sysDescr'), 0)
     )
-
-#debug.setLogger(debug.Debug())
 
 # Check for errors and print out results
 if errorIndication:
@@ -66,12 +58,12 @@ else:
 
 
 # Send SNMP GET request
-#     with SNMPv3 with user 'test-user', MD5 auth and DES privacy protocols
+#     with SNMPv3 with user 'usr-md5-des', MD5 auth and DES privacy protocols
 #     over IPv6/UDP
 #     to an Agent at [::1]:161
 #     for three OIDs in string form
 errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-        cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
+        cmdgen.UsmUserData('usr-md5-des', 'authkey1', 'privkey1'),
         cmdgen.Udp6TransportTarget(('::1', 161)),
         '1.3.6.1.2.1.1.1.0',
         '1.3.6.1.2.1.1.2.0',
@@ -94,12 +86,12 @@ else:
 
 
 # Send SNMP GET request
-#     with SNMPv3, user 'test-user', no authentication, no privacy
+#     with SNMPv3, user 'usr-md5-none', MD5 authentication, no privacy
 #     over IPv4/UDP
 #     to an Agent at localhost:161
 #     for IP-MIB::ipAdEntAddr.127.0.0.1 MIB object
 errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-        cmdgen.UsmUserData('test-user'),
+        cmdgen.UsmUserData('usr-md5-none', 'authkey1'),
         cmdgen.UdpTransportTarget(('localhost', 161)),
         (('IP-MIB', 'ipAdEntAddr'), '127.0.0.1')
     )
@@ -120,14 +112,14 @@ else:
 
 
 # Send SNMP GET request
-#     with SNMPv3, user 'test-user', no authentication, no privacy
+#     with SNMPv3, user 'usr-none-none', no authentication, no privacy
 #     over IPv4/UDP
 #     to an Agent at localhost:161
 #     for IP-MIB::ipAdEntAddr.127.0.0.1 MIB object
 #     perform response OIDs and values resolution at MIB
 
 errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-        cmdgen.UsmUserData('test-user'),
+        cmdgen.UsmUserData('usr-none-none'),
         cmdgen.UdpTransportTarget(('localhost', 161)),
         (('IP-MIB', 'ipAdEntAddr'), '127.0.0.1'),
         lookupNames=True, lookupValues=True
@@ -151,12 +143,12 @@ else:
 
 
 # Send SNMP GET request
-#     with SNMPv3, user 'test-user', SHA auth, AES128 privacy
+#     with SNMPv3, user 'usr-sha-aes128', SHA auth, AES128 privacy
 #     over Local Domain Sockets
 #     to an Agent at /tmp/snmp-agent
 #     for TCP-MIB::tcpConnLocalAddress."0.0.0.0".22."0.0.0.0".0 MIB object
 errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-        cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1',
+        cmdgen.UsmUserData('usr-sha-aes128', 'authkey1', 'privkey1',
                            authProtocol=cmdgen.usmHMACSHAAuthProtocol,
                            privProtocol=cmdgen.usmAesCfb128Protocol ),
         cmdgen.UnixTransportTarget('/tmp/snmp-agent'),

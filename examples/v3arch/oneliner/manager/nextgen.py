@@ -67,7 +67,7 @@ else:
 
 
 # Send a series of SNMP GETNEXT requests
-#     with SNMPv3 with user 'test-user', MD5 auth and DES privacy protocols
+#     with SNMPv3 with user 'usr-md5-des', MD5 auth and DES privacy protocols
 #     over IPv6/UDP
 #     to an Agent at [::1]:161
 #     for all columns of the IF-MIB::ifEntry table
@@ -75,7 +75,7 @@ else:
 #     perform response OIDs and values resolution at MIB
 # make sure IF-MIB.py is in search path
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-        cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
+        cmdgen.UsmUserData('usr-md5-des', 'authkey1', 'privkey1'),
         cmdgen.Udp6TransportTarget(('::1', 161)),
         (('IF-MIB', 'ifEntry'),),
         lookupNames=True, lookupValues=True
@@ -99,7 +99,7 @@ else:
 
 
 # Send a series of SNMP GETNEXT requests
-#     with SNMPv3 with user 'test-user', MD5 authentication, no privacy
+#     with SNMPv3, user 'usr-md5-none', MD5 authentication, no privacy
 #     over IPv4/UDP
 #     to an Agent at localhost:161
 #     for all OIDs in IF-MIB
@@ -108,7 +108,7 @@ else:
 # make sure IF-MIB.py is in search path
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-        cmdgen.UsmUserData('test-user', 'authkey1'),
+        cmdgen.UsmUserData('usr-md5-none', 'authkey1'),
         cmdgen.UdpTransportTarget(('localhost', 161)),
         (('IF-MIB', ''),),
         lookupValues=True
@@ -130,7 +130,7 @@ else:
 
 
 # Send a series of SNMP GETNEXT requests
-#     with SNMPv3, user 'test-user', SHA auth, AES256 privacy
+#     with SNMPv3, user 'usr-sha-aes256', SHA auth, AES256 privacy
 #     over Local Domain Sockets
 #     to an Agent at localhost:161
 #     for all OIDs past IF-MIB
@@ -139,7 +139,7 @@ else:
 # make sure IF-MIB.py is search path
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-        cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1',
+        cmdgen.UsmUserData('usr-sha-aes256', 'authkey1', 'privkey1',
                            authProtocol=cmdgen.usmHMACSHAAuthProtocol,
                            privProtocol=cmdgen.usmAesCfb256Protocol),
         cmdgen.UdpTransportTarget(('localhost', 161)),

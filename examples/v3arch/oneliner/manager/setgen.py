@@ -58,13 +58,13 @@ else:
 
 
 # Send SNMP SET request
-#     with SNMPv3 with user 'test-user', MD5 auth and DES privacy protocols
+#     with SNMPv3 with user 'usr-md5-des', MD5 auth and DES privacy protocols
 #     over IPv4/UDP
 #     to an Agent at localhost:161
 #     setting SNMPv2-MIB::sysName.0 to new value (type taken from MIB)
 #     perform response OIDs and values resolution at MIB
 errorIndication, errorStatus, errorIndex, varBinds = cmdGen.setCmd(
-        cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
+        cmdgen.UsmUserData('usr-md5-des', 'authkey1', 'privkey1'),
         cmdgen.UdpTransportTarget(('localhost', 161)),
         ((('SNMPv2-MIB', 'sysName'), 0), 'new system name'),
         lookupNames=True, lookupValues=True

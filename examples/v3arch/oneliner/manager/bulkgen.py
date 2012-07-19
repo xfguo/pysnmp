@@ -34,7 +34,7 @@ else:
 
 
 # Send a series of SNMP GETBULK requests
-#     with SNMPv3 with user 'test-user', MD5 auth and DES privacy protocols
+#     with SNMPv3 with user 'usr-md5-des', MD5 auth and DES privacy protocols
 #     over IPv6/UDP
 #     to an Agent at [::1]:161
 #     with values non-repeaters = 1, max-repetitions = 25
@@ -44,7 +44,7 @@ else:
 # make sure IF-MIB.py and IP-MIB.py are in search path
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.bulkCmd(
-        cmdgen.UsmUserData('test-user', 'authkey1', 'privkey1'),
+        cmdgen.UsmUserData('usr-md5-des', 'authkey1', 'privkey1'),
         cmdgen.Udp6TransportTarget(('::1', 161)),
         1, 25,
         (('IP-MIB', 'ipAdEntAddr'),),
@@ -71,7 +71,7 @@ else:
 
 
 # Send a series of SNMP GETBULK requests
-#     with SNMPv3, user 'test-user', no auth, no privacy
+#     with SNMPv3, user 'usr-none-none', no authentication, no privacy
 #     over Local Domain Sockets
 #     to an Agent at localhost:161
 #     for all OIDs past 1.3.6.1.2.1.1
@@ -80,7 +80,7 @@ else:
 # make sure IF-MIB.py is search path
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.bulkCmd(
-        cmdgen.UsmUserData('test-user'),
+        cmdgen.UsmUserData('usr-none-none'),
         cmdgen.UdpTransportTarget(('localhost', 161)),
         0, 50,
         '1.3.6.1.2.1.1',
