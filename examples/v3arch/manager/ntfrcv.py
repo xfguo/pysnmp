@@ -37,14 +37,14 @@ config.addSocketTransport(
     )
 
 #
-# SNMPv1/2c setup
+# SNMPv1/2c setup (if you need to handle SNMPv1/v2c messages)
 #
 
 # SecurityName <-> CommunityName mapping
-config.addV1System(snmpEngine, 'my-agt', 'public')
+config.addV1System(snmpEngine, 'my-area', 'public')
 
 #
-# SNMPv3/USM setup
+# SNMPv3/USM setup (if you need to handle SNMPv3 messages)
 #
 
 # user: usr-md5-des, auth: MD5, priv DES
