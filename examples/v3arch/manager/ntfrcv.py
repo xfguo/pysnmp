@@ -1,8 +1,8 @@
 # Notification Receiver (TRAP/INFORM)
 from pysnmp.entity import engine, config
-from pysnmp.carrier.asynsock.dgram import udp
+from pysnmp.carrier.asynsock.dgram import udp, udp6, unix
 from pysnmp.entity.rfc3413 import ntfrcv
-from pysnmp import debug
+#from pysnmp import debug
 
 # Optionally enable stdout debugging
 #debug.setLogger(debug.Debug('all'))
@@ -11,25 +11,88 @@ from pysnmp import debug
 # to socket transport dispatcher
 snmpEngine = engine.SnmpEngine()
 
-# Setup transport endpoint
+#
+# Transport setup
+#
+
+# UDP over IPv4
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpSocketTransport().openServerMode(('127.0.0.1', 162))
+    udp.UdpTransport().openServerMode(('127.0.0.1', 162))
+)
+
+# UDP over IPv6
+config.addSocketTransport(
+    snmpEngine,
+    udp6.domainName,
+    udp6.Udp6Transport().openServerMode(('::1', 162))
     )
 
-# v1/2 setup
-config.addV1System(snmpEngine, 'test-agent', 'public')
+# Local domain sockets
+config.addSocketTransport(
+    snmpEngine,
+    unix.domainName,
+    unix.UnixTransport().openServerMode('/tmp/snmp-manager')
+    )
 
-# v3 setup
+#
+# SNMPv1/2c setup
+#
+
+# SecurityName <-> CommunityName mapping
+config.addV1System(snmpEngine, 'my-agt', 'public')
+
+#
+# SNMPv3/USM setup
+#
+
+# user: usr-md5-des, auth: MD5, priv DES
 config.addV3User(
-    snmpEngine, 'test-user',
+    snmpEngine, 'usr-md5-des',
     config.usmHMACMD5AuthProtocol, 'authkey1',
     config.usmDESPrivProtocol, 'privkey1'
-#   '\x80\x00\x4f\xb8\x1c\x3d\xaf\xe6'   # ContextEngineID of
-                                         # Notification Originator
-    )
-    
+)
+
+# user: usr-none-none, auth: NONE, priv NONE
+config.addV3User(
+    snmpEngine, 'usr-none-none'
+)
+
+# user: usr-md5-none, auth: MD5, priv NONE
+config.addV3User(
+    snmpEngine, 'usr-md5-none',
+    config.usmHMACMD5AuthProtocol, 'authkey1'
+)
+
+# user: usr-sha-aes128, auth: SHA, priv AES
+config.addV3User(
+    snmpEngine, 'usr-sha-aes128',
+    config.usmHMACSHAAuthProtocol, 'authkey1',
+    config.usmAesCfb128Protocol, 'privkey1'
+)
+
+# user: usr-md5-aes256, auth: MD5, priv AES256
+config.addV3User(
+    snmpEngine, 'usr-md5-aes256',
+    config.usmHMACMD5AuthProtocol, 'authkey1',
+    config.usmAesCfb256Protocol, 'privkey1'
+)
+
+# user: usr-md5-aes192, auth: MD5, priv AES192
+config.addV3User(
+    snmpEngine, 'usr-md5-aes192',
+    config.usmHMACMD5AuthProtocol, 'authkey1',
+    config.usmAesCfb192Protocol, 'privkey1'
+)
+
+# user: usr-md5-3des, auth: MD5, priv 3DES
+config.addV3User(
+    snmpEngine, 'usr-md5-3des',
+    config.usmHMACMD5AuthProtocol, 'authkey1',
+    config.usm3DESEDEPrivProtocol, 'privkey1'
+)
+
 # Callback function for receiving notifications
 def cbFun(snmpEngine,
           stateReference,
@@ -37,7 +100,7 @@ def cbFun(snmpEngine,
           varBinds,
           cbCtx):
     transportDomain, transportAddress = snmpEngine.msgAndPduDsp.getTransportInfo(stateReference)
-    print('Notification from %s, SNMP Engine %s, Context %s' % (
+    print('Notification from %s, SNMP Engine "%s", Context "%s"' % (
         transportAddress, contextEngineId.prettyPrint(),
         contextName.prettyPrint()
         )
@@ -47,5 +110,12 @@ def cbFun(snmpEngine,
 
 # Apps registration
 ntfrcv.NotificationReceiver(snmpEngine, cbFun)
+
 snmpEngine.transportDispatcher.jobStarted(1) # this job would never finish
-snmpEngine.transportDispatcher.runDispatcher()
+
+# Run I/O dispatcher which would receive queries and send confirmations
+try:
+    snmpEngine.transportDispatcher.runDispatcher()
+except:
+    snmpEngine.transportDispatcher.closeDispatcher()
+    raise
