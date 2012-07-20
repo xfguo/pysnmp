@@ -112,7 +112,7 @@ if errorIndication:
 #     with TRAP ID 'authenticationFailure' specified as a MIB symbol
 #     include managed object information 1.3.6.1.2.1.1.2.0 = 1.3.6.1.2.1.1.1
 errorIndication = ntfOrg.sendNotification(
-    ntforg.UsmUserData('test-user'),
+    ntforg.UsmUserData('usr-none-none'),
     ntforg.UnixTransportTarget('/tmp/snmp-manager'),
     'trap',
     (('SNMPv2-MIB', 'authenticationFailure'),),
