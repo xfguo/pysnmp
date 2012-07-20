@@ -3,11 +3,10 @@ from pysnmp.entity import engine, config
 from pysnmp.carrier.asynsock.dgram import udp, udp6, unix
 from pysnmp.entity.rfc3413 import ntforg, context
 from pysnmp.proto.api import v2c
-from pysnmp import debug
+#from pysnmp import debug
 
 ## Optional debugging ('all' enables full debugging)
 #debug.setLogger(debug.Debug('io', 'dsp', 'msgproc', 'secmod', 'app'))
-#debug.setLogger(debug.Debug('app'))
 
 # Create SNMP engine instance
 snmpEngine = engine.SnmpEngine()
