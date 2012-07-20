@@ -1,8 +1,5 @@
 # Various GETNEXT Command Generator uses
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-from pysnmp import debug
-
-#debug.setLogger(debug.Debug('secmod'))
 
 cmdGen = cmdgen.CommandGenerator()
 
