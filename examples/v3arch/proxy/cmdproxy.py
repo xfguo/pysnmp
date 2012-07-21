@@ -13,6 +13,7 @@
 from pysnmp.entity import engine, config
 from pysnmp.entity.rfc3413 import cmdrsp, cmdgen, context
 from pysnmp.proto.api import v2c
+from pysnmp.proto.acmod import void
 from pysnmp.carrier.asynsock.dgram import udp
 
 # Create SNMP engine with autogenernated engineID and pre-bound
@@ -74,7 +75,7 @@ snmpContext = context.SnmpContext(snmpEngine)
 
 
 class GetCommandProxy(cmdrsp.GetCommandResponder):
-    acmID = 0  # void access control method
+    acmID = void.accessModelID
     cmdGen = cmdgen.GetCommandGenerator()
     
     def handleMgmtOperation(self, snmpEngine, stateReference, contextName,
