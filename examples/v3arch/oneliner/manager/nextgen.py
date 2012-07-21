@@ -127,7 +127,7 @@ else:
 
 
 # Send a series of SNMP GETNEXT requests
-#     with SNMPv3, user 'usr-sha-aes256', SHA auth, AES256 privacy
+#     with SNMPv3, user 'usr-sha-aes128', SHA auth, AES128 privacy
 #     over Local Domain Sockets
 #     to an Agent at localhost:161
 #     for all OIDs past IF-MIB
@@ -136,9 +136,9 @@ else:
 # make sure IF-MIB.py is search path
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-        cmdgen.UsmUserData('usr-sha-aes256', 'authkey1', 'privkey1',
+        cmdgen.UsmUserData('usr-sha-aes128', 'authkey1', 'privkey1',
                            authProtocol=cmdgen.usmHMACSHAAuthProtocol,
-                           privProtocol=cmdgen.usmAesCfb256Protocol),
+                           privProtocol=cmdgen.usmAesCfb128Protocol),
         cmdgen.UdpTransportTarget(('localhost', 161)),
         (('IF-MIB', ''),),
         lexicographicMode=True, maxRows=20,
