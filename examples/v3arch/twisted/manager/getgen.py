@@ -4,41 +4,57 @@ from pysnmp.entity import engine, config
 from pysnmp.carrier.twisted import dispatch
 from pysnmp.carrier.twisted.dgram import udp
 from pysnmp.entity.rfc3413.twisted import cmdgen
+#from pysnmp import debug
 
+## Optional debugging ('all' enables full debugging)
+#debug.setLogger(debug.Debug('io', 'dsp', 'msgproc', 'secmod', 'app'))
+
+# Create SNMP engine instance
 snmpEngine = engine.SnmpEngine()
 
 # Set Twisted dispatcher
 snmpEngine.registerTransportDispatcher(dispatch.TwistedDispatcher())
 
-# v1/2 setup
-config.addV1System(snmpEngine, 'test-agent', 'public')
+#
+# SNMPv1/2c setup (if you use SNMPv1 or v2c)
+#
 
-# v3 setup
+## SecurityName <-> CommunityName mapping
+#config.addV1System(snmpEngine, 'my-area', 'public')
+
+## Specify security settings per SecurityName (SNMPv1 - 0, SNMPv2c - 1)
+#config.addTargetParams(snmpEngine, 'my-creds', 'my-area', 'noAuthNoPriv', 0)
+#config.addTargetParams(snmpEngine, 'my-creds', 'my-area', 'noAuthNoPriv', 1)
+
+#
+# SNMPv3/USM setup (choose any one if you use SNMPv3/USM)
+#
+
+# user: usr-md5-des, auth: MD5, priv DES
 config.addV3User(
-    snmpEngine, 'test-user',
+    snmpEngine, 'usr-md5-des',
     config.usmHMACMD5AuthProtocol, 'authkey1',
     config.usmDESPrivProtocol, 'privkey1'
-    )
+)
+config.addTargetParams(snmpEngine, 'my-creds', 'usr-md5-des', 'authPriv')
 
-# Transport params
-config.addTargetParams(snmpEngine, 'myParams', 'test-user', 'authPriv')
-#config.addTargetParams(snmpEngine, 'myParams', 'test-agent', 'noAuthNoPriv', 1)
-
-# Transport addresses
-config.addTargetAddr(
-    snmpEngine, 'myRouter', config.snmpUDPDomain,
-    ('127.0.0.1', 161), 'myParams'
-    )
-
-# Transport
+# UDP/IPv4
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpTwistedTransport().openClientMode()
-    )
+    udp.UdpTransport().openClientMode()
+)
+config.addTargetAddr(
+    snmpEngine, 'my-router',
+    udp.domainName, ('127.0.0.1', 161),
+    'my-creds'
+)
 
+#
 # Twisted API follows
+#
 
+# Error/response reciever
 def receiveResponse(cbCtx):
     (errorIndication, errorStatus, errorIndex, varBinds) = cbCtx
     if errorIndication:
@@ -56,11 +72,13 @@ def receiveResponse(cbCtx):
             print('%s = %s' % (oid.prettyPrint(), val.prettyPrint()))
     reactor.stop()
 
-getCmdGen = cmdgen.GetCommandGenerator()
-
-df = getCmdGen.sendReq(
-    snmpEngine, 'myRouter', (((1,3,6,1,2,1,1,1,0), None),)
-    )
+# Prepare request to be sent
+df = cmdgen.GetCommandGenerator().sendReq(
+         snmpEngine,
+         'my-router',
+         ( ('1.3.6.1.2.1.1.1.0', None), 
+           ('1.3.6.1.2.1.1.2.0', None) ),
+)
 
 df.addCallback(receiveResponse)
 
