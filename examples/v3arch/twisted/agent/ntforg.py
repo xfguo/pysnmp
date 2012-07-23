@@ -97,7 +97,7 @@ config.addTargetParams(snmpEngine, 'my-creds-3', 'usr-md5-des', 'authPriv')
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpTransport().openClientMode()
+    udp.UdpTwistedTransport().openClientMode()
 )
 config.addTargetAddr(
     snmpEngine, 'my-nms-1',

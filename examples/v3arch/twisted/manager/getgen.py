@@ -42,7 +42,7 @@ config.addTargetParams(snmpEngine, 'my-creds', 'usr-md5-des', 'authPriv')
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpTransport().openClientMode()
+    udp.UdpTwistedTransport().openClientMode()
 )
 config.addTargetAddr(
     snmpEngine, 'my-router',

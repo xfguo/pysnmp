@@ -93,7 +93,7 @@ config.addTargetParams(snmpEngine, 'my-creds', 'my-area', 'noAuthNoPriv', 0)
 config.addSocketTransport(
     snmpEngine,
     udp.domainName,
-    udp.UdpTransport().openClientMode()
+    udp.UdpTwistedTransport().openClientMode()
 )
 config.addTargetAddr(
     snmpEngine, 'my-router',
