@@ -5,7 +5,7 @@ from pysnmp.entity.rfc3413 import cmdgen
 #from pysnmp import debug
 
 ## Optional debugging ('all' enables full debugging)
-#debug.setLogger(debug.Debug('io', 'dsp', 'msgproc', 'secmod', 'app'))
+#debug.setLogger(debug.Debug('all', '!mibbuild', '!mibinstrum', '!mibview'))
 
 # Create SNMP engine instance
 snmpEngine = engine.SnmpEngine()
