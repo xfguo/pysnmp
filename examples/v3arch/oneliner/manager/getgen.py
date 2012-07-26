@@ -138,7 +138,7 @@ else:
     else:
         for name, val in varBinds:
             (modName, symName), indices = name
-            indices = '.'.join([x.prettyPrint() for x in indices ])
+            indices = '.'.join(['"%s"' % x.prettyPrint() for x in indices ])
             print('%s::%s.%s = %s' % (modName, symName, indices, val.prettyPrint()))
 
 

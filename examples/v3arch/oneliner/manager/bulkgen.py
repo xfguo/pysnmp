@@ -66,7 +66,7 @@ else:
         for varBindTableRow in varBindTable:
             for name, val in varBindTableRow:
                 (modName, symName), indices = name
-                indices = '.'.join([x.prettyPrint() for x in indices ])
+                indices = '.'.join(['"%s"' % x.prettyPrint() for x in indices ])
                 print('%s::%s.%s = %s' % (modName, symName, indices, val.prettyPrint()))
 
 
