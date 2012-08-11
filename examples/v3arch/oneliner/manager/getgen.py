@@ -38,7 +38,7 @@ else:
 errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         cmdgen.CommunityData('public', mpModel=0),
         cmdgen.UdpTransportTarget(('localhost', 161)),
-        ('iso', 'org', 'dod', 'internet', 'mgmt', 'mib-2', 'system', 'sysDescr', 0),
+        cmdgen.MibVariable('iso.org.dod.internet.mgmt.mib-2.system.sysDescr.0'),
         (('SNMPv2-MIB', 'sysDescr'), 0)
     )
 
@@ -137,9 +137,7 @@ else:
         )
     else:
         for name, val in varBinds:
-            (modName, symName), indices = name
-            indices = '.'.join(['"%s"' % x.prettyPrint() for x in indices ])
-            print('%s::%s.%s = %s' % (modName, symName, indices, val.prettyPrint()))
+            print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
 
 
 # Send SNMP GET request

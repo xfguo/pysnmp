@@ -90,9 +90,7 @@ else:
     else:
         for varBindTableRow in varBindTable:
             for name, val in varBindTableRow:
-                (modName, symName), indices = name
-                indices = '.'.join(['"%s"' % x.prettyPrint() for x in indices ])
-                print('%s::%s.%s = %s' % (modName, symName, indices, val.prettyPrint()))
+                print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
 
 
 # Send a series of SNMP GETNEXT requests
@@ -123,7 +121,7 @@ else:
     else:
         for varBindTableRow in varBindTable:
             for name, val in varBindTableRow:
-                print('%s = %s' % (name, val.prettyPrint()))
+                print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
 
 
 # Send a series of SNMP GETNEXT requests
@@ -141,7 +139,7 @@ errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
                            privProtocol=cmdgen.usmAesCfb128Protocol),
         cmdgen.UdpTransportTarget(('localhost', 161)),
         (('IF-MIB', ''),),
-        lexicographicMode=True, maxRows=20,
+        lexicographicMode=True, #maxRows=20,
         ignoreNonIncreasingOid=True
     )
 
@@ -157,5 +155,5 @@ else:
     else:
         for varBindTableRow in varBindTable:
             for name, val in varBindTableRow:
-                print('%s = %s' % (name, val.prettyPrint()))
+                print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
 

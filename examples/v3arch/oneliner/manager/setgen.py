@@ -39,6 +39,7 @@ errorIndication, errorStatus, errorIndex, varBinds = cmdGen.setCmd(
         cmdgen.CommunityData('public'),
         cmdgen.UdpTransportTarget(('localhost', 161)),
         ('1.3.6.1.2.1.1.2.0', rfc1902.ObjectName('1.3.6.1.4.1.20408.1.1')),
+        ('1.3.6.1.2.1.1.2.0', '1.3.6.1.4.1.20408.1.1'),
         ('1.3.6.1.2.1.1.5.0', rfc1902.OctetString('new system name'))
     )
 
@@ -82,8 +83,4 @@ else:
         )
     else:
         for name, val in varBinds:
-            (modName, symName), indices = name
-            indices = '.'.join([x.prettyPrint() for x in indices ])
-            print('%s::%s.%s = %s' % (modName, symName, indices, val.prettyPrint()))
-
-
+            print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
