@@ -1,5 +1,6 @@
 import sys
 from pysnmp.proto import rfc1902
+from pysnmp.smi.builder import ZipMibSource
 from pysnmp.error import PySnmpError
 from pyasn1.error import PyAsn1Error
 
@@ -19,7 +20,7 @@ class MibVariable:
         
     def __init__(self, *args):
         self.__args = args
-        self.__modNamesToLoad = None
+        self.__mibSourcesToAdd = self.__modNamesToLoad = None
         self.__state  = self.stDirty
 
     #
@@ -52,7 +53,15 @@ class MibVariable:
     def isFullyResolved(self):
         return not (self.__state & self.stUnresolved)
 
-    # a gateway to MibViewController to perform a deferred load
+    #
+    # A gateway to MIBs manipulation routines
+    #
+
+    def addMibSource(self, *mibSources):
+        self.__mibSourcesToAdd = mibSources
+        return self
+
+    # provides deferred MIBs load
     def loadMibs(self, *modNames):
         self.__modNamesToLoad = modNames
         return self
@@ -60,6 +69,13 @@ class MibVariable:
     # this would eventually be called by an entity which posses a
     # reference to MibViewController
     def resolveWithMib(self, mibViewController, oidOnly=False):
+        if self.__mibSourcesToAdd is not None:
+            mibSources = tuple(
+                [ ZipMibSource(x) for x in self.__mibSourcesToAdd ]
+            ) + mibViewController.mibBuilder.getMibSources()
+            mibViewController.mibBuilder.setMibSources(*mibSources)
+            self.__mibSourcesToAdd = None
+
         if self.__modNamesToLoad is not None:
             mibViewController.mibBuilder.loadModules(*self.__modNamesToLoad)
             self.__modNamesToLoad = None
@@ -202,5 +218,5 @@ class MibVariable:
                 return getattr(self.__oid, attr)
             raise AttributeError
         else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized for %s access' % (self.__class__.__name__, attr))
 
