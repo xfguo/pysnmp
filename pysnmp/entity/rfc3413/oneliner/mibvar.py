@@ -32,7 +32,7 @@ class MibVariable:
         if self.__state & (self.stOidOnly | self.stClean):
             return self.__oid
         else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
 
     def getLabel(self):
         if self.__state & self.stClean:
@@ -190,98 +190,98 @@ class MibVariable:
         if self.__state & self.stOidOnly:
             return str(self.__oid)
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __getitem__(self, i):
         if self.__state & self.stOidOnly:
             return self.__oid[i]
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __eq__(self, other):
         if self.__state & self.stOidOnly:
             return self.__oid == other
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __ne__(self, other):
         if self.__state & self.stOidOnly:
             return self.__oid != other
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __lt__(self, other):
         if self.__state & self.stOidOnly:
             return self.__oid < other
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __le__(self, other):
         if self.__state & self.stOidOnly:
             return self.__oid <= other
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __gt__(self, other):
         if self.__state & self.stOidOnly:
             return self.__oid > other
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __ge__(self, other):
         if self.__state & self.stOidOnly:
             return self.__oid >= other
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     if sys.version_info[0] <= 2:
         def __nonzero__(self):
             if self.__state & self.stOidOnly:
                 return bool(self.__oid)
             else:
-                raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+                raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
     else:
         def __bool__(self):
             if self.__state & self.stOidOnly:
                 return bool(self.__oid)
             else:
-                raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+                raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __hash__(self):
         if self.__state & self.stOidOnly:
             return hash(self.__oid)
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __len__(self):
         if self.__state & self.stOidOnly:
             return len(self.__oid)
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def __index__(self, i):
         if self.__state & self.stOidOnly:
             return self.__oid[i]
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def asTuple(self):
         if self.__state & self.stOidOnly:
             return self.__oid.asTuple()
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def clone(self, *args):
         if self.__state & self.stOidOnly:
             return self.__oid.clone(*args)
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def subtype(self, *args):
         if self.__state & self.stOidOnly:
             return self.__oid.subtype(*args)
         else:
-            raise PySnmpError('%s object not fully initialized' % self.__class__.__name__)
+            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
 
     def isPrefixOf(self, *args):
         if self.__state & self.stOidOnly:
