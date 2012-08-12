@@ -10,11 +10,11 @@ cmdGen = cmdgen.CommandGenerator()
 #     for two OIDs in string form
 #     stop when response OIDs leave the scopes of initial OIDs
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-        cmdgen.CommunityData('public'),
-        cmdgen.UdpTransportTarget(('localhost', 161)),
-        '1.3.6.1.2.1.2.2.1.2',
-        '1.3.6.1.2.1.2.2.1.3',
-    )
+    cmdgen.CommunityData('public'),
+    cmdgen.UdpTransportTarget(('localhost', 161)),
+    '1.3.6.1.2.1.2.2.1.2',
+    '1.3.6.1.2.1.2.2.1.3',
+)
 
 if errorIndication:
     print(errorIndication)
@@ -39,14 +39,14 @@ else:
 #     stop when response OIDs leave the scopes of initial OIDs
 # make sure IF-MIB.py is in search path
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-        cmdgen.CommunityData('public', mpModel=0),
-        cmdgen.UdpTransportTarget(('localhost', 161)),
-        (('IF-MIB', 'ifDescr'),),
-        (('IF-MIB', 'ifType'),),
-        (('IF-MIB', 'ifMtu'),),
-        (('IF-MIB', 'ifSpeed'),),
-        (('IF-MIB', 'ifPhysAddress'),)
-    )
+    cmdgen.CommunityData('public', mpModel=0),
+    cmdgen.UdpTransportTarget(('localhost', 161)),
+    cmdgen.MibVariable('IF-MIB', 'ifDescr'),
+    cmdgen.MibVariable('IF-MIB', 'ifType'),
+    cmdgen.MibVariable('IF-MIB', 'ifMtu'),
+    cmdgen.MibVariable('IF-MIB', 'ifSpeed'),
+    cmdgen.MibVariable('IF-MIB', 'ifPhysAddress')
+)
 
 if errorIndication:
     print(errorIndication)
@@ -72,11 +72,11 @@ else:
 #     perform response OIDs and values resolution at MIB
 # make sure IF-MIB.py is in search path
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-        cmdgen.UsmUserData('usr-md5-des', 'authkey1', 'privkey1'),
-        cmdgen.Udp6TransportTarget(('::1', 161)),
-        (('IF-MIB', 'ifEntry'),),
-        lookupNames=True, lookupValues=True
-    )
+    cmdgen.UsmUserData('usr-md5-des', 'authkey1', 'privkey1'),
+    cmdgen.Udp6TransportTarget(('::1', 161)),
+    cmdgen.MibVariable('IF-MIB', 'ifEntry'),
+    lookupNames=True, lookupValues=True
+)
 
 if errorIndication:
     print(errorIndication)
@@ -103,11 +103,11 @@ else:
 # make sure IF-MIB.py is in search path
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-        cmdgen.UsmUserData('usr-md5-none', 'authkey1'),
-        cmdgen.UdpTransportTarget(('localhost', 161)),
-        (('IF-MIB', ''),),
-        lookupValues=True
-    )
+    cmdgen.UsmUserData('usr-md5-none', 'authkey1'),
+    cmdgen.UdpTransportTarget(('localhost', 161)),
+    cmdgen.MibVariable('IF-MIB', ''),
+    lookupValues=True
+)
 
 if errorIndication:
     print(errorIndication)
@@ -134,14 +134,14 @@ else:
 # make sure IF-MIB.py is search path
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-        cmdgen.UsmUserData('usr-sha-aes128', 'authkey1', 'privkey1',
-                           authProtocol=cmdgen.usmHMACSHAAuthProtocol,
-                           privProtocol=cmdgen.usmAesCfb128Protocol),
-        cmdgen.UdpTransportTarget(('localhost', 161)),
-        (('IF-MIB', ''),),
-        lexicographicMode=True, maxRows=100,
-        ignoreNonIncreasingOid=True
-    )
+    cmdgen.UsmUserData('usr-sha-aes128', 'authkey1', 'privkey1',
+                       authProtocol=cmdgen.usmHMACSHAAuthProtocol,
+                       privProtocol=cmdgen.usmAesCfb128Protocol),
+    cmdgen.UdpTransportTarget(('localhost', 161)),
+    cmdgen.MibVariable('IF-MIB', ''),
+    lexicographicMode=True, maxRows=100,
+    ignoreNonIncreasingOid=True
+)
 
 if errorIndication:
     print(errorIndication)

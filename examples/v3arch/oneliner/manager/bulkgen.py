@@ -11,12 +11,12 @@ cmdGen = cmdgen.CommandGenerator()
 #     for two OIDs in string form
 #     stop when response OIDs leave the scopes of initial OIDs
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.bulkCmd(
-        cmdgen.CommunityData('public'),
-        cmdgen.UdpTransportTarget(('localhost', 161)),
-        0, 25,
-        '1.3.6.1.2.1.2.2.1.2',
-        '1.3.6.1.2.1.2.2.1.3',
-    )
+    cmdgen.CommunityData('public'),
+    cmdgen.UdpTransportTarget(('localhost', 161)),
+    0, 25,
+    '1.3.6.1.2.1.2.2.1.2',
+    '1.3.6.1.2.1.2.2.1.3',
+)
 
 if errorIndication:
     print(errorIndication)
@@ -44,14 +44,13 @@ else:
 # make sure IF-MIB.py and IP-MIB.py are in search path
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.bulkCmd(
-        cmdgen.UsmUserData('usr-md5-des', 'authkey1', 'privkey1'),
-        cmdgen.Udp6TransportTarget(('::1', 161)),
-        1, 25,
-        (('IP-MIB', 'ipAdEntAddr'),),
-        (('IF-MIB', 'ifEntry'),),
-        lookupNames=True, lookupValues=True,
-        maxRows=20
-    )
+    cmdgen.UsmUserData('usr-md5-des', 'authkey1', 'privkey1'),
+    cmdgen.Udp6TransportTarget(('::1', 161)),
+    1, 25,
+    cmdgen.MibVariable('IP-MIB', 'ipAdEntAddr'),
+    cmdgen.MibVariable('IF-MIB', 'ifEntry'),
+    lookupNames=True, lookupValues=True, maxRows=20
+)
 
 if errorIndication:
     print(errorIndication)
@@ -78,13 +77,12 @@ else:
 # make sure IF-MIB.py is search path
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.bulkCmd(
-        cmdgen.UsmUserData('usr-none-none'),
-        cmdgen.UdpTransportTarget(('localhost', 161)),
-        0, 50,
-        '1.3.6.1.2.1.1',
-        lexicographicMode=True, maxRows=100,
-        ignoreNonIncreasingOid=True
-    )
+    cmdgen.UsmUserData('usr-none-none'),
+    cmdgen.UdpTransportTarget(('localhost', 161)),
+    0, 50,
+    '1.3.6.1.2.1.1',
+    lexicographicMode=True, maxRows=100, ignoreNonIncreasingOid=True
+)
 
 if errorIndication:
     print(errorIndication)

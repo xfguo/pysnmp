@@ -14,10 +14,10 @@ errorIndication = ntfOrg.sendNotification(
     ntforg.CommunityData('public'),
     ntforg.UdpTransportTarget(('localhost', 162)),
     'trap',
-    (('SNMPv2-MIB', 'coldStart'),),
-    # MIB symbol: ((mib-name, mib-symbol), instance-id), new-value
-    ((('SNMPv2-MIB', 'sysName'), 0), 'new name')
-    )
+    ntforg.MibVariable('SNMPv2-MIB', 'coldStart'),
+    # MIB symbol: (mib-name, mib-symbol, instance-id), new-value
+    (ntforg.MibVariable('SNMPv2-MIB', 'sysName', 0), 'new name')
+)
 
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
@@ -40,7 +40,7 @@ errorIndication = ntfOrg.sendNotification(
     ('1.3.6.1.6.3.18.1.3.0', '127.0.0.1'),
     ('1.3.6.1.6.3.1.1.4.3.0', '1.3.6.1.4.1.20408.4.1.1.2'),
     ('1.3.6.1.2.1.1.1.0', rfc1902.OctetString('my system'))
-    )
+)
 
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
@@ -61,7 +61,7 @@ errorIndication = ntfOrg.sendNotification(
     '1.3.6.1.6.3.1.1.5.2',
     ('1.3.6.1.6.3.1.1.4.3.0', '1.3.6.1.4.1.20408.4.1.1.2'),
     ('1.3.6.1.2.1.1.1.0', rfc1902.OctetString('my system'))
-    )
+)
 
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
@@ -78,7 +78,7 @@ errorIndication = ntfOrg.sendNotification(
     'inform',
     '1.3.6.1.6.3.1.1.5.2',
     ('1.3.6.1.2.1.1.5.0', rfc1902.OctetString('system name'))
-    )
+)
 
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
@@ -96,10 +96,10 @@ errorIndication = ntfOrg.sendNotification(
                        privProtocol=ntforg.usmAesCfb128Protocol),
     ntforg.Udp6TransportTarget(('::1', 162)),
     'trap',
-    (('SNMPv2-MIB', 'authenticationFailure'),),
+    ntforg.MibVariable('SNMPv2-MIB', 'authenticationFailure'),
     ('1.3.6.1.2.1.1.1.0', rfc1902.OctetString('my system')),
     ('1.3.6.1.2.1.1.3.0', rfc1902.TimeTicks(567))
-    )
+)
 
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
@@ -107,17 +107,17 @@ if errorIndication:
 
 # Using
 #     SNMPv3 user 'usr-none-none', no auth, no priv
-#     over Local Domain Socket /tmp/snmp-manager
+#     over IPv4/UDP
 #     send TRAP notification
 #     with TRAP ID 'authenticationFailure' specified as a MIB symbol
 #     include managed object information 1.3.6.1.2.1.1.2.0 = 1.3.6.1.2.1.1.1
 errorIndication = ntfOrg.sendNotification(
     ntforg.UsmUserData('usr-none-none'),
-    ntforg.UnixTransportTarget('/tmp/snmp-manager'),
+    ntforg.UdpTransportTarget(('localhost', 162)),
     'trap',
-    (('SNMPv2-MIB', 'authenticationFailure'),),
+    ntforg.MibVariable('SNMPv2-MIB', 'authenticationFailure'),
     ('1.3.6.1.2.1.1.2.0', rfc1902.ObjectName('1.3.6.1.2.1.1.1'))
-    )
+)
 
 if errorIndication:
     print('Notification not sent: %s' % errorIndication)
