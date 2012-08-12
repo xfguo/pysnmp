@@ -129,7 +129,7 @@ else:
 #     over Local Domain Sockets
 #     to an Agent at localhost:161
 #     for all OIDs past IF-MIB
-#     run till end-of-mib condition is reported by Agent OR maxRows == 20
+#     run till end-of-mib condition is reported by Agent OR maxRows == 100
 #     ignoring non-increasing OIDs whenever reported by Agent
 # make sure IF-MIB.py is search path
 
@@ -139,7 +139,7 @@ errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
                            privProtocol=cmdgen.usmAesCfb128Protocol),
         cmdgen.UdpTransportTarget(('localhost', 161)),
         (('IF-MIB', ''),),
-        lexicographicMode=True, #maxRows=20,
+        lexicographicMode=True, maxRows=100,
         ignoreNonIncreasingOid=True
     )
 
