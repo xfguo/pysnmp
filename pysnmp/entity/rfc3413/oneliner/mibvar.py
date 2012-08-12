@@ -206,15 +206,22 @@ class MibVariable:
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, ', '.join([ repr(x) for x in self.__args]))
 
-   # Redirect some attrs access to the OID object to behave alike
+    # Redirect some attrs access to the OID object to behave alike
+
+    def __getitem__(self, i):  # Py3 needs this
+        if self.__state & self.stOidOnly:
+            return self.__oid[i]
+        else:
+            raise PySnmpError('%s object not properly initialized for %s access' % (self.__class__.__name__, attr))
 
     def __getattr__(self, attr):
         if self.__state & self.stOidOnly:
-            if attr in ('__str__', '__getitem__', '__eq__', '__ne__',
+            if attr in ('__str__', '__eq__', '__ne__',
                         '__lt__', '__le__', '__ge__', '__ge__',
                         '__nonzero__', '__bool__', '__hash__', '__len__',
-                        '__index__',
-                        'asTuple', 'clone', 'subtype', 'isPrefixOf'):
+                        '__index__', '__add__', '__radd__',
+                        'asTuple', 'clone', 'subtype', 'isPrefixOf',
+                        'isSameTypeWith', 'isSuperTypeOf'):
                 return getattr(self.__oid, attr)
             raise AttributeError
         else:
