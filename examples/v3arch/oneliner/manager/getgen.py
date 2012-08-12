@@ -11,7 +11,7 @@ cmdGen = cmdgen.CommandGenerator()
 errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
     cmdgen.CommunityData('public'),
     cmdgen.UdpTransportTarget(('localhost', 161)),
-    '1.3.6.1.2.1.1.1.0'
+    '1.3.6.1.2.1.1.1.0',
     '1.3.6.1.2.1.1.6.0'
 )
 
