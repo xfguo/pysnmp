@@ -71,7 +71,8 @@ else:
 #     with SNMPv3, user 'usr-none-none', no authentication, no privacy
 #     over Local Domain Sockets
 #     to an Agent at localhost:161
-#     for all OIDs past 1.3.6.1.2.1.1
+#     for all OIDs past TCP-MIB::tcpConnTable
+#     TCP-MIB will be searched by a user-specified path
 #     run till end-of-mib condition is reported by Agent OR maxRows == 20
 #     ignoring non-increasing OIDs whenever reported by Agent
 # make sure IF-MIB.py is search path
@@ -80,7 +81,7 @@ errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.bulkCmd(
     cmdgen.UsmUserData('usr-none-none'),
     cmdgen.UdpTransportTarget(('localhost', 161)),
     0, 50,
-    '1.3.6.1.2.1.1',
+    cmdgen.MibVariable('TCP-MIB', 'tcpConnTable').addMibSource('/tmp/mymibs'),
     lexicographicMode=True, maxRows=100, ignoreNonIncreasingOid=True
 )
 
