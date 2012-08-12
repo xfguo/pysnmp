@@ -22,6 +22,9 @@ class MibVariable:
         self.__modNamesToLoad = None
         self.__state  = self.stDirty
 
+    #
+    # public API
+    #
     def getMibSymbol(self):
         if self.__state & self.stClean:
             return self.__modName, self.__symName, self.__indices
@@ -49,10 +52,13 @@ class MibVariable:
     def isFullyResolved(self):
         return not (self.__state & self.stUnresolved)
 
+    # a gateway to MibViewController to perform a deferred load
     def loadMibs(self, *modNames):
         self.__modNamesToLoad = modNames
         return self
 
+    # this would eventually be called by an entity which posses a
+    # reference to MibViewController
     def resolveWithMib(self, mibViewController, oidOnly=False):
         if self.__modNamesToLoad is not None:
             mibViewController.mibBuilder.loadModules(*self.__modNamesToLoad)
@@ -186,107 +192,15 @@ class MibVariable:
 
    # Redirect some attrs access to the OID object to behave alike
 
-    def __str__(self):
+    def __getattr__(self, attr):
         if self.__state & self.stOidOnly:
-            return str(self.__oid)
+            if attr in ('__str__', '__getitem__', '__eq__', '__ne__',
+                        '__lt__', '__le__', '__ge__', '__ge__',
+                        '__nonzero__', '__bool__', '__hash__', '__len__',
+                        '__index__',
+                        'asTuple', 'clone', 'subtype', 'isPrefixOf'):
+                return getattr(self.__oid, attr)
+            raise AttributeError
         else:
             raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __getitem__(self, i):
-        if self.__state & self.stOidOnly:
-            return self.__oid[i]
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __eq__(self, other):
-        if self.__state & self.stOidOnly:
-            return self.__oid == other
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __ne__(self, other):
-        if self.__state & self.stOidOnly:
-            return self.__oid != other
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __lt__(self, other):
-        if self.__state & self.stOidOnly:
-            return self.__oid < other
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __le__(self, other):
-        if self.__state & self.stOidOnly:
-            return self.__oid <= other
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __gt__(self, other):
-        if self.__state & self.stOidOnly:
-            return self.__oid > other
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __ge__(self, other):
-        if self.__state & self.stOidOnly:
-            return self.__oid >= other
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    if sys.version_info[0] <= 2:
-        def __nonzero__(self):
-            if self.__state & self.stOidOnly:
-                return bool(self.__oid)
-            else:
-                raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-    else:
-        def __bool__(self):
-            if self.__state & self.stOidOnly:
-                return bool(self.__oid)
-            else:
-                raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __hash__(self):
-        if self.__state & self.stOidOnly:
-            return hash(self.__oid)
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __len__(self):
-        if self.__state & self.stOidOnly:
-            return len(self.__oid)
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def __index__(self, i):
-        if self.__state & self.stOidOnly:
-            return self.__oid[i]
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def asTuple(self):
-        if self.__state & self.stOidOnly:
-            return self.__oid.asTuple()
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def clone(self, *args):
-        if self.__state & self.stOidOnly:
-            return self.__oid.clone(*args)
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def subtype(self, *args):
-        if self.__state & self.stOidOnly:
-            return self.__oid.subtype(*args)
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
-    def isPrefixOf(self, *args):
-        if self.__state & self.stOidOnly:
-            return self.__oid.isPrefixOf(*args)
-        else:
-            raise PySnmpError('%s object not properly initialized' % self.__class__.__name__)
-
 
