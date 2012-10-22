@@ -25,7 +25,7 @@ usmNoPrivProtocol = config.usmNoPrivProtocol
 
 nextID = nextid.Integer(0xffffffff)
 
-class AsynCommandGenerator:
+class GeventCommandGenerator:
     _null = univ.Null('')
     def __init__(self, snmpEngine=None):
         self.__knownAuths = {}
@@ -168,7 +168,7 @@ class AsynCommandGenerator:
             _varBinds.append((name, value))
         return _varBinds
 
-    # Async SNMP apps
+    # Gevent SNMP apps
 
     def getCmd(self, authData, transportTarget, varNames, cbInfo):
         (cbFun, cbCtx) = cbInfo
@@ -181,7 +181,7 @@ class AsynCommandGenerator:
             authData.contextEngineId, authData.contextName
             )
     
-    asyncGetCmd = getCmd
+    geventGetCmd = getCmd
     
     def setCmd(self, authData, transportTarget, varBinds, cbInfo):
         (cbFun, cbCtx) = cbInfo
@@ -211,7 +211,7 @@ class AsynCommandGenerator:
             authData.contextEngineId, authData.contextName
             )
     
-    asyncSetCmd = setCmd
+    geventSetCmd = setCmd
     
     def nextCmd(self, authData, transportTarget, varNames, cbInfo):
         (cbFun, cbCtx) = cbInfo
@@ -224,7 +224,7 @@ class AsynCommandGenerator:
             authData.contextEngineId, authData.contextName
             )
 
-    asyncNextCmd = nextCmd
+    geventNextCmd = nextCmd
     
     def bulkCmd(self, authData, transportTarget, nonRepeaters, maxRepetitions,
                 varNames, cbInfo):
@@ -239,18 +239,18 @@ class AsynCommandGenerator:
             authData.contextEngineId, authData.contextName
             )
 
-    asyncBulkCmd = bulkCmd
+    geventBulkCmd = bulkCmd
 
 class CommandGenerator:
-    def __init__(self, snmpEngine=None, asynCmdGen=None):
-        if asynCmdGen is None:
-            self.__asynCmdGen = AsynCommandGenerator(snmpEngine)
+    def __init__(self, snmpEngine=None, geventCmdGen=None):
+        if geventCmdGen is None:
+            self.__geventCmdGen = GeventCommandGenerator(snmpEngine)
         else:
-            self.__asynCmdGen = asynCmdGen
+            self.__geventCmdGen = geventCmdGen
 
         # compatibility attributes
-        self.snmpEngine = self.__asynCmdGen.snmpEngine
-        self.mibViewController = self.__asynCmdGen.mibViewController
+        self.snmpEngine = self.__geventCmdGen.snmpEngine
+        self.mibViewController = self.__geventCmdGen.mibViewController
        
     def getCmd(self, authData, transportTarget, *varNames, **kwargs):
         def __cbFun(
@@ -266,12 +266,12 @@ class CommandGenerator:
         lookupValues = kwargs.get('lookupValues', False)
 
         appReturn = {}
-        self.__asynCmdGen.getCmd(
+        self.__geventCmdGen.getCmd(
             authData, transportTarget, varNames, (__cbFun, appReturn)
             )
-        self.__asynCmdGen.snmpEngine.transportDispatcher.runDispatcher()
+        self.__geventCmdGen.snmpEngine.transportDispatcher.runDispatcher()
         if lookupNames or lookupValues:
-            appReturn['varBinds'] = self.__asynCmdGen.unmakeVarBinds(
+            appReturn['varBinds'] = self.__geventCmdGen.unmakeVarBinds(
                                         appReturn['varBinds'],
                                         lookupNames=lookupNames,
                                         lookupValues=lookupValues
@@ -295,12 +295,12 @@ class CommandGenerator:
         lookupValues = kwargs.get('lookupValues', False)
 
         appReturn = {}
-        self.__asynCmdGen.setCmd(
+        self.__geventCmdGen.setCmd(
             authData, transportTarget, varBinds, (__cbFun, appReturn)
             )
-        self.__asynCmdGen.snmpEngine.transportDispatcher.runDispatcher()
+        self.__geventCmdGen.snmpEngine.transportDispatcher.runDispatcher()
         if lookupNames or lookupValues:
-            appReturn['varBinds'] = self.__asynCmdGen.unmakeVarBinds(
+            appReturn['varBinds'] = self.__geventCmdGen.unmakeVarBinds(
                                         appReturn['varBinds'],
                                         lookupNames=lookupNames,
                                         lookupValues=lookupValues
@@ -375,21 +375,21 @@ class CommandGenerator:
         maxRows = kwargs.get('maxRows', 0)
         ignoreNonIncreasingOid = kwargs.get('ignoreNonIncreasingOid', False)
 
-        varBindHead = [ univ.ObjectIdentifier(x[0]) for x in self.__asynCmdGen.makeReadVarBinds(varNames) ]
+        varBindHead = [ univ.ObjectIdentifier(x[0]) for x in self.__geventCmdGen.makeReadVarBinds(varNames) ]
 
         appReturn = {}
-        self.__asynCmdGen.nextCmd(
+        self.__geventCmdGen.nextCmd(
             authData, transportTarget, varNames,
             (__cbFun, (self, varBindHead, [], appReturn))
             )
 
-        self.__asynCmdGen.snmpEngine.transportDispatcher.runDispatcher()
+        self.__geventCmdGen.snmpEngine.transportDispatcher.runDispatcher()
 
         if lookupNames or lookupValues:
             _varBindTable = []
             for varBindTableRow in appReturn['varBindTable']:
                 _varBindTable.append(
-                    self.__asynCmdGen.unmakeVarBinds(
+                    self.__geventCmdGen.unmakeVarBinds(
                         varBindTableRow,
                         lookupNames=lookupNames,
                         lookupValues=lookupValues
@@ -469,22 +469,22 @@ class CommandGenerator:
         maxRows = kwargs.get('maxRows', 0)
         ignoreNonIncreasingOid = kwargs.get('ignoreNonIncreasingOid', False)
 
-        varBindHead = [ univ.ObjectIdentifier(x[0]) for x in self.__asynCmdGen.makeReadVarBinds(varNames) ]
+        varBindHead = [ univ.ObjectIdentifier(x[0]) for x in self.__geventCmdGen.makeReadVarBinds(varNames) ]
 
         appReturn = {}
         
-        self.__asynCmdGen.bulkCmd(
+        self.__geventCmdGen.bulkCmd(
             authData, transportTarget, nonRepeaters, maxRepetitions,
             varNames, (__cbFun, (self, varBindHead, [], appReturn))
             )
 
-        self.__asynCmdGen.snmpEngine.transportDispatcher.runDispatcher()
+        self.__geventCmdGen.snmpEngine.transportDispatcher.runDispatcher()
 
         if lookupNames or lookupValues:
             _varBindTable = []
             for varBindTableRow in appReturn['varBindTable']:
                 _varBindTable.append(
-                    self.__asynCmdGen.unmakeVarBinds(
+                    self.__geventCmdGen.unmakeVarBinds(
                         varBindTableRow,
                         lookupNames=lookupNames,
                         lookupValues=lookupValues

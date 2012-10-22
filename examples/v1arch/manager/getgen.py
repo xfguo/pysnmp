@@ -1,6 +1,6 @@
 # GET Command Generator
-from pysnmp.carrier.asynsock.dispatch import AsynsockDispatcher
-from pysnmp.carrier.asynsock.dgram import udp, udp6, unix
+from pysnmp.carrier.gevent.dispatch import GeventDispatcher
+from pysnmp.carrier.gevent.dgram import udp, udp6, unix
 from pyasn1.codec.ber import encoder, decoder
 from pysnmp.proto import api
 from time import time
@@ -46,30 +46,19 @@ def cbRecvFun(transportDispatcher, transportDomain, transportAddress,
             transportDispatcher.jobFinished(1)
     return wholeMsg
 
-transportDispatcher = AsynsockDispatcher()
+transportDispatcher = GeventDispatcher()
 
 transportDispatcher.registerRecvCbFun(cbRecvFun)
 transportDispatcher.registerTimerCbFun(cbTimerFun)
 
 # UDP/IPv4
 transportDispatcher.registerTransport(
-    udp.domainName, udp.UdpSocketTransport().openClientMode()
+    udp.domainName, udp.UdpTransport().openClientMode()
 )
 
 # Pass message to dispatcher
 transportDispatcher.sendMessage(
     encoder.encode(reqMsg), udp.domainName, ('localhost', 161)
-)
-transportDispatcher.jobStarted(1)
-
-## UDP/IPv6 (second copy of the same PDU will be sent)
-transportDispatcher.registerTransport(
-    udp6.domainName, udp6.Udp6SocketTransport().openClientMode()
-)
-
-# Pass message to dispatcher
-transportDispatcher.sendMessage(
-    encoder.encode(reqMsg), udp6.domainName, ('::1', 161)
 )
 transportDispatcher.jobStarted(1)
 

@@ -108,6 +108,8 @@ params.update( {
                   'pysnmp.carrier.asynsock.dgram',
                   'pysnmp.carrier.twisted',
                   'pysnmp.carrier.twisted.dgram',                   
+                  'pysnmp.carrier.gevent',
+                  'pysnmp.carrier.gevent.dgram',                   
                   'pysnmp.entity',
                   'pysnmp.entity.rfc3413',
                   'pysnmp.entity.rfc3413.oneliner',

@@ -1,6 +1,5 @@
 # Implements I/O over asynchronous sockets
 from time import time
-from select import select
 from asyncore import socket_map
 from pysnmp.carrier.base import AbstractTransportDispatcher
 from asyncore import poll

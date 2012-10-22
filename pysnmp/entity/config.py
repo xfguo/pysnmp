@@ -1,8 +1,8 @@
 # Initial SNMP engine configuration functions. During further operation,
 # SNMP engine might be configured remotely (through SNMP).
 from pyasn1.compat.octets import null
-from pysnmp.carrier.asynsock import dispatch
-from pysnmp.carrier.asynsock.dgram import udp, udp6, unix
+from pysnmp.carrier.gevent import dispatch
+from pysnmp.carrier.gevent.dgram import udp, udp6, unix
 from pysnmp.proto import rfc3412
 from pysnmp.entity import engine
 from pysnmp.proto.secmod.rfc3414.auth import hmacmd5, hmacsha, noauth
@@ -280,7 +280,7 @@ def delTargetAddr(snmpEngine, addrName):
 def addSocketTransport(snmpEngine, transportDomain, transport):
     """Add transport object to socket dispatcher of snmpEngine"""
     if not snmpEngine.transportDispatcher:
-        snmpEngine.registerTransportDispatcher(dispatch.AsynsockDispatcher())
+        snmpEngine.registerTransportDispatcher(dispatch.GeventDispatcher())
     snmpEngine.transportDispatcher.registerTransport(
         transportDomain, transport
         )

@@ -1,5 +1,5 @@
 import socket, sys
-from pysnmp.carrier.asynsock.dgram import udp, udp6, unix
+from pysnmp.carrier.gevent.dgram import udp, udp6, unix
 from pyasn1.compat.octets import null
 
 class _AbstractTransportTarget:
@@ -30,7 +30,7 @@ class _AbstractTransportTarget:
  
 class UdpTransportTarget(_AbstractTransportTarget):
     transportDomain = udp.domainName
-    protoTransport = udp.UdpSocketTransport
+    protoTransport = udp.UdpTransport
     def __init__(self, transportAddr, timeout=1, retries=5, tagList=null):
         _AbstractTransportTarget.__init__(self, transportAddr, timeout,
                                           retries, tagList)
@@ -45,7 +45,7 @@ class UdpTransportTarget(_AbstractTransportTarget):
 
 class Udp6TransportTarget(_AbstractTransportTarget):
     transportDomain = udp6.domainName
-    protoTransport = udp6.Udp6SocketTransport
+    protoTransport = udp6.Udp6Transport
     def __init__(self, transportAddr, timeout=1, retries=5, tagList=null):
         _AbstractTransportTarget.__init__(self, transportAddr, timeout,
                                           retries, tagList)
@@ -60,6 +60,6 @@ class Udp6TransportTarget(_AbstractTransportTarget):
 
 class UnixTransportTarget(_AbstractTransportTarget):
     transportDomain = unix.domainName
-    protoTransport = unix.UnixSocketTransport
+    protoTransport = unix.UnixTransport
 
 
