@@ -81,23 +81,27 @@ class DgramGeventTransport(AbstractGeventTransport):
             
             self.socket.sendto(outgoingMessage, transportAddress)
             
-	    # Recv
+            # Recv
             socket.wait_read(self.socket.fileno())
             
             incomingMessage, transportAddress = self.socket.recvfrom(65535)
             debug.logger & debug.flagIO and debug.logger('loop: transportAddress %r -> %r incomingMessage %s' % (transportAddress, self.socket.getsockname(), debug.hexdump(incomingMessage)))
             
+            tick_timeout.cancel()
             if not incomingMessage:
-	        # XXX: handle close here?
+                # XXX: handle close here?
                 return
             else:
                 self._cbFun(self, transportAddress, incomingMessage)
                 return
         except Timeout, t:
+            # XXX: better implements
             debug.logger & debug.flagIO and debug.logger('loop: tick timeout')
             if time_tick_handler:
                 time_tick_handler(time())
-            t.start()
+            t.cancel()
+            tick_timeout = Timeout(timeout)
+            tick_timeout.start()
         except socket.error:
             if sys.exc_info()[1].args[0] in sockErrors:
                 debug.logger & debug.flagIO and debug.logger('loop: ignoring socket error %s' % (sys.exc_info()[1],))
