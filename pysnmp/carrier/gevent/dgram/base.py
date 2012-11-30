@@ -20,10 +20,10 @@ from time import time
 import errno, sys
 from pysnmp.carrier.gevent.base import AbstractGeventTransport
 from pysnmp.carrier import error
-from pysnmp import debug
 from gevent import select
 
-debug.setLogger(debug.Debug('all', '!mibbuild', '!mibinstrum', '!mibview'))
+from pysnmp import debug
+#debug.setLogger(debug.Debug('all', '!mibbuild', '!mibinstrum', '!mibview'))
 
 sockErrors = { # Ignore these socket errors
     errno.ESHUTDOWN: 1,
