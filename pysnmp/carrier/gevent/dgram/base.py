@@ -15,13 +15,15 @@
 #
 
 from gevent import socket
-from gevent import Timeout
 from gevent.queue import Queue
 from time import time
 import errno, sys
 from pysnmp.carrier.gevent.base import AbstractGeventTransport
 from pysnmp.carrier import error
 from pysnmp import debug
+from gevent import select
+
+debug.setLogger(debug.Debug('all', '!mibbuild', '!mibinstrum', '!mibview'))
 
 sockErrors = { # Ignore these socket errors
     errno.ESHUTDOWN: 1,
@@ -64,44 +66,45 @@ class DgramGeventTransport(AbstractGeventTransport):
         except socket.error:
             raise error.CarrierError('bind() for %s failed: %s' % (iface, sys.exc_info()[1],))
         return self
-
-    def loop(self, timeout=0.0, time_tick_handler = None):
-        tick_timeout = Timeout(timeout)
+    def _send(self, outgoingMessage, transportAddress):
+        debug.logger & debug.flagIO and debug.logger('handle_write: transportAddress %r -> %r outgoingMessage %s' % (self.socket.getsockname(), transportAddress, "" and debug.hexdump(outgoingMessage)))
+        if not transportAddress:
+            debug.logger & debug.flagIO and debug.logger('handle_write: missing dst address, loosing outgoing msg')
+            return
+        
+        self.socket.sendto(outgoingMessage, transportAddress)
+        
+    def loop(self, timeout, time_tick_handler, jobsArePending):
         try:
+            # send
             outgoingMessage, transportAddress = self.__outQueue.get()
-            debug.logger & debug.flagIO and debug.logger('handle_write: transportAddress %r -> %r outgoingMessage %s' % (self.socket.getsockname(), transportAddress, debug.hexdump(outgoingMessage)))
-            if not transportAddress:
-                debug.logger & debug.flagIO and debug.logger('handle_write: missing dst address, loosing outgoing msg')
-                return
-            # Start timer
-            tick_timeout.start()
+            self._send(outgoingMessage, transportAddress)
 
-            # Send
-            socket.wait_write(self.socket.fileno())
-            
-            self.socket.sendto(outgoingMessage, transportAddress)
-            
-            # Recv
-            socket.wait_read(self.socket.fileno())
+            while True:
+                rlist, wlist, xlist = select.select([self.socket.fileno()], [], [], timeout)
+                if rlist:
+                    break
+                else:
+                    time_tick_handler(time())
+                    if not self.__outQueue.empty():
+                        outgoingMessage, transportAddress = self.__outQueue.get()
+                        self._send(outgoingMessage, transportAddress)
+                        
+                    if not jobsArePending():
+                        debug.logger & debug.flagIO and debug.logger("loop: can't get response.")
+                        return
+                    debug.logger & debug.flagIO and debug.logger('loop: tick timeout')
+                        
             
             incomingMessage, transportAddress = self.socket.recvfrom(65535)
-            debug.logger & debug.flagIO and debug.logger('loop: transportAddress %r -> %r incomingMessage %s' % (transportAddress, self.socket.getsockname(), debug.hexdump(incomingMessage)))
+            debug.logger & debug.flagIO and debug.logger('loop: transportAddress %r -> %r incomingMessage %s' % (transportAddress, self.socket.getsockname(), "" and debug.hexdump(incomingMessage)))
             
-            tick_timeout.cancel()
             if not incomingMessage:
                 # XXX: handle close here?
                 return
             else:
                 self._cbFun(self, transportAddress, incomingMessage)
                 return
-        except Timeout, t:
-            # XXX: better implements
-            debug.logger & debug.flagIO and debug.logger('loop: tick timeout')
-            if time_tick_handler:
-                time_tick_handler(time())
-            t.cancel()
-            tick_timeout = Timeout(timeout)
-            tick_timeout.start()
         except socket.error:
             if sys.exc_info()[1].args[0] in sockErrors:
                 debug.logger & debug.flagIO and debug.logger('loop: ignoring socket error %s' % (sys.exc_info()[1],))
@@ -109,4 +112,4 @@ class DgramGeventTransport(AbstractGeventTransport):
                 return
             else:
                 raise error.CarrierError('loop: sendto or recvfrom failed for %s: %s' % (transportAddress, sys.exc_info()[1]))
-            
+

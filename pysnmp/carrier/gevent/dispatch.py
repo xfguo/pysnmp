@@ -34,5 +34,5 @@ class GeventDispatcher(AbstractTransportDispatcher):
         # FIXME: we only support one transport, we should listen all of the transport in each coroutine, 
         #        and commuicate with gevent.queue
         while self.jobsArePending():
-            self.transport.loop(timeout and timeout or self.timeout, self.handleTimerTick)
+            self.transport.loop(timeout and timeout or self.timeout, self.handleTimerTick, self.jobsArePending)
             
