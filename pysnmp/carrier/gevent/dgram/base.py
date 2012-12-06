@@ -14,13 +14,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-from gevent import socket
-from gevent.queue import Queue
+from gevent import socket, select, Greenlet
+from gevent.queue import Queue, Empty
+from gevent.event import Event
 from time import time
 import errno, sys
 from pysnmp.carrier.gevent.base import AbstractGeventTransport
 from pysnmp.carrier import error
-from gevent import select
 
 from pysnmp import debug
 #debug.setLogger(debug.Debug('all', '!mibbuild', '!mibinstrum', '!mibview'))
@@ -40,17 +40,39 @@ except AttributeError:
     # Windows sockets do not have EBADFD
     pass
 
+class SocketRecvWaiter(Greenlet):
+    def __init__(self, socket, outbox, event):
+        self.socket = socket
+        self.outbox = outbox
+        self.event = event
+
+        Greenlet.__init__(self)
+    def _run(self):
+        self.running = True
+        while self.running:
+            rlist, wlist, xlist = select.select([self.socket.fileno()], [], [])
+            if rlist:
+                incomingMessage, transportAddress = self.socket.recvfrom(65535)
+                debug.logger & debug.flagIO and debug.logger('loop: transportAddress %r -> %r incomingMessage %s' % (transportAddress, self.socket.getsockname(), "" and debug.hexdump(incomingMessage)))
+                
+                self.outbox.put_nowait((transportAddress, incomingMessage))
+                self.event.set()
+
+
 class DgramGeventTransport(AbstractGeventTransport):
     sockType = socket.SOCK_DGRAM
     retryCount = 3; retryInterval = 1
     def __init__(self, sock=None):
         self.__outQueue = Queue()
+        self.__inQueue = Queue()
+        self.__queuesEvent = Event()
         AbstractGeventTransport.__init__(self, sock)
     
     def sendMessage(self, outgoingMessage, transportAddress):
         self.__outQueue.put_nowait(
             (outgoingMessage, transportAddress)
             )
+        self.__queuesEvent.set()
     
     def openClientMode(self, iface=None):
         if iface is not None:
@@ -58,6 +80,9 @@ class DgramGeventTransport(AbstractGeventTransport):
                 self.socket.bind(iface)
             except socket.error:
                 raise error.CarrierError('bind() for %s failed: %s' % (iface is None and "<all local>" or iface, sys.exc_info()[1],))
+        
+        self.srw = SocketRecvWaiter(self.socket, self.__inQueue, self.__queuesEvent)
+        self.srw.start()
         return self
     
     def openServerMode(self, iface):
@@ -65,6 +90,9 @@ class DgramGeventTransport(AbstractGeventTransport):
             self.socket.bind(iface)
         except socket.error:
             raise error.CarrierError('bind() for %s failed: %s' % (iface, sys.exc_info()[1],))
+        
+        self.srw = SocketRecvWaiter(self.socket, self.__inQueue, self.__queuesEvent)
+        self.srw.start()
         return self
     def _send(self, outgoingMessage, transportAddress):
         debug.logger & debug.flagIO and debug.logger('handle_write: transportAddress %r -> %r outgoingMessage %s' % (self.socket.getsockname(), transportAddress, "" and debug.hexdump(outgoingMessage)))
@@ -76,33 +104,36 @@ class DgramGeventTransport(AbstractGeventTransport):
         
     def loop(self, timeout, time_tick_handler, jobsArePending):
         try:
-            # send
-            outgoingMessage, transportAddress = self.__outQueue.get()
-            self._send(outgoingMessage, transportAddress)
+            # wait until out queue or socket recv event.
+            self.__queuesEvent.wait()
 
-            while True:
-                rlist, wlist, xlist = select.select([self.socket.fileno()], [], [], timeout)
-                if rlist:
-                    break
-                else:
-                    time_tick_handler(time())
-                    if not self.__outQueue.empty():
-                        outgoingMessage, transportAddress = self.__outQueue.get()
-                        self._send(outgoingMessage, transportAddress)
-                        
-                    if not jobsArePending():
-                        debug.logger & debug.flagIO and debug.logger("loop: can't get response.")
-                        return
-                    debug.logger & debug.flagIO and debug.logger('loop: tick timeout')
-                        
-            
-            incomingMessage, transportAddress = self.socket.recvfrom(65535)
-            debug.logger & debug.flagIO and debug.logger('loop: transportAddress %r -> %r incomingMessage %s' % (transportAddress, self.socket.getsockname(), "" and debug.hexdump(incomingMessage)))
-            
-            if not incomingMessage:
-                # XXX: handle close here?
-                return
-            else:
+            # clear event first
+            self.__queuesEvent.clear()
+
+            # handle send
+            if not self.__outQueue.empty():
+                outgoingMessage, transportAddress = self.__outQueue.get_nowait()
+                self._send(outgoingMessage, transportAddress)
+    
+                while True:
+                    try:
+                        transportAddress, incomingMessage = self.__inQueue.get(timeout = timeout)
+                        self._cbFun(self, transportAddress, incomingMessage)
+                    except Empty:
+                        time_tick_handler(time())
+                        debug.logger & debug.flagIO and debug.logger('loop: tick timeout')
+
+                        if not self.__outQueue.empty():
+                            outgoingMessage, transportAddress = self.__outQueue.get_nowait()
+                            self._send(outgoingMessage, transportAddress)
+                    finally:
+                        if not jobsArePending():
+                            debug.logger & debug.flagIO and debug.logger("loop: can't get response.")
+                            return
+
+            # handle recv
+            if not self.__inQueue.empty():
+                transportAddress, incomingMessage = self.__inQueue.get_nowait()
                 self._cbFun(self, transportAddress, incomingMessage)
                 return
         except socket.error:
